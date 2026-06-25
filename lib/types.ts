@@ -18,15 +18,19 @@ export interface Song {
   nombre: string
   artista: string
   tono_original?: string
+  bpm?: number
+  compas?: string
   link_spotify?: string
   link_letras?: string
+  link_recursos?: string
+  tags?: string[]
   notas?: string
   created_at: string
 }
 
 export interface Service {
   id: string
-  fecha: string          // ISO date string
+  fecha: string
   titulo: string
   created_at: string
 }
@@ -46,7 +50,7 @@ export interface SetlistItem {
 export interface BandaAssignment {
   id: string
   service_id: string
-  posicion: 'AG1' | 'AG2' | 'EG' | 'KEYS' | 'BASS' | 'DRUMS' | 'MD' | 'SONIDO' | 'VX1' | 'VX2' | 'VX3' | 'VX4'
+  posicion: 'AG1'|'AG2'|'EG'|'KEYS'|'BASS'|'DRUMS'|'MD'|'SONIDO'|'VX1'|'VX2'|'VX3'|'VX4'
   member_id?: string
   member?: Member
 }
@@ -58,7 +62,7 @@ export interface Invitation {
   member?: Member
   service?: Service
   token: string
-  status: 'pendiente' | 'confirmado' | 'declinado'
+  status: 'pendiente'|'confirmado'|'declinado'
   comentario?: string
   sent_at?: string
   responded_at?: string
