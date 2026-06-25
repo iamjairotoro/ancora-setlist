@@ -67,3 +67,18 @@ export interface Invitation {
   sent_at?: string
   responded_at?: string
 }
+
+export interface ServiceBlock {
+  id: string
+  service_id: string
+  orden: number
+  tipo: 'cancion' | 'bloque'
+  titulo?: string
+  duracion_min?: number
+  notas?: string
+  song_id?: string
+  song?: Song
+  tono?: string
+  lead_id?: string
+  lead?: Member
+}
