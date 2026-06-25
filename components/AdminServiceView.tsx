@@ -331,7 +331,7 @@ export default function AdminServiceView({
                           {isSong?(
                             <select className="w-full bg-transparent border-none text-sm font-semibold text-[#1F2A44] focus:outline-none cursor-pointer"
                               value={block.song_id||''}
-                              onChange={e=>updateBlock(block.id,{song_id:e.target.value||null,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
+                              onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
                               <option value="">— Seleccionar canción —</option>
                               {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
                             </select>
@@ -361,7 +361,7 @@ export default function AdminServiceView({
                           {isSong?(
                             <select className="w-full bg-transparent border-none text-sm text-gray-600 focus:outline-none cursor-pointer"
                               value={block.tono||''}
-                              onChange={e=>updateBlock(block.id,{tono:e.target.value||null})}>
+                              onChange={e=>updateBlock(block.id,{tono:e.target.value||undefined})}>
                               <option value="">—</option>
                               {NOTAS.map(n=><option key={n}>{n}</option>)}
                             </select>
@@ -377,7 +377,7 @@ export default function AdminServiceView({
                           {isSong&&(
                             <select className="w-full bg-transparent border-none text-sm text-gray-600 focus:outline-none cursor-pointer"
                               value={block.lead_id||''}
-                              onChange={e=>updateBlock(block.id,{lead_id:e.target.value||null})}>
+                              onChange={e=>updateBlock(block.id,{lead_id:e.target.value||undefined})}>
                               <option value="">— Lead —</option>
                               {members.filter(m=>m.instrumentos.includes('Voz')).map(m=>(
                                 <option key={m.id} value={m.id}>{m.nombre}</option>
