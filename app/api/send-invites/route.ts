@@ -1,22 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import { createClient } from '@supabase/supabase-js'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+async function sendEmail(to: string, subject: string, html: string) {
+  const user = process.env.GMAIL_USER!
+  const pass = process.env.GMAIL_APP_PASSWORD!
+
+  // Use Gmail SMTP via fetch to smtp2go or direct nodemailer-style
+  // We'll use the Gmail API via raw SMTP through a simple approach
+  const { createTransport } = await import('nodemailer')
+  const transporter = createTransport({
+    service: 'gmail',
+    auth: { user, pass },
+  })
+  await transporter.sendMail({
+    from: `Ancora Setlist <${user}>`,
+    to,
+    subject,
+    html,
+  })
+}
+
 export async function POST(req: NextRequest) {
   const { serviceId } = await req.json()
 
-  // Get service info
   const { data: service } = await supabase
     .from('services').select('*').eq('id', serviceId).single()
   if (!service) return NextResponse.json({ error: 'Servicio no encontrado' }, { status: 404 })
 
-  // Get all band/voices assignments
   const { data: assignments } = await supabase
     .from('banda_assignments')
     .select('*, member:members(*)')
@@ -25,7 +40,6 @@ export async function POST(req: NextRequest) {
   if (!assignments?.length)
     return NextResponse.json({ error: 'No hay músicos asignados' }, { status: 400 })
 
-  // Get unique members with email
   type MemberEntry = { member: { nombre: string; email: string; id: string }; posiciones: string[] }
   const uniqueMembers: Record<string, MemberEntry> = {}
   for (const a of assignments) {
@@ -36,7 +50,6 @@ export async function POST(req: NextRequest) {
     uniqueMembers[a.member_id].posiciones.push(a.posicion)
   }
 
-  // Get setlist for this service
   const { data: setlist } = await supabase
     .from('setlist_items')
     .select('orden, tono, song:songs(nombre, artista), lead:members(nombre)')
@@ -45,22 +58,20 @@ export async function POST(req: NextRequest) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL
 
-  // Format date nicely
   const d = new Date(service.fecha + 'T12:00:00')
   const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
   const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
   const fechaFmt = `${dias[d.getDay()]} ${d.getDate()} de ${meses[d.getMonth()]} ${d.getFullYear()}`
 
   let sent = 0
+  const errors: string[] = []
+
   for (const [memberId, { member, posiciones }] of Object.entries(uniqueMembers)) {
-    // Upsert invitation
-    const { data: inv } = await supabase
+    await supabase
       .from('invitations')
       .upsert({ service_id: serviceId, member_id: memberId, sent_at: new Date().toISOString() },
                { onConflict: 'service_id,member_id' })
-      .select().single()
 
-    // Get token
     const { data: fullInv } = await supabase
       .from('invitations').select('token').eq('service_id', serviceId).eq('member_id', memberId).single()
 
@@ -101,15 +112,12 @@ export async function POST(req: NextRequest) {
       <h2 style="color:#1F2A44;margin:0 0 4px;font-size:18px">Hola, ${member.nombre} 👋</h2>
       <p style="color:#555;font-size:14px;margin:4px 0 0">Tienes una invitación para el servicio del:</p>
       <p style="color:#1F2A44;font-weight:600;font-size:16px;margin:8px 0">${fechaFmt}</p>
-
       <div style="background:#f8f8f8;border-radius:8px;padding:12px 16px;margin:16px 0">
         <p style="margin:0;font-size:13px;color:#555">Tu(s) rol(es) este domingo:</p>
         <p style="margin:4px 0 0;font-weight:600;color:#1F2A44;font-size:15px">${posiciones.join(' · ')}</p>
       </div>
-
       <p style="color:#555;font-size:14px;font-weight:500;margin:20px 0 8px">Setlist del servicio:</p>
       ${setlistHtml}
-
       <p style="color:#555;font-size:14px;margin:24px 0 12px">¿Puedes asistir?</p>
       <div style="display:flex;gap:12px;margin-bottom:28px">
         <a href="${confirmUrl}" style="flex:1;background:#1F2A44;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">✓ Sí, confirmo</a>
@@ -121,14 +129,16 @@ export async function POST(req: NextRequest) {
 </body>
 </html>`
 
-    await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL!,
-      to: member.email,
-      subject: `🎵 Setlist Ancora — ${fechaFmt}`,
-      html,
-    })
-    sent++
+    try {
+      await sendEmail(member.email, `🎵 Setlist Ancora — ${fechaFmt}`, html)
+      sent++
+    } catch (e: any) {
+      errors.push(`${member.nombre}: ${e.message}`)
+    }
   }
 
+  if (errors.length) {
+    return NextResponse.json({ message: `${sent} enviado(s). Errores: ${errors.join(', ')}` })
+  }
   return NextResponse.json({ message: `✓ ${sent} invitación(es) enviada(s)` })
 }
