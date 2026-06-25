@@ -26,13 +26,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No hay músicos asignados' }, { status: 400 })
 
   // Get unique members with email
-  const uniqueMembers = new Map<string, { member: any; posiciones: string[] }>()
+  type MemberEntry = { member: { nombre: string; email: string; id: string }; posiciones: string[] }
+  const uniqueMembers: Record<string, MemberEntry> = {}
   for (const a of assignments) {
     if (!a.member?.email) continue
-    if (!uniqueMembers.has(a.member_id)) {
-      uniqueMembers.set(a.member_id, { member: a.member, posiciones: [] })
+    if (!uniqueMembers[a.member_id]) {
+      uniqueMembers[a.member_id] = { member: a.member, posiciones: [] }
     }
-    uniqueMembers.get(a.member_id)!.posiciones.push(a.posicion)
+    uniqueMembers[a.member_id].posiciones.push(a.posicion)
   }
 
   // Get setlist for this service
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
   const fechaFmt = `${dias[d.getDay()]} ${d.getDate()} de ${meses[d.getMonth()]} ${d.getFullYear()}`
 
   let sent = 0
-  for (const [memberId, { member, posiciones }] of uniqueMembers) {
+  for (const [memberId, { member, posiciones }] of Object.entries(uniqueMembers)) {
     // Upsert invitation
     const { data: inv } = await supabase
       .from('invitations')
