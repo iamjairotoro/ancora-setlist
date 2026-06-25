@@ -5,23 +5,20 @@ import type { Service, Member, Song, SetlistItem, BandaAssignment, Invitation } 
 import ServicePanel from '@/components/ServicePanel'
 import TeamPanel from '@/components/TeamPanel'
 import SongsPanel from '@/components/SongsPanel'
+import StatsPanel from '@/components/StatsPanel'
 
 const POSICIONES_BANDA = ['AG1','AG2','EG','KEYS','BASS','DRUMS','MD','SONIDO'] as const
 const POSICIONES_VX    = ['VX1','VX2','VX3','VX4'] as const
 
 const INSTR_POR_POSICION: Record<string, string[]> = {
-  AG1:    ['Guitarra Acustica'],
-  AG2:    ['Guitarra Acustica'],
-  EG:     ['Guitarra Electrica'],
-  KEYS:   ['Keys','Piano'],
-  BASS:   ['Bajo'],
-  DRUMS:  ['Bateria'],
-  MD:     ['MD (Direccion Musical en vivo)'],
-  SONIDO: ['Sonido'],
-  VX1:    ['Voz'], VX2: ['Voz'], VX3: ['Voz'], VX4: ['Voz'],
+  AG1: ['Guitarra Acustica'], AG2: ['Guitarra Acustica'],
+  EG:  ['Guitarra Electrica'], KEYS: ['Keys','Piano'],
+  BASS: ['Bajo'], DRUMS: ['Bateria'],
+  MD:   ['MD (Direccion Musical en vivo)'], SONIDO: ['Sonido'],
+  VX1: ['Voz'], VX2: ['Voz'], VX3: ['Voz'], VX4: ['Voz'],
 }
 
-type Tab = 'setlist' | 'equipo' | 'canciones'
+type Tab = 'setlist' | 'equipo' | 'canciones' | 'estadisticas'
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false)
@@ -39,33 +36,21 @@ export default function AdminPage() {
   const [sending, setSending]                 = useState(false)
   const [msg, setMsg]                         = useState('')
 
-  // ── Auth ──────────────────────────────────────────────────────────────────
   function login() {
-    if (pw === process.env.NEXT_PUBLIC_ADMIN_PASSWORD || pw === 'ancora2024') {
-      setAuthed(true)
-      sessionStorage.setItem('ancora_auth', '1')
+    if (pw === (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ancora2024')) {
+      setAuthed(true); sessionStorage.setItem('ancora_auth', '1')
     } else { setPwError(true); setTimeout(() => setPwError(false), 2000) }
   }
-  useEffect(() => {
-    if (sessionStorage.getItem('ancora_auth')) setAuthed(true)
-  }, [])
+  useEffect(() => { if (sessionStorage.getItem('ancora_auth')) setAuthed(true) }, [])
 
-  // ── Load data ─────────────────────────────────────────────────────────────
   const loadServices = useCallback(async () => {
     const { data } = await supabase.from('services').select('*').order('fecha', { ascending: false })
     setServices(data || [])
     if (!selectedService && data?.length) setSelectedService(data[0])
   }, [selectedService])
 
-  const loadMembers = useCallback(async () => {
-    const { data } = await supabase.from('members').select('*').order('nombre')
-    setMembers(data || [])
-  }, [])
-
-  const loadSongs = useCallback(async () => {
-    const { data } = await supabase.from('songs').select('*').order('nombre')
-    setSongs(data || [])
-  }, [])
+  const loadMembers  = useCallback(async () => { const { data } = await supabase.from('members').select('*').order('nombre'); setMembers(data || []) }, [])
+  const loadSongs    = useCallback(async () => { const { data } = await supabase.from('songs').select('*').order('nombre'); setSongs(data || []) }, [])
 
   const loadService = useCallback(async (svc: Service) => {
     const [sl, ba, inv] = await Promise.all([
@@ -81,17 +66,35 @@ export default function AdminPage() {
   useEffect(() => { if (authed) { loadServices(); loadMembers(); loadSongs() } }, [authed])
   useEffect(() => { if (selectedService) loadService(selectedService) }, [selectedService])
 
-  // ── Service CRUD ──────────────────────────────────────────────────────────
   async function createService(fecha: string) {
     const d = new Date(fecha + 'T12:00:00')
     const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado']
     const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
-    const titulo = `${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`
-    const { data } = await supabase.from('services').insert({ fecha, titulo: `Servicio Ancora — ${titulo}` }).select().single()
+    const titulo = `Servicio Ancora — ${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`
+    const { data } = await supabase.from('services').insert({ fecha, titulo }).select().single()
     if (data) { await loadServices(); setSelectedService(data) }
   }
 
-  // ── Banda assignments ─────────────────────────────────────────────────────
+  async function editServiceTitle(id: string, titulo: string) {
+    await supabase.from('services').update({ titulo }).eq('id', id)
+    await loadServices()
+  }
+
+  async function deleteService(id: string) {
+    if (!confirm('¿Eliminar este servicio y todo su contenido?')) return
+    await fetch('/api/delete-service', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ serviceId: id }) })
+    setSelectedService(null)
+    await loadServices()
+  }
+
+  async function duplicateService(id: string, newFecha: string) {
+    const res = await fetch('/api/duplicate-service', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ serviceId: id, newFecha }) })
+    const data = await res.json()
+    await loadServices()
+    const { data: newSvc } = await supabase.from('services').select('*').eq('id', data.serviceId).single()
+    if (newSvc) setSelectedService(newSvc)
+  }
+
   async function assignBanda(posicion: string, memberId: string) {
     if (!selectedService) return
     await supabase.from('banda_assignments').upsert(
@@ -101,7 +104,6 @@ export default function AdminPage() {
     loadService(selectedService)
   }
 
-  // ── Setlist CRUD ──────────────────────────────────────────────────────────
   async function addSetlistRow() {
     if (!selectedService) return
     const next = (setlistItems.length || 0) + 1
@@ -119,40 +121,32 @@ export default function AdminPage() {
     loadService(selectedService!)
   }
 
-  // ── Send invitations ──────────────────────────────────────────────────────
   async function sendInvites() {
     if (!selectedService) return
     setSending(true); setMsg('')
     try {
       const res = await fetch('/api/send-invites', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ serviceId: selectedService.id }),
       })
       const data = await res.json()
       setMsg(data.message || 'Invitaciones enviadas ✓')
       loadService(selectedService)
-    } catch { setMsg('Error al enviar. Revisa la consola.') }
+    } catch { setMsg('Error al enviar.') }
     finally { setSending(false) }
   }
 
-  // ── Filter members by posicion ────────────────────────────────────────────
   function membersFor(posicion: string) {
     const allowed = INSTR_POR_POSICION[posicion] || []
     return members.filter(m => m.instrumentos.some(i => allowed.includes(i)))
   }
-
-  function getBanda(pos: string) {
-    return bandaItems.find(b => b.posicion === pos)
-  }
-
+  function getBanda(pos: string) { return bandaItems.find(b => b.posicion === pos) }
   function statusColor(s: string) {
     if (s === 'confirmado') return 'bg-green-100 text-green-800'
     if (s === 'declinado')  return 'bg-red-100 text-red-800'
     return 'bg-yellow-100 text-yellow-800'
   }
 
-  // ── LOGIN ─────────────────────────────────────────────────────────────────
   if (!authed) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="card p-8 w-full max-w-sm">
@@ -173,10 +167,8 @@ export default function AdminPage() {
     </div>
   )
 
-  // ── MAIN ──────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen">
-      {/* Header */}
       <header className="bg-navy text-white px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gold rounded-full flex items-center justify-center font-bold text-navy text-sm">A</div>
@@ -187,50 +179,39 @@ export default function AdminPage() {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 py-6">
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6">
-          {(['setlist','equipo','canciones'] as Tab[]).map(t => (
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {([
+            ['setlist', '🎵 Setlist'],
+            ['equipo', '👥 Equipo'],
+            ['canciones', '🎶 Canciones'],
+            ['estadisticas', '📊 Estadísticas'],
+          ] as [Tab, string][]).map(([t, label]) => (
             <button key={t} onClick={() => setTab(t)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${tab === t ? 'bg-navy text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}>
-              {t === 'setlist' ? '🎵 Setlist' : t === 'equipo' ? '👥 Equipo' : '🎶 Canciones'}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t ? 'bg-navy text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}>
+              {label}
             </button>
           ))}
         </div>
 
-        {/* SETLIST TAB */}
         {tab === 'setlist' && (
           <ServicePanel
-            services={services}
-            selectedService={selectedService}
-            setSelectedService={setSelectedService}
-            createService={createService}
-            members={members}
-            songs={songs}
-            setlistItems={setlistItems}
-            bandaItems={bandaItems}
-            invitations={invitations}
-            membersFor={membersFor}
-            getBanda={getBanda}
-            assignBanda={assignBanda}
-            addSetlistRow={addSetlistRow}
-            updateSetlistItem={updateSetlistItem}
-            removeSetlistRow={removeSetlistRow}
-            sendInvites={sendInvites}
-            sending={sending}
-            msg={msg}
+            services={services} selectedService={selectedService}
+            setSelectedService={setSelectedService} createService={createService}
+            editServiceTitle={editServiceTitle} deleteService={deleteService}
+            duplicateService={duplicateService}
+            members={members} songs={songs} setlistItems={setlistItems}
+            bandaItems={bandaItems} invitations={invitations}
+            membersFor={membersFor} getBanda={getBanda}
+            assignBanda={assignBanda} addSetlistRow={addSetlistRow}
+            updateSetlistItem={updateSetlistItem} removeSetlistRow={removeSetlistRow}
+            sendInvites={sendInvites} sending={sending} msg={msg}
             statusColor={statusColor}
-            POSICIONES_BANDA={POSICIONES_BANDA}
-            POSICIONES_VX={POSICIONES_VX}
+            POSICIONES_BANDA={POSICIONES_BANDA} POSICIONES_VX={POSICIONES_VX}
           />
         )}
-
-        {tab === 'equipo' && (
-          <TeamPanel members={members} onRefresh={loadMembers} />
-        )}
-
-        {tab === 'canciones' && (
-          <SongsPanel songs={songs} onRefresh={loadSongs} />
-        )}
+        {tab === 'equipo'       && <TeamPanel members={members} onRefresh={loadMembers} />}
+        {tab === 'canciones'    && <SongsPanel songs={songs} onRefresh={loadSongs} />}
+        {tab === 'estadisticas' && <StatsPanel members={members} />}
       </div>
     </div>
   )

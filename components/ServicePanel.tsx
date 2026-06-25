@@ -9,6 +9,9 @@ interface Props {
   selectedService: Service | null
   setSelectedService: (s: Service) => void
   createService: (fecha: string) => void
+  editServiceTitle: (id: string, titulo: string) => void
+  deleteService: (id: string) => void
+  duplicateService: (id: string, newFecha: string) => void
   members: Member[]
   songs: Song[]
   setlistItems: SetlistItem[]
@@ -30,14 +33,19 @@ interface Props {
 
 export default function ServicePanel({
   services, selectedService, setSelectedService, createService,
+  editServiceTitle, deleteService, duplicateService,
   members, songs, setlistItems, bandaItems, invitations,
   membersFor, getBanda, assignBanda, addSetlistRow,
   updateSetlistItem, removeSetlistRow,
   sendInvites, sending, msg, statusColor,
   POSICIONES_BANDA, POSICIONES_VX
 }: Props) {
-  const [newFecha, setNewFecha] = useState('')
-  const [showNew, setShowNew] = useState(false)
+  const [newFecha, setNewFecha]     = useState('')
+  const [showNew, setShowNew]       = useState(false)
+  const [showDup, setShowDup]       = useState(false)
+  const [dupFecha, setDupFecha]     = useState('')
+  const [editingTitle, setEditingTitle] = useState(false)
+  const [titleVal, setTitleVal]     = useState('')
 
   function fmt(fecha: string) {
     const d = new Date(fecha + 'T12:00:00')
@@ -46,9 +54,9 @@ export default function ServicePanel({
     return `${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`
   }
 
-  const confirmed  = invitations.filter(i => i.status === 'confirmado').length
-  const declined   = invitations.filter(i => i.status === 'declinado').length
-  const pending    = invitations.filter(i => i.status === 'pendiente').length
+  const confirmed = invitations.filter(i => i.status === 'confirmado').length
+  const declined  = invitations.filter(i => i.status === 'declinado').length
+  const pending   = invitations.filter(i => i.status === 'pendiente').length
 
   return (
     <div className="space-y-4">
@@ -56,20 +64,23 @@ export default function ServicePanel({
       <div className="card p-4 flex flex-wrap gap-3 items-center">
         <select className="input w-auto flex-1 min-w-48"
           value={selectedService?.id || ''}
-          onChange={e => {
-            const s = services.find(sv => sv.id === e.target.value)
-            if (s) setSelectedService(s)
-          }}>
-          {services.map(s => (
-            <option key={s.id} value={s.id}>{fmt(s.fecha)} — {s.titulo}</option>
-          ))}
+          onChange={e => { const s = services.find(sv => sv.id === e.target.value); if (s) setSelectedService(s) }}>
+          {services.map(s => <option key={s.id} value={s.id}>{fmt(s.fecha)} — {s.titulo}</option>)}
           {!services.length && <option>Sin servicios aún</option>}
         </select>
-        <button onClick={() => setShowNew(v => !v)} className="btn-secondary text-sm">
-          + Nuevo servicio
-        </button>
+        <button onClick={() => setShowNew(v => !v)} className="btn-secondary text-sm">+ Nuevo</button>
+        {selectedService && (
+          <>
+            <button onClick={() => setShowDup(v => !v)} className="btn-secondary text-sm" title="Duplicar servicio">⧉ Duplicar</button>
+            <button onClick={() => { setEditingTitle(true); setTitleVal(selectedService.titulo) }}
+              className="btn-secondary text-sm" title="Editar nombre">✏️ Editar</button>
+            <button onClick={() => deleteService(selectedService.id)}
+              className="text-sm text-red-400 hover:text-red-600 px-2 py-2" title="Eliminar">🗑</button>
+          </>
+        )}
       </div>
 
+      {/* New service form */}
       {showNew && (
         <div className="card p-4 flex gap-3 items-end">
           <div className="flex-1">
@@ -78,6 +89,31 @@ export default function ServicePanel({
           </div>
           <button onClick={() => { if (newFecha) { createService(newFecha); setNewFecha(''); setShowNew(false) } }}
             className="btn-primary">Crear</button>
+        </div>
+      )}
+
+      {/* Duplicate form */}
+      {showDup && selectedService && (
+        <div className="card p-4 flex gap-3 items-end border-gold border">
+          <div className="flex-1">
+            <label className="text-xs text-gray-500 mb-1 block">Duplicar "{selectedService.titulo}" a esta fecha:</label>
+            <input type="date" className="input" value={dupFecha} onChange={e => setDupFecha(e.target.value)} />
+          </div>
+          <button onClick={() => { if (dupFecha) { duplicateService(selectedService.id, dupFecha); setDupFecha(''); setShowDup(false) } }}
+            className="btn-gold">Duplicar</button>
+        </div>
+      )}
+
+      {/* Edit title */}
+      {editingTitle && selectedService && (
+        <div className="card p-4 flex gap-3 items-end border-navy border">
+          <div className="flex-1">
+            <label className="text-xs text-gray-500 mb-1 block">Nombre del servicio</label>
+            <input className="input" value={titleVal} onChange={e => setTitleVal(e.target.value)} />
+          </div>
+          <button onClick={() => { editServiceTitle(selectedService.id, titleVal); setEditingTitle(false) }}
+            className="btn-primary">Guardar</button>
+          <button onClick={() => setEditingTitle(false)} className="btn-secondary">Cancelar</button>
         </div>
       )}
 
@@ -92,8 +128,7 @@ export default function ServicePanel({
               return (
                 <div key={pos}>
                   <label className="text-xs font-medium text-gray-500 block mb-1">{pos}</label>
-                  <select className="input text-sm"
-                    value={asig?.member_id || ''}
+                  <select className="input text-sm" value={asig?.member_id || ''}
                     onChange={e => assignBanda(pos, e.target.value)}>
                     <option value="">—</option>
                     {opts.map(m => <option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
@@ -114,8 +149,7 @@ export default function ServicePanel({
               return (
                 <div key={pos}>
                   <label className="text-xs font-medium text-gray-500 block mb-1">{pos}</label>
-                  <select className="input text-sm"
-                    value={asig?.member_id || ''}
+                  <select className="input text-sm" value={asig?.member_id || ''}
                     onChange={e => assignBanda(pos, e.target.value)}>
                     <option value="">—</option>
                     {opts.map(m => <option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
@@ -133,20 +167,17 @@ export default function ServicePanel({
             {setlistItems.map((item, idx) => (
               <div key={item.id} className="flex gap-2 items-center">
                 <span className="text-xs text-gray-400 w-5 text-right">{idx+1}</span>
-                <select className="input text-sm flex-1"
-                  value={item.song_id || ''}
+                <select className="input text-sm flex-1" value={item.song_id || ''}
                   onChange={e => updateSetlistItem(item.id, 'song_id', e.target.value)}>
                   <option value="">— Canción —</option>
                   {songs.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}
                 </select>
-                <select className="input text-sm w-20"
-                  value={item.tono || ''}
+                <select className="input text-sm w-20" value={item.tono || ''}
                   onChange={e => updateSetlistItem(item.id, 'tono', e.target.value)}>
                   <option value="">Tono</option>
                   {NOTAS.map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
-                <select className="input text-sm w-36"
-                  value={item.lead_id || ''}
+                <select className="input text-sm w-36" value={item.lead_id || ''}
                   onChange={e => updateSetlistItem(item.id, 'lead_id', e.target.value)}>
                   <option value="">— Lead —</option>
                   {members.filter(m => m.instrumentos.includes('Voz')).map(m =>
@@ -158,9 +189,7 @@ export default function ServicePanel({
               </div>
             ))}
           </div>
-          <button onClick={addSetlistRow} className="mt-3 text-sm text-navy hover:underline">
-            + Agregar canción
-          </button>
+          <button onClick={addSetlistRow} className="mt-3 text-sm text-navy hover:underline">+ Agregar canción</button>
         </div>
 
         {/* INVITACIONES */}
@@ -181,7 +210,6 @@ export default function ServicePanel({
             </div>
           </div>
           {msg && <p className="text-sm text-green-600 mb-3">{msg}</p>}
-
           {invitations.length > 0 ? (
             <div className="space-y-2">
               {invitations.map(inv => (
@@ -197,9 +225,7 @@ export default function ServicePanel({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400">
-              Al presionar "Enviar invitaciones" se enviará un correo a cada músico asignado en Banda y Voces.
-            </p>
+            <p className="text-sm text-gray-400">Al presionar "Enviar invitaciones" se enviará un correo a cada músico asignado.</p>
           )}
         </div>
       </>)}
