@@ -16,7 +16,7 @@ const SHORT: Record<string, string> = {
 
 interface Props { members: Member[]; onRefresh: () => void }
 
-const EMPTY = { nombre:'', apellido:'', email:'', telefono:'', instrumentos:[] as Instrument[] }
+const newEmpty = () => ({ nombre:'', apellido:'', email:'', telefono:'', instrumentos:[] as Instrument[] })
 
 export default function TeamPanel({ members, onRefresh }: Props) {
   const [editing, setEditing] = useState<Partial<Member> | null>(null)
@@ -33,15 +33,21 @@ export default function TeamPanel({ members, onRefresh }: Props) {
     if (!editing) return
     if (!editing.nombre || !editing.email) { setErr('Nombre y email son obligatorios'); return }
     setSaving(true); setErr('')
-    const payload = { nombre: editing.nombre, apellido: editing.apellido || '',
-                      email: editing.email, telefono: editing.telefono || '',
-                      instrumentos: editing.instrumentos || [] }
+    const payload = {
+      nombre: editing.nombre,
+      apellido: editing.apellido || '',
+      email: editing.email,
+      telefono: editing.telefono || '',
+      instrumentos: editing.instrumentos || []
+    }
     if (editing.id) {
       await supabase.from('members').update(payload).eq('id', editing.id)
     } else {
       await supabase.from('members').insert(payload)
     }
-    setSaving(false); setEditing(null); onRefresh()
+    setSaving(false)
+    setEditing(null)
+    onRefresh()
   }
 
   async function del(id: string) {
@@ -53,8 +59,8 @@ export default function TeamPanel({ members, onRefresh }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-500">{members.length} integrantes</p>
-        <button onClick={() => setEditing(EMPTY)} className="btn-primary text-sm">+ Agregar</button>
+        <p className="text-sm text-gray-500">{members.length} integrante{members.length !== 1 ? 's' : ''}</p>
+        <button onClick={() => setEditing(newEmpty())} className="btn-primary text-sm">+ Agregar</button>
       </div>
 
       {/* Edit / Add form */}
@@ -64,19 +70,23 @@ export default function TeamPanel({ members, onRefresh }: Props) {
           <div className="grid grid-cols-2 gap-3 mb-3">
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Nombre *</label>
-              <input className="input" value={editing.nombre || ''} onChange={e => setEditing({...editing, nombre: e.target.value})} />
+              <input className="input" value={editing.nombre || ''}
+                onChange={e => setEditing({...editing, nombre: e.target.value})} />
             </div>
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Apellido</label>
-              <input className="input" value={editing.apellido || ''} onChange={e => setEditing({...editing, apellido: e.target.value})} />
+              <input className="input" value={editing.apellido || ''}
+                onChange={e => setEditing({...editing, apellido: e.target.value})} />
             </div>
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Email *</label>
-              <input className="input" type="email" value={editing.email || ''} onChange={e => setEditing({...editing, email: e.target.value})} />
+              <input className="input" type="email" value={editing.email || ''}
+                onChange={e => setEditing({...editing, email: e.target.value})} />
             </div>
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Teléfono</label>
-              <input className="input" value={editing.telefono || ''} onChange={e => setEditing({...editing, telefono: e.target.value})} />
+              <input className="input" value={editing.telefono || ''}
+                onChange={e => setEditing({...editing, telefono: e.target.value})} />
             </div>
           </div>
           <div className="mb-4">
@@ -85,7 +95,7 @@ export default function TeamPanel({ members, onRefresh }: Props) {
               {ALL_INSTRUMENTOS.map(instr => {
                 const active = (editing.instrumentos || []).includes(instr)
                 return (
-                  <button key={instr} onClick={() => toggleInstr(instr)}
+                  <button key={instr} type="button" onClick={() => toggleInstr(instr)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                       active ? 'bg-navy text-white border-navy' : 'bg-white text-gray-600 border-gray-200 hover:border-navy'
                     }`}>
@@ -97,10 +107,12 @@ export default function TeamPanel({ members, onRefresh }: Props) {
           </div>
           {err && <p className="text-red-500 text-xs mb-2">{err}</p>}
           <div className="flex gap-2">
-            <button onClick={save} disabled={saving} className="btn-primary text-sm">
+            <button type="button" onClick={save} disabled={saving} className="btn-primary text-sm">
               {saving ? 'Guardando...' : 'Guardar'}
             </button>
-            <button onClick={() => setEditing(null)} className="btn-secondary text-sm">Cancelar</button>
+            <button type="button" onClick={() => { setEditing(null); setErr('') }} className="btn-secondary text-sm">
+              Cancelar
+            </button>
           </div>
         </div>
       )}
@@ -119,16 +131,18 @@ export default function TeamPanel({ members, onRefresh }: Props) {
               <p className="font-medium text-sm">{m.nombre} {m.apellido}</p>
               <p className="text-xs text-gray-500 truncate">{m.email}</p>
               <div className="flex flex-wrap gap-1 mt-1">
-                {m.instrumentos.map(i => (
-                  <span key={i} className="text-xs bg-gold/10 text-gold-dark border border-gold/20 px-1.5 py-0.5 rounded">
+                {(m.instrumentos || []).map(i => (
+                  <span key={i} className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-1.5 py-0.5 rounded">
                     {SHORT[i] || i}
                   </span>
                 ))}
               </div>
             </div>
             <div className="flex gap-1">
-              <button onClick={() => setEditing(m)} className="text-xs text-gray-400 hover:text-navy px-2 py-1">Editar</button>
-              <button onClick={() => del(m.id)} className="text-xs text-gray-400 hover:text-red-500 px-2 py-1">Eliminar</button>
+              <button type="button" onClick={() => { setErr(''); setEditing({...m}) }}
+                className="text-xs text-gray-400 hover:text-navy px-2 py-1">Editar</button>
+              <button type="button" onClick={() => del(m.id)}
+                className="text-xs text-gray-400 hover:text-red-500 px-2 py-1">Eliminar</button>
             </div>
           </div>
         ))}
