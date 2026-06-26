@@ -260,7 +260,14 @@ export default function PortalPage() {
                                 <span className="w-6 h-6 rounded-full bg-navy/10 text-navy text-xs font-bold flex items-center justify-center flex-shrink-0">{item.orden}</span>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-semibold text-navy truncate">{item.song?.nombre||'—'}</p>
-                                  <p className="text-xs text-gray-500">{item.song?.artista}{item.tono?` · ${item.tono}`:''}{item.song?.bpm?` · ${item.song.bpm} BPM`:''}</p>
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <p className="text-xs text-gray-500">{item.song?.artista}{item.tono?` · ${item.tono}`:''}{item.song?.bpm?` · ${item.song.bpm} BPM`:''}</p>
+                                    {item.lead && (
+                                      <span className="text-xs bg-gold/20 text-yellow-700 px-1.5 py-0.5 rounded-full font-semibold">
+                                        Lead: {item.lead.nombre}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                                 <div className="flex gap-1.5 flex-shrink-0">
                                   {item.song?.link_spotify  && <a href={item.song.link_spotify}  target="_blank" className="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center text-sm hover:bg-green-200">🎧</a>}

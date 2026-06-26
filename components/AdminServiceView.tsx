@@ -92,7 +92,7 @@ export default function AdminServiceView({
     onBlocksChange()
   }
 
-  const totalMin = blocks.reduce((s,b)=>(s+(b.duracion_min||0)),0)
+  const totalMin = blocks.reduce((s,b)=>{ const dur = b.tipo==='cancion' && (b.song as any)?.duracion_min ? (b.song as any).duracion_min : (b.duracion_min||0); return s+dur },0)
   const confirmed  = invitations.filter(i=>i.status==='confirmado').length
   const declined   = invitations.filter(i=>i.status==='declinado').length
   const pending    = invitations.filter(i=>i.status==='pendiente').length
@@ -313,13 +313,19 @@ export default function AdminServiceView({
                     const isSong=block.tipo==='cancion'
                     return(
                       <div key={block.id} className={`grid grid-cols-12 gap-2 px-5 py-3 items-center hover:bg-gray-50 transition-colors ${isSong?'':'bg-gray-50/50'}`}>
-                        {/* Duration */}
+                        {/* Duration — read-only for songs, editable for blocks */}
                         <div className="col-span-1">
-                          {isEditing?(
+                          {isSong && block.song && (block.song as any).duracion_min ? (
+                            <span className="text-xs font-mono text-navy bg-navy/10 px-1.5 py-0.5 rounded" title="Duración desde base de datos">
+                              {(block.song as any).duracion_min}m
+                            </span>
+                          ) : isSong ? (
+                            <span className="text-xs font-mono text-gray-300 bg-gray-50 px-1.5 py-0.5 rounded">—m</span>
+                          ) : isEditing ? (
                             <input type="number" className="w-full border border-gray-200 rounded-lg px-1.5 py-1 text-xs text-center focus:outline-none focus:border-navy"
-                              value={block.duracion_min||''} min={1}
-                              onChange={e=>updateBlock(block.id,{duracion_min:parseInt(e.target.value)||0})}/>
-                          ):(
+                              value={block.duracion_min||''} min={0} step={0.5}
+                              onChange={e=>updateBlock(block.id,{duracion_min:parseFloat(e.target.value)||0})}/>
+                          ) : (
                             <span className="text-xs font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
                               {block.duracion_min||'—'}m
                             </span>

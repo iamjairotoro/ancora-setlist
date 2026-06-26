@@ -4,7 +4,6 @@ import { supabase } from '@/lib/supabase'
 import type { Service, Member, Song, BandaAssignment, Invitation, ServiceBlock } from '@/lib/types'
 import TeamPanel from '@/components/TeamPanel'
 import SongsPanel from '@/components/SongsPanel'
-import StatsPanel from '@/components/StatsPanel'
 import AdminServiceView from '@/components/AdminServiceView'
 
 const POSICIONES_BANDA = ['AG1','AG2','EG','KEYS','BASS','DRUMS','MD','SONIDO'] as const
@@ -16,7 +15,7 @@ const INSTR_POR_POSICION: Record<string,string[]> = {
   VX1:['Voz'],VX2:['Voz'],VX3:['Voz'],VX4:['Voz'],
 }
 
-type Tab = 'setlist'|'equipo'|'canciones'|'estadisticas'
+type Tab = 'setlist'|'equipo'|'canciones'
 
 export default function AdminPage() {
   const [authed, setAuthed]   = useState(false)
@@ -167,7 +166,6 @@ export default function AdminPage() {
         )}
         {tab==='equipo'       && <TeamPanel members={members} onRefresh={loadMembers} />}
         {tab==='canciones'    && <SongsPanel songs={songs} onRefresh={loadSongs} />}
-        {tab==='estadisticas' && <StatsPanel members={members} />}
       </div>
     </div>
   )

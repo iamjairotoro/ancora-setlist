@@ -25,6 +25,7 @@ export interface Song {
   link_recursos?: string
   tags?: string[]
   notas?: string
+  duracion_min?: number
   created_at: string
 }
 
@@ -82,3 +83,6 @@ export interface ServiceBlock {
   lead_id?: string
   lead?: Member
 }
+
+// Updated Song with float bpm and duracion_min
+// (already in Song interface above — just update bpm type mentally to number/float)

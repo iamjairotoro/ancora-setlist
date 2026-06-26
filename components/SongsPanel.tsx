@@ -7,7 +7,7 @@ const NOTAS   = ['A','A#','Bb','B','C','C#','Db','D','D#','Eb','E','F','F#','Gb'
 const COMPASES = ['4/4','3/4','6/8','12/8','2/4','5/4','7/8']
 
 interface Props { songs: Song[]; onRefresh: () => void }
-const newEmpty = (): Partial<Song> => ({ nombre:'',artista:'',tono_original:'',bpm:undefined,compas:'',link_spotify:'',link_letras:'',link_recursos:'',notas:'' })
+const newEmpty = (): Partial<Song> => ({ nombre:'',artista:'',tono_original:'',bpm:undefined,compas:'',link_spotify:'',link_letras:'',link_recursos:'',notas:'', duracion_min:undefined })
 
 export default function SongsPanel({ songs, onRefresh }: Props) {
   const [editing, setEditing] = useState<Partial<Song>|null>(null)
@@ -22,7 +22,7 @@ export default function SongsPanel({ songs, onRefresh }: Props) {
       tono_original: editing.tono_original||null, bpm: editing.bpm||null,
       compas: editing.compas||null, link_spotify: editing.link_spotify||null,
       link_letras: editing.link_letras||null, link_recursos: editing.link_recursos||null,
-      notas: editing.notas||null,
+      notas: editing.notas||null, duracion_min: editing.duracion_min||null,
     }
     if (editing.id) await supabase.from('songs').update(payload).eq('id', editing.id)
     else            await supabase.from('songs').insert(payload)
@@ -68,7 +68,7 @@ export default function SongsPanel({ songs, onRefresh }: Props) {
             </div>
             <div>
               <label className="text-xs text-gray-500 mb-1 block font-medium">BPM / Tempo</label>
-              <input className="input" type="number" placeholder="ej: 74" value={editing.bpm||''} onChange={e => setEditing({...editing,bpm:parseInt(e.target.value)||undefined})} />
+              <input className="input" type="number" placeholder="ej: 72.5" step="0.1" min="0" value={editing.bpm||''} onChange={e => setEditing({...editing,bpm:parseFloat(e.target.value)||undefined})} />
             </div>
             <div>
               <label className="text-xs text-gray-500 mb-1 block font-medium">Compás</label>
@@ -76,6 +76,10 @@ export default function SongsPanel({ songs, onRefresh }: Props) {
                 <option value="">—</option>
                 {COMPASES.map(c => <option key={c}>{c}</option>)}
               </select>
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block font-medium">Duración (min)</label>
+              <input className="input" type="number" placeholder="ej: 4.5" step="0.5" min="0" value={editing.duracion_min||''} onChange={e => setEditing({...editing,duracion_min:parseFloat(e.target.value)||undefined})} />
             </div>
             <div>
               <label className="text-xs text-gray-500 mb-1 block font-medium">Link Spotify</label>
