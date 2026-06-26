@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
+import AvatarUpload from '@/components/AvatarUpload'
 import { supabase } from '@/lib/supabase'
 import { useParams } from 'next/navigation'
 
@@ -143,8 +144,11 @@ export default function PortalPage() {
         <div className="relative max-w-lg mx-auto">
           <p className="text-gold font-bold text-sm tracking-widest uppercase mb-6">ANCORA WORSHIP</p>
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-gold flex items-center justify-center text-navy font-black text-xl flex-shrink-0">
-              {member?.nombre[0]}{member?.apellido?.[0]||''}
+            <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gold flex items-center justify-center text-navy font-black text-xl flex-shrink-0 flex-shrink-0">
+              {(member as any)?.avatar_url
+                ? <img src={(member as any).avatar_url} className="w-full h-full object-cover" alt={member?.nombre} />
+                : <span>{member?.nombre[0]}{member?.apellido?.[0]||''}</span>
+              }
             </div>
             <div>
               <h1 className="text-white font-bold text-xl leading-tight">Hola, {member?.nombre} 👋</h1>
@@ -388,8 +392,8 @@ export default function PortalPage() {
           <div className="space-y-4">
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className="bg-gradient-to-r from-navy to-[#2E3D5C] p-5 flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gold flex items-center justify-center text-navy font-black text-2xl">
-                  {member?.nombre[0]}{member?.apellido?.[0]||''}
+                <div className="relative">
+                  {member && <AvatarUpload memberId={(member as any).id} currentUrl={(member as any).avatar_url} nombre={member.nombre} apellido={member.apellido} size="lg" onUpdate={url => setMember(prev => prev ? {...prev, avatar_url: url} as any : prev)} />}
                 </div>
                 <div>
                   <p className="text-white font-bold text-lg">{member?.nombre} {member?.apellido}</p>

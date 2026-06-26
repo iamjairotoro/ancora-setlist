@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Member, Instrument } from '@/lib/types'
+import AvatarUpload from './AvatarUpload'
 
 const ALL_INSTRUMENTOS: Instrument[] = [
   'Guitarra Acustica','Guitarra Electrica','Keys','Piano',
@@ -124,9 +125,7 @@ export default function TeamPanel({ members, onRefresh }: Props) {
         )}
         {members.map(m => (
           <div key={m.id} className="flex items-center gap-3 p-3">
-            <div className="w-9 h-9 rounded-full bg-navy/10 text-navy flex items-center justify-center text-sm font-semibold flex-shrink-0">
-              {m.nombre[0]}{m.apellido?.[0] || ''}
-            </div>
+            <AvatarUpload memberId={m.id} currentUrl={m.avatar_url} nombre={m.nombre} apellido={m.apellido} size="sm" />
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm">{m.nombre} {m.apellido}</p>
               <p className="text-xs text-gray-500 truncate">{m.email}</p>

@@ -263,8 +263,11 @@ export default function AdminServiceView({
                       <div className="space-y-2">
                         {entries.map(({member,roles,status})=>(
                           <div key={member.id} className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
-                            <div className="w-9 h-9 rounded-full bg-[#1F2A44] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                              {member.nombre?.[0]}{member.apellido?.[0]||''}
+                            <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1F2A44] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                              {member.avatar_url
+                                ? <img src={member.avatar_url} className="w-full h-full object-cover" alt={member.nombre} />
+                                : <span>{member.nombre?.[0]}{member.apellido?.[0]||''}</span>
+                              }
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-[#1F2A44] truncate">{member.nombre} {member.apellido}</p>

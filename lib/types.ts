@@ -10,6 +10,7 @@ export interface Member {
   email: string
   telefono?: string
   instrumentos: Instrument[]
+  avatar_url?: string
   created_at: string
 }
 

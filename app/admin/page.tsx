@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import type { Service, Member, Song, BandaAssignment, Invitation, ServiceBlock } from '@/lib/types'
 import TeamPanel from '@/components/TeamPanel'
 import SongsPanel from '@/components/SongsPanel'
@@ -19,8 +20,6 @@ type Tab = 'setlist'|'equipo'|'canciones'
 
 export default function AdminPage() {
   const [authed, setAuthed]   = useState(false)
-  const [pw, setPw]           = useState('')
-  const [pwError, setPwError] = useState(false)
   const [tab, setTab]         = useState<Tab>('setlist')
 
   const [services, setServices]             = useState<Service[]>([])
@@ -33,12 +32,14 @@ export default function AdminPage() {
   const [sending, setSending]               = useState(false)
   const [msg, setMsg]                       = useState('')
 
-  function login() {
-    if (pw === (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ancora2024')) {
-      setAuthed(true); sessionStorage.setItem('ancora_auth','1')
-    } else { setPwError(true); setTimeout(()=>setPwError(false),2000) }
-  }
-  useEffect(()=>{ if(sessionStorage.getItem('ancora_auth')) setAuthed(true) },[])
+  useEffect(()=>{
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) { window.location.href = '/login'; return }
+      const { data } = await supabase.from('admin_emails').select('email').eq('email', session.user.email!).single()
+      if (data) setAuthed(true)
+      else window.location.href = '/login'
+    })
+  },[])
 
   const loadServices = useCallback(async () => {
     const { data } = await supabase.from('services').select('*').order('fecha',{ascending:false})
@@ -145,7 +146,7 @@ export default function AdminPage() {
               <span className="hidden sm:inline">{icon} </span>{label}
             </button>
           ))}
-          <button onClick={()=>{sessionStorage.clear();setAuthed(false)}} className="ml-2 text-white/40 hover:text-white text-xs">Salir</button>
+          <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }} className="ml-2 text-white/40 hover:text-white text-xs">Salir</button>
         </div>
       </header>
 
