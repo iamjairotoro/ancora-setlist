@@ -201,66 +201,91 @@ export default function AdminServiceView({
                 {msg&&<p className="text-green-300 text-xs mt-2 text-center">{msg}</p>}
               </div>
 
-              {/* Banda */}
+              {/* #4 Redesigned + #5 Unified banda panel */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                  <p className="font-bold text-sm text-[#1F2A44]">🎸 Banda</p>
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="font-bold text-sm text-[#1F2A44]">Asignación de roles</p>
                 </div>
-                <div className="divide-y divide-gray-50">
+
+                {/* Assign dropdowns — compact */}
+                <div className="p-3 space-y-1 border-b border-gray-100">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 mb-2">Banda</p>
                   {POSICIONES_BANDA.map(pos=>{
                     const asig=getBanda(pos)
                     const opts=membersFor(pos)
-                    const status=getMemberInvStatus(asig?.member_id)
                     return(
-                      <div key={pos} className="flex items-center gap-3 px-4 py-2.5">
-                        <span className="text-lg w-6 flex-shrink-0">{POS_ICON[pos]}</span>
-                        <div className="w-14 flex-shrink-0">
-                          <p className="text-xs font-bold text-gray-400">{pos}</p>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <select className="w-full bg-transparent border-none text-sm font-medium text-[#1F2A44] focus:outline-none cursor-pointer p-0"
-                            value={asig?.member_id||''}
-                            onChange={e=>assignBanda(pos,e.target.value)}>
-                            <option value="">— Asignar —</option>
-                            {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
-                          </select>
-                        </div>
-                        {status&&<span className="flex-shrink-0">{statusDot(status)}</span>}
+                      <div key={pos} className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+                        <span className="text-xs font-bold text-gray-400 w-12 flex-shrink-0">{pos}</span>
+                        <select className="flex-1 bg-transparent border-none text-sm font-medium text-[#1F2A44] focus:outline-none cursor-pointer"
+                          value={asig?.member_id||''}
+                          onChange={e=>assignBanda(pos,e.target.value)}>
+                          <option value="">— Asignar —</option>
+                          {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
+                        </select>
                       </div>
                     )
                   })}
-                </div>
-              </div>
-
-              {/* Voces */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="font-bold text-sm text-[#1F2A44]">🎤 Voces</p>
-                </div>
-                <div className="divide-y divide-gray-50">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 mt-3 mb-2">Voces</p>
                   {POSICIONES_VX.map(pos=>{
                     const asig=getBanda(pos)
                     const opts=membersFor(pos)
-                    const status=getMemberInvStatus(asig?.member_id)
                     return(
-                      <div key={pos} className="flex items-center gap-3 px-4 py-2.5">
-                        <span className="text-lg w-6 flex-shrink-0">{POS_ICON[pos]}</span>
-                        <div className="w-14 flex-shrink-0">
-                          <p className="text-xs font-bold text-gray-400">{pos}</p>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <select className="w-full bg-transparent border-none text-sm font-medium text-[#1F2A44] focus:outline-none cursor-pointer p-0"
-                            value={asig?.member_id||''}
-                            onChange={e=>assignBanda(pos,e.target.value)}>
-                            <option value="">— Asignar —</option>
-                            {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
-                          </select>
-                        </div>
-                        {status&&<span className="flex-shrink-0">{statusDot(status)}</span>}
+                      <div key={pos} className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
+                        <span className="text-xs font-bold text-gray-400 w-12 flex-shrink-0">{pos}</span>
+                        <select className="flex-1 bg-transparent border-none text-sm font-medium text-[#1F2A44] focus:outline-none cursor-pointer"
+                          value={asig?.member_id||''}
+                          onChange={e=>assignBanda(pos,e.target.value)}>
+                          <option value="">— Asignar —</option>
+                          {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
+                        </select>
                       </div>
                     )
                   })}
                 </div>
+
+                {/* #5 Unified member cards — one card per person, all their roles */}
+                {(()=>{
+                  const allPos=[...POSICIONES_BANDA,...POSICIONES_VX]
+                  const byMember: Record<string,{member:any,roles:string[],status:string|null}> = {}
+                  allPos.forEach(pos=>{
+                    const asig=getBanda(pos)
+                    if(!asig?.member_id||!asig.member) return
+                    if(!byMember[asig.member_id]){
+                      byMember[asig.member_id]={member:asig.member,roles:[],status:getMemberInvStatus(asig.member_id)}
+                    }
+                    byMember[asig.member_id].roles.push(pos)
+                  })
+                  const entries=Object.values(byMember)
+                  if(!entries.length) return <p className="px-4 py-3 text-xs text-gray-400">Sin músicos asignados aún.</p>
+                  return(
+                    <div className="p-3">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 mb-2">Equipo del domingo</p>
+                      <div className="space-y-2">
+                        {entries.map(({member,roles,status})=>(
+                          <div key={member.id} className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
+                            <div className="w-9 h-9 rounded-full bg-[#1F2A44] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                              {member.nombre?.[0]}{member.apellido?.[0]||''}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-[#1F2A44] truncate">{member.nombre} {member.apellido}</p>
+                              <div className="flex gap-1 flex-wrap mt-0.5">
+                                {roles.map(r=>(
+                                  <span key={r} className="text-xs bg-[#1F2A44]/10 text-[#1F2A44] px-1.5 py-0.5 rounded font-medium">{r}</span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="flex-shrink-0">
+                              {status==='confirmado' && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">✓</span>}
+                              {status==='declinado'  && <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-semibold">✗</span>}
+                              {status==='pendiente'  && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold">⏳</span>}
+                              {!status              && <span className="text-xs text-gray-300">—</span>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
 
               {/* Confirmations detail */}

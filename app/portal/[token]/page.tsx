@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
 import { useParams } from 'next/navigation'
 
 
@@ -49,24 +50,35 @@ export default function PortalPage() {
   const [songSearch, setSongSearch] = useState('')
   const [expandedSong, setExpandedSong] = useState<string|null>(null)
 
-  useEffect(() => {
-    async function load() {
-      const [portalRes, songsRes] = await Promise.all([
-        fetch(`/api/member-portal?token=${token}`),
-        fetch('/api/all-songs'),
-      ])
-      if (!portalRes.ok) { setNotFound(true); setLoading(false); return }
-      const data = await portalRes.json()
-      const songsData = songsRes.ok ? await songsRes.json() : { songs: [] }
-      setMember(data.member)
-      setServices(data.services)
-      setAllSongs(songsData.songs || [])
-      setProfileData({ nombre: data.member.nombre, apellido: data.member.apellido||'', telefono: data.member.telefono||'' })
-      if (data.services.length > 0) setExpandedSvc(data.services[0].service.id)
-      setLoading(false)
-    }
-    load()
+  const loadData = useCallback(async () => {
+    const [portalRes, songsRes] = await Promise.all([
+      fetch(`/api/member-portal?token=${token}`),
+      fetch('/api/all-songs'),
+    ])
+    if (!portalRes.ok) { setNotFound(true); setLoading(false); return }
+    const data = await portalRes.json()
+    const songsData = songsRes.ok ? await songsRes.json() : { songs: [] }
+    setMember(data.member)
+    setServices(data.services)
+    setAllSongs(songsData.songs || [])
+    setProfileData({ nombre: data.member.nombre, apellido: data.member.apellido||'', telefono: data.member.telefono||'' })
+    if (data.services.length > 0) setExpandedSvc(prev => prev || data.services[0].service.id)
+    setLoading(false)
   }, [token])
+
+  useEffect(() => {
+    loadData()
+
+    // #2: Supabase Realtime — auto-refresh when admin makes changes
+    const channel = supabase
+      .channel('portal-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'service_blocks' }, () => loadData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'banda_assignments' }, () => loadData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'songs' }, () => loadData())
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [loadData])
 
   function fmtFecha(fecha: string) {
     const d = new Date(fecha + 'T12:00:00')
