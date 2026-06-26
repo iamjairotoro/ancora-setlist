@@ -85,9 +85,8 @@ export default function PortalPage() {
   const filteredSongs = allSongs.filter(s=>s.nombre.toLowerCase().includes(songSearch.toLowerCase())||s.artista.toLowerCase().includes(songSearch.toLowerCase()))
 
   const tabStyle = (t:Tab):React.CSSProperties => ({
-    flex:1,textAlign:'center',fontSize:11,fontWeight:tab===t?700:500,
+    flex:1,textAlign:'center' as const,fontSize:11,fontWeight:tab===t?700:500,
     color:tab===t?C.txt:C.muted,padding:'10px 4px',
-    borderBottom:tab===t?`2px solid ${C.txt}`:'2px solid transparent',
     cursor:'pointer',background:'none',border:'none',
     borderBottom:tab===t?`2px solid ${C.txt}`:'2px solid transparent',
     fontFamily:'inherit',
