@@ -19,7 +19,7 @@ interface SetlistItem { orden: number; tono?: string; song?: Song; lead?: { nomb
 interface BandaItem   { posicion: string; member?: { nombre: string } }
 interface ServiceData {
   service: { id: string; fecha: string; titulo: string }
-  posicion: string
+  posiciones: string[]
   invitation: { status: string; comentario?: string; token: string } | null
   setlist: SetlistItem[]
   banda: BandaItem[]
@@ -166,7 +166,7 @@ export default function PortalPage() {
                 </div>
                 <p className="text-white font-bold text-base">{dia} {fecha}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="bg-gold/30 text-gold text-xs px-2 py-0.5 rounded-full font-semibold">{nextService.posicion}</span>
+                  {nextService.posiciones.map(p => <span key={p} className="bg-gold/30 text-gold text-xs px-2 py-0.5 rounded-full font-semibold mr-1">{p}</span>)}
                   {nextService.invitation && statusBadge(nextService.invitation.status)}
                 </div>
               </div>
@@ -202,7 +202,7 @@ export default function PortalPage() {
               </div>
             )}
 
-            {services.map(({ service, posicion, invitation, setlist, banda }) => {
+            {services.map(({ service, posiciones, invitation, setlist, banda }) => {
               const isOpen = expandedSvc === service.id
               const { dia, fecha } = fmtFecha(service.fecha)
               const days = daysUntil(service.fecha)
@@ -219,7 +219,7 @@ export default function PortalPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-navy text-sm">{dia}, {fecha}</p>
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span className="text-xs bg-navy text-white px-2 py-0.5 rounded-full font-semibold">{posicion}</span>
+                        {posiciones.map(p => <span key={p} className="text-xs bg-navy text-white px-2 py-0.5 rounded-full font-semibold mr-1">{p}</span>)}
                         {invitation && statusBadge(invitation.status)}
                         <span className="text-xs text-gray-400">{days===0?'¡Hoy!':days===1?'Mañana':`${days} días`}</span>
                       </div>
