@@ -1,47 +1,45 @@
 'use client'
 import { useState } from 'react'
 import type { Service, Member, Song, BandaAssignment, Invitation, ServiceBlock } from '@/lib/types'
-
-
-function toMMSS(totalSeconds: number): string {
-  if (!totalSeconds) return '—'
-  const m = Math.floor(totalSeconds / 60)
-  const s = Math.round(totalSeconds % 60)
-  return `${m}:${s.toString().padStart(2, '0')}`
-}
-
-function fromMMSS(val: string): number {
-  if (!val) return 0
-  if (val.includes(':')) {
-    const [m, s] = val.split(':').map(Number)
-    return (m || 0) * 60 + (s || 0)
-  }
-  return parseFloat(val) * 60
-}
-
-function totalToDisplay(seconds: number): string {
-  if (!seconds) return '0:00'
-  const m = Math.floor(seconds / 60)
-  const s = Math.round(seconds % 60)
-  return s > 0 ? `${m}:${s.toString().padStart(2,'0')}` : `${m} min`
-}
+import TexBg from './TexBg'
 
 const NOTAS = ['A','A#','Bb','B','C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab']
 
-const POS_ICON: Record<string,string> = {
-  AG1:'🎸',AG2:'🎸',EG:'⚡',KEYS:'🎹',BASS:'🎸',DRUMS:'🥁',MD:'🎙',SONIDO:'🔊',
-  VX1:'🎤',VX2:'🎤',VX3:'🎤',VX4:'🎤'
+const BLOQUES_PRESET = [
+  {titulo:'Preroll',duracion_min:180},
+  {titulo:'MC / Bienvenida',duracion_min:300},
+  {titulo:'Prédica',duracion_min:2700},
+  {titulo:'Plan de salvación',duracion_min:300},
+  {titulo:'Ofrenda',duracion_min:300},
+  {titulo:'Anuncios',duracion_min:300},
+  {titulo:'Closing / Cierre',duracion_min:300},
+]
+
+function toMMSS(secs: number): string {
+  if (!secs) return '—'
+  const m = Math.floor(secs / 60)
+  const s = Math.round(secs % 60)
+  return `${m}:${s.toString().padStart(2,'0')}`
+}
+function fromMMSS(val: string): number {
+  if (!val) return 0
+  if (val.includes(':')) { const [m,s]=val.split(':').map(Number); return (m||0)*60+(s||0) }
+  return parseFloat(val)*60
+}
+function totalToDisplay(seconds: number): string {
+  if (!seconds) return '0:00'
+  const m = Math.floor(seconds/60)
+  const s = Math.round(seconds%60)
+  return s > 0 ? `${m}:${s.toString().padStart(2,'0')}` : `${m} min`
 }
 
-const BLOQUES_PRESET = [
-  {titulo:'Preroll',duracion_min:3},
-  {titulo:'MC / Bienvenida',duracion_min:5},
-  {titulo:'Prédica',duracion_min:45},
-  {titulo:'Plan de salvación',duracion_min:5},
-  {titulo:'Ofrenda',duracion_min:5},
-  {titulo:'Anuncios',duracion_min:5},
-  {titulo:'Closing / Cierre',duracion_min:5},
-]
+const C = {
+  crema: '#F5F0E6',
+  cremaDark: '#E0D8C8',
+  txt: '#1A1A1A',
+  muted: '#999',
+  bg: '#FDFCF9',
+}
 
 interface Props {
   services: Service[]
@@ -66,6 +64,12 @@ interface Props {
   POSICIONES_VX: readonly string[]
 }
 
+const sel: React.CSSProperties = {
+  width:'100%', background:'transparent', border:'none',
+  fontSize:11, fontWeight:500, color:C.txt, outline:'none', cursor:'pointer',
+  fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif',
+}
+
 export default function AdminServiceView({
   services,selectedService,setSelectedService,createService,
   deleteService,duplicateService,
@@ -74,11 +78,12 @@ export default function AdminServiceView({
   sendInvites,sending,msg,onBlocksChange,
   POSICIONES_BANDA,POSICIONES_VX
 }: Props) {
-  const [showNew, setShowNew]   = useState(false)
-  const [newFecha, setNewFecha] = useState('')
-  const [showDup, setShowDup]   = useState(false)
-  const [dupFecha, setDupFecha] = useState('')
-  const [editingBlock, setEditingBlock] = useState<string|null>(null)
+  const [showNew,setShowNew]     = useState(false)
+  const [newFecha,setNewFecha]   = useState('')
+  const [showDup,setShowDup]     = useState(false)
+  const [dupFecha,setDupFecha]   = useState('')
+  const [editingBlock,setEditingBlock] = useState<string|null>(null)
+  const [showPresets,setShowPresets]   = useState(false)
 
   function fmt(fecha:string) {
     const d=new Date(fecha+'T12:00:00')
@@ -86,7 +91,6 @@ export default function AdminServiceView({
     const meses=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
     return `${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`
   }
-
   function fmtLong(fecha:string) {
     const d=new Date(fecha+'T12:00:00')
     const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
@@ -94,215 +98,230 @@ export default function AdminServiceView({
     return `${dias[d.getDay()]} ${d.getDate()} de ${meses[d.getMonth()]} ${d.getFullYear()}`
   }
 
-  async function addBlock(tipo: 'cancion'|'bloque', preset?: {titulo:string,duracion_min:number}) {
+  async function addBlock(tipo:'cancion'|'bloque', preset?:{titulo:string,duracion_min:number}) {
     if(!selectedService) return
     const orden=(blocks.length||0)+1
-    const body={
-      service_id:selectedService.id, orden, tipo,
-      titulo: preset?.titulo||(tipo==='cancion'?'Nueva canción':'Nuevo bloque'),
-      duracion_min: preset?.duracion_min||5,
-    }
-    await fetch('/api/service-blocks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+    await fetch('/api/service-blocks',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({service_id:selectedService.id,orden,tipo,
+        titulo:preset?.titulo||(tipo==='cancion'?'Nueva canción':'Nuevo bloque'),
+        duracion_min:preset?.duracion_min||300})})
     onBlocksChange()
+    setShowPresets(false)
   }
-
   async function updateBlock(id:string, updates:Partial<ServiceBlock>) {
     await fetch('/api/service-blocks',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,...updates})})
     onBlocksChange()
   }
-
   async function deleteBlock(id:string) {
     await fetch('/api/service-blocks',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})})
     onBlocksChange()
   }
 
-  const totalMin = blocks.reduce((s,b)=>{ const dur = b.tipo==='cancion' && (b.song as any)?.duracion_min ? (b.song as any).duracion_min : (b.duracion_min||0); return s+dur },0) // stored as seconds
-  const confirmed  = invitations.filter(i=>i.status==='confirmado').length
-  const declined   = invitations.filter(i=>i.status==='declinado').length
-  const pending    = invitations.filter(i=>i.status==='pendiente').length
-
-  function statusDot(status:string) {
-    if(status==='confirmado') return <span className="w-2 h-2 rounded-full bg-green-400 inline-block"/>
-    if(status==='declinado')  return <span className="w-2 h-2 rounded-full bg-red-400 inline-block"/>
-    return <span className="w-2 h-2 rounded-full bg-amber-400 inline-block"/>
-  }
+  const totalSecs = blocks.reduce((s,b)=>{
+    const dur = b.tipo==='cancion' && (b.song as any)?.duracion_min ? (b.song as any).duracion_min : (b.duracion_min||0)
+    return s+dur
+  },0)
+  const confirmed = invitations.filter(i=>i.status==='confirmado').length
+  const declined  = invitations.filter(i=>i.status==='declinado').length
+  const pending   = invitations.filter(i=>i.status==='pendiente').length
 
   function getMemberInvStatus(memberId?:string) {
     if(!memberId) return null
     return invitations.find(i=>i.member_id===memberId)?.status||null
   }
 
+  function statusDot(status:string) {
+    const color = status==='confirmado'?'#52B788':status==='declinado'?'#E24B4A':'#F4A261'
+    return <span style={{width:6,height:6,borderRadius:'50%',background:color,display:'inline-block',flexShrink:0}}/>
+  }
+
+  const input: React.CSSProperties = {
+    border:`0.5px solid ${C.cremaDark}`, borderRadius:8, padding:'6px 10px',
+    fontSize:12, fontFamily:'inherit', outline:'none', background:'white', color:C.txt,
+  }
+  const btn: React.CSSProperties = {
+    border:`0.5px solid ${C.cremaDark}`, borderRadius:8, padding:'6px 12px',
+    fontSize:11, fontWeight:500, fontFamily:'inherit', cursor:'pointer',
+    background:'white', color:C.txt,
+  }
+  const btnDark: React.CSSProperties = {
+    ...btn, background:C.txt, color:C.crema, border:'none',
+  }
+
   return (
-    <div className="space-y-4">
+    <div>
       {/* Service selector bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-wrap gap-3 items-center">
-        <select className="input flex-1 min-w-48 font-medium"
+      <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,padding:'10px 14px',marginBottom:12,display:'flex',flexWrap:'wrap',gap:10,alignItems:'center'}}>
+        <select style={{...input,flex:1,minWidth:200,fontWeight:500}}
           value={selectedService?.id||''}
           onChange={e=>{const s=services.find(sv=>sv.id===e.target.value);if(s)setSelectedService(s)}}>
           {services.map(s=><option key={s.id} value={s.id}>{fmt(s.fecha)} — {s.titulo}</option>)}
           {!services.length&&<option>Sin servicios aún</option>}
         </select>
-        <div className="flex gap-2">
-          <button onClick={()=>setShowNew(v=>!v)} className="btn-primary text-sm">+ Nuevo</button>
+        <div style={{display:'flex',gap:6}}>
+          <button style={btnDark} onClick={()=>setShowNew(v=>!v)}>+ Nuevo</button>
           {selectedService&&<>
-            <button onClick={()=>setShowDup(v=>!v)} className="btn-secondary text-sm" title="Duplicar">⧉ Duplicar</button>
-            <button onClick={()=>deleteService(selectedService.id)} className="text-sm text-red-400 hover:text-red-600 px-2">🗑</button>
+            <button style={btn} onClick={()=>setShowDup(v=>!v)}>⧉ Duplicar</button>
+            <button style={{...btn,color:'#E24B4A'}} onClick={()=>deleteService(selectedService.id)}>🗑</button>
           </>}
         </div>
       </div>
 
       {showNew&&(
-        <div className="bg-white rounded-2xl shadow-sm border border-navy/30 p-4 flex gap-3 items-end">
-          <div className="flex-1"><label className="text-xs text-gray-500 mb-1 block font-medium">Fecha</label>
-            <input type="date" className="input" value={newFecha} onChange={e=>setNewFecha(e.target.value)}/></div>
-          <button onClick={()=>{if(newFecha){createService(newFecha);setNewFecha('');setShowNew(false)}}} className="btn-primary">Crear</button>
-          <button onClick={()=>setShowNew(false)} className="btn-secondary">✕</button>
+        <div style={{background:'white',border:`1px solid ${C.txt}`,borderRadius:12,padding:'12px 14px',marginBottom:12,display:'flex',gap:10,alignItems:'flex-end'}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:10,fontWeight:600,color:C.muted,marginBottom:4,textTransform:'uppercase',letterSpacing:1}}>Fecha</div>
+            <input type="date" style={input} value={newFecha} onChange={e=>setNewFecha(e.target.value)}/>
+          </div>
+          <button style={btnDark} onClick={()=>{if(newFecha){createService(newFecha);setNewFecha('');setShowNew(false)}}}>Crear</button>
+          <button style={btn} onClick={()=>setShowNew(false)}>✕</button>
         </div>
       )}
       {showDup&&selectedService&&(
-        <div className="bg-white rounded-2xl shadow-sm border border-gold/50 p-4 flex gap-3 items-end">
-          <div className="flex-1"><label className="text-xs text-gray-500 mb-1 block font-medium">Duplicar a fecha:</label>
-            <input type="date" className="input" value={dupFecha} onChange={e=>setDupFecha(e.target.value)}/></div>
-          <button onClick={()=>{if(dupFecha){duplicateService(selectedService.id,dupFecha);setDupFecha('');setShowDup(false)}}} className="btn-gold">Duplicar</button>
-          <button onClick={()=>setShowDup(false)} className="btn-secondary">✕</button>
+        <div style={{background:'white',border:`1px solid ${C.cremaDark}`,borderRadius:12,padding:'12px 14px',marginBottom:12,display:'flex',gap:10,alignItems:'flex-end'}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:10,fontWeight:600,color:C.muted,marginBottom:4,textTransform:'uppercase',letterSpacing:1}}>Duplicar a fecha</div>
+            <input type="date" style={input} value={dupFecha} onChange={e=>setDupFecha(e.target.value)}/>
+          </div>
+          <button style={btnDark} onClick={()=>{if(dupFecha){duplicateService(selectedService.id,dupFecha);setDupFecha('');setShowDup(false)}}}>Duplicar</button>
+          <button style={btn} onClick={()=>setShowDup(false)}>✕</button>
         </div>
       )}
 
       {selectedService&&(
         <div>
-          {/* Title */}
-          <div className="mb-4">
-            <h2 className="text-xl font-black text-[#1F2A44]">{fmtLong(selectedService.fecha)}</h2>
-            <p className="text-sm text-gray-400 mt-0.5">{selectedService.titulo}</p>
+          {/* Title + live badge */}
+          <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:14}}>
+            <div>
+              <h2 style={{fontSize:20,fontWeight:700,color:C.txt,letterSpacing:'-0.3px'}}>{fmtLong(selectedService.fecha)}</h2>
+              <p style={{fontSize:11,fontWeight:300,color:C.muted,marginTop:2}}>{selectedService.titulo}</p>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:5,background:'#D8F3DC',padding:'3px 10px',borderRadius:20}}>
+              <span style={{width:6,height:6,borderRadius:'50%',background:'#52B788',display:'inline-block'}}/>
+              <span style={{fontSize:9,fontWeight:600,color:'#1B4332'}}>En vivo</span>
+            </div>
           </div>
 
-          {/* Main 2-col layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* 3-col layout */}
+          <div style={{display:'grid',gridTemplateColumns:'160px 1fr',gap:12}}>
 
-            {/* LEFT: Banda panel */}
-            <div className="lg:col-span-1 space-y-3">
+            {/* LEFT — Banda + Invitaciones */}
+            <div style={{display:'flex',flexDirection:'column',gap:10}}>
 
-              {/* Send invites summary */}
-              <div className="bg-[#1F2A44] rounded-2xl p-4 text-white">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="font-bold text-sm">✉️ Invitaciones</p>
+              {/* Invitaciones card */}
+              <div style={{background:C.txt,borderRadius:12,padding:'12px 14px'}}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
+                  <span style={{fontSize:9,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.crema}}>Invitaciones</span>
                   {invitations.length>0&&(
-                    <div className="flex gap-1.5 text-xs">
-                      <span className="bg-green-500/30 text-green-300 px-2 py-0.5 rounded-full">{confirmed} ✓</span>
-                      <span className="bg-red-500/30 text-red-300 px-2 py-0.5 rounded-full">{declined} ✗</span>
-                      <span className="bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">{pending} ⏳</span>
+                    <div style={{display:'flex',gap:4}}>
+                      <span style={{fontSize:7,fontWeight:700,background:'rgba(82,183,136,0.25)',color:'#A8F0C6',padding:'1px 5px',borderRadius:10}}>✓ {confirmed}</span>
+                      <span style={{fontSize:7,fontWeight:700,background:'rgba(226,75,74,0.25)',color:'#FFB3B3',padding:'1px 5px',borderRadius:10}}>✗ {declined}</span>
+                      <span style={{fontSize:7,fontWeight:700,background:'rgba(244,162,97,0.25)',color:'#FFD4A3',padding:'1px 5px',borderRadius:10}}>⏳ {pending}</span>
                     </div>
                   )}
                 </div>
                 <button onClick={sendInvites} disabled={sending}
-                  className="w-full bg-[#C9A14A] hover:bg-[#b8912f] text-white font-bold py-2.5 rounded-xl text-sm transition-all active:scale-95 disabled:opacity-50">
+                  style={{width:'100%',background:'#C9A14A',color:'white',border:'none',borderRadius:8,padding:'8px',fontSize:11,fontWeight:700,fontFamily:'inherit',cursor:'pointer',opacity:sending?0.6:1}}>
                   {sending?'Enviando...':`${invitations.length?'Reenviar':'Enviar'} invitaciones`}
                 </button>
-                {msg&&<p className="text-green-300 text-xs mt-2 text-center">{msg}</p>}
+                {msg&&<p style={{fontSize:9,color:'#A8F0C6',marginTop:6,textAlign:'center'}}>{msg}</p>}
               </div>
 
-              {/* #4 Redesigned + #5 Unified banda panel */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="font-bold text-sm text-[#1F2A44]">Asignación de roles</p>
+              {/* Banda */}
+              <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
+                <div style={{padding:'8px 12px',borderBottom:`0.5px solid ${C.cremaDark}`,background:C.crema}}>
+                  <span style={{fontSize:8,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Banda</span>
                 </div>
-
-                {/* Assign dropdowns — compact */}
-                <div className="p-3 space-y-1 border-b border-gray-100">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 mb-2">Banda</p>
+                <div>
                   {POSICIONES_BANDA.map(pos=>{
                     const asig=getBanda(pos)
                     const opts=membersFor(pos)
+                    const status=getMemberInvStatus(asig?.member_id)
                     return(
-                      <div key={pos} className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
-                        <span className="text-xs font-bold text-gray-400 w-12 flex-shrink-0">{pos}</span>
-                        <select className="flex-1 bg-transparent border-none text-sm font-medium text-[#1F2A44] focus:outline-none cursor-pointer"
-                          value={asig?.member_id||''}
-                          onChange={e=>assignBanda(pos,e.target.value)}>
+                      <div key={pos} style={{display:'flex',alignItems:'center',gap:6,padding:'5px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
+                        <span style={{fontSize:8,fontWeight:700,color:C.muted,width:36,flexShrink:0,letterSpacing:0.3}}>{pos}</span>
+                        <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
                           <option value="">— Asignar —</option>
                           {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
                         </select>
-                      </div>
-                    )
-                  })}
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 mt-3 mb-2">Voces</p>
-                  {POSICIONES_VX.map(pos=>{
-                    const asig=getBanda(pos)
-                    const opts=membersFor(pos)
-                    return(
-                      <div key={pos} className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors">
-                        <span className="text-xs font-bold text-gray-400 w-12 flex-shrink-0">{pos}</span>
-                        <select className="flex-1 bg-transparent border-none text-sm font-medium text-[#1F2A44] focus:outline-none cursor-pointer"
-                          value={asig?.member_id||''}
-                          onChange={e=>assignBanda(pos,e.target.value)}>
-                          <option value="">— Asignar —</option>
-                          {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
-                        </select>
+                        {status&&statusDot(status)}
                       </div>
                     )
                   })}
                 </div>
-
-                {/* #5 Unified member cards — one card per person, all their roles */}
-                {(()=>{
-                  const allPos=[...POSICIONES_BANDA,...POSICIONES_VX]
-                  const byMember: Record<string,{member:any,roles:string[],status:string|null}> = {}
-                  allPos.forEach(pos=>{
+                <div style={{padding:'6px 12px',background:C.crema,borderTop:`0.5px solid ${C.cremaDark}`}}>
+                  <span style={{fontSize:8,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Voces</span>
+                </div>
+                <div>
+                  {POSICIONES_VX.map(pos=>{
                     const asig=getBanda(pos)
-                    if(!asig?.member_id||!asig.member) return
-                    if(!byMember[asig.member_id]){
-                      byMember[asig.member_id]={member:asig.member,roles:[],status:getMemberInvStatus(asig.member_id)}
-                    }
-                    byMember[asig.member_id].roles.push(pos)
-                  })
-                  const entries=Object.values(byMember)
-                  if(!entries.length) return <p className="px-4 py-3 text-xs text-gray-400">Sin músicos asignados aún.</p>
-                  return(
-                    <div className="p-3">
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 mb-2">Equipo del domingo</p>
-                      <div className="space-y-2">
-                        {entries.map(({member,roles,status})=>(
-                          <div key={member.id} className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
-                            <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1F2A44] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                              {member.avatar_url
-                                ? <img src={member.avatar_url} className="w-full h-full object-cover" alt={member.nombre} />
-                                : <span>{member.nombre?.[0]}{member.apellido?.[0]||''}</span>
-                              }
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-[#1F2A44] truncate">{member.nombre} {member.apellido}</p>
-                              <div className="flex gap-1 flex-wrap mt-0.5">
-                                {roles.map(r=>(
-                                  <span key={r} className="text-xs bg-[#1F2A44]/10 text-[#1F2A44] px-1.5 py-0.5 rounded font-medium">{r}</span>
-                                ))}
-                              </div>
-                            </div>
-                            <div className="flex-shrink-0">
-                              {status==='confirmado' && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">✓</span>}
-                              {status==='declinado'  && <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-semibold">✗</span>}
-                              {status==='pendiente'  && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold">⏳</span>}
-                              {!status              && <span className="text-xs text-gray-300">—</span>}
-                            </div>
-                          </div>
-                        ))}
+                    const opts=membersFor(pos)
+                    const status=getMemberInvStatus(asig?.member_id)
+                    return(
+                      <div key={pos} style={{display:'flex',alignItems:'center',gap:6,padding:'5px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
+                        <span style={{fontSize:8,fontWeight:700,color:C.muted,width:36,flexShrink:0}}>{pos}</span>
+                        <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
+                          <option value="">— Asignar —</option>
+                          {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
+                        </select>
+                        {status&&statusDot(status)}
                       </div>
-                    </div>
-                  )
-                })()}
+                    )
+                  })}
+                </div>
               </div>
 
-              {/* Confirmations detail */}
-              {invitations.length>0&&(
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="font-bold text-sm text-[#1F2A44]">Respuestas</p>
+              {/* Equipo unificado */}
+              {(()=>{
+                const allPos=[...POSICIONES_BANDA,...POSICIONES_VX]
+                const byMember: Record<string,{member:any,roles:string[],status:string|null}> = {}
+                allPos.forEach(pos=>{
+                  const asig=getBanda(pos)
+                  if(!asig?.member_id||!asig.member) return
+                  if(!byMember[asig.member_id]) byMember[asig.member_id]={member:asig.member,roles:[],status:getMemberInvStatus(asig.member_id)}
+                  byMember[asig.member_id].roles.push(pos)
+                })
+                const entries=Object.values(byMember)
+                if(!entries.length) return null
+                return(
+                  <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
+                    <div style={{padding:'8px 12px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                      <span style={{fontSize:8,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Equipo del domingo</span>
+                    </div>
+                    <div style={{padding:'8px'}}>
+                      {entries.map(({member,roles,status})=>(
+                        <div key={member.id} style={{display:'flex',alignItems:'center',gap:8,background:C.bg,borderRadius:8,padding:'5px 8px',marginBottom:4}}>
+                          <div style={{width:28,height:28,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,fontWeight:700,flexShrink:0}}>
+                            {member.nombre?.[0]}{member.apellido?.[0]||''}
+                          </div>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{fontSize:9,fontWeight:600,color:C.txt,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{member.nombre} {member.apellido}</div>
+                            <div style={{display:'flex',gap:2,flexWrap:'wrap',marginTop:2}}>
+                              {roles.map(r=><span key={r} style={{fontSize:6,fontWeight:700,background:'rgba(0,0,0,0.07)',color:C.txt,padding:'1px 3px',borderRadius:3}}>{r}</span>)}
+                            </div>
+                          </div>
+                          {status==='confirmado'&&<span style={{fontSize:7,background:'#D8F3DC',color:'#1B4332',padding:'1px 5px',borderRadius:10,fontWeight:700}}>✓</span>}
+                          {status==='declinado' &&<span style={{fontSize:7,background:'#FEE2E2',color:'#991B1B',padding:'1px 5px',borderRadius:10,fontWeight:700}}>✗</span>}
+                          {status==='pendiente' &&<span style={{fontSize:7,background:'#FFF3CD',color:'#664D03',padding:'1px 5px',borderRadius:10,fontWeight:700}}>⏳</span>}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="divide-y divide-gray-50">
+                )
+              })()}
+
+              {/* Respuestas */}
+              {invitations.length>0&&(
+                <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
+                  <div style={{padding:'8px 12px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                    <span style={{fontSize:8,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Respuestas</span>
+                  </div>
+                  <div style={{padding:'6px 0'}}>
                     {invitations.map(inv=>(
-                      <div key={inv.id} className="flex items-center gap-2 px-4 py-2.5">
+                      <div key={inv.id} style={{display:'flex',alignItems:'center',gap:8,padding:'4px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
                         {statusDot(inv.status)}
-                        <p className="text-sm flex-1 font-medium">{inv.member?.nombre} {inv.member?.apellido}</p>
-                        {inv.comentario&&<p className="text-xs text-gray-400 truncate max-w-24" title={inv.comentario}>"{inv.comentario}"</p>}
+                        <span style={{fontSize:9,fontWeight:500,color:C.txt,flex:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{inv.member?.nombre} {inv.member?.apellido}</span>
+                        {inv.comentario&&<span style={{fontSize:8,fontWeight:300,color:C.muted,fontStyle:'italic',flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>"{inv.comentario}"</span>}
                       </div>
                     ))}
                   </div>
@@ -310,163 +329,141 @@ export default function AdminServiceView({
               )}
             </div>
 
-            {/* RIGHT: Order of service */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-                  <div>
-                    <p className="font-bold text-[#1F2A44]">Orden del servicio</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {blocks.length} items · {totalToDisplay(totalMin)} total
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="relative group">
-                      <button className="btn-secondary text-xs py-1.5">+ Bloque ▾</button>
-                      <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-20 hidden group-hover:block w-48">
+            {/* RIGHT — Order of service */}
+            <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
+              {/* Header */}
+              <div style={{padding:'10px 14px',borderBottom:`0.5px solid ${C.cremaDark}`,display:'flex',alignItems:'baseline',justifyContent:'space-between'}}>
+                <div>
+                  <span style={{fontSize:11,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.txt}}>Orden del servicio</span>
+                  <span style={{fontSize:9,fontWeight:300,color:C.muted,marginLeft:8}}>{blocks.length} items · {totalToDisplay(totalSecs)}</span>
+                </div>
+                <div style={{display:'flex',gap:6,position:'relative'}}>
+                  <div style={{position:'relative'}}>
+                    <button style={btn} onClick={()=>setShowPresets(v=>!v)}>+ Bloque ▾</button>
+                    {showPresets&&(
+                      <div style={{position:'absolute',right:0,top:'calc(100% + 4px)',background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.08)',zIndex:20,width:180,padding:'4px 0'}}>
                         {BLOQUES_PRESET.map(b=>(
                           <button key={b.titulo} onClick={()=>addBlock('bloque',b)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">
-                            {b.titulo} <span className="text-gray-400 text-xs">{b.duracion_min}min</span>
+                            style={{width:'100%',textAlign:'left',padding:'7px 14px',fontSize:11,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.txt,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            {b.titulo}<span style={{fontSize:9,color:C.muted}}>{toMMSS(b.duracion_min)}</span>
                           </button>
                         ))}
-                        <div className="border-t border-gray-100 mt-1 pt-1">
-                          <button onClick={()=>addBlock('bloque')}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-500">
-                            + Bloque personalizado
-                          </button>
-                        </div>
+                        <div style={{borderTop:`0.5px solid ${C.cremaDark}`,margin:'2px 0'}}/>
+                        <button onClick={()=>addBlock('bloque')}
+                          style={{width:'100%',textAlign:'left',padding:'7px 14px',fontSize:11,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.muted}}>
+                          + Personalizado
+                        </button>
                       </div>
-                    </div>
-                    <button onClick={()=>addBlock('cancion')} className="btn-primary text-xs py-1.5">🎵 + Canción</button>
+                    )}
                   </div>
+                  <button style={btnDark} onClick={()=>addBlock('cancion')}>🎵 + Canción</button>
                 </div>
+              </div>
 
-                {/* Table header */}
-                <div className="grid grid-cols-12 gap-2 px-5 py-2 bg-gray-50 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                  <div className="col-span-1">Min</div>
-                  <div className="col-span-5">Título</div>
-                  <div className="col-span-2">Tono</div>
-                  <div className="col-span-3">Lead / Voz</div>
-                  <div className="col-span-1"></div>
+              {/* Column headers */}
+              <div style={{display:'grid',gridTemplateColumns:'44px 1fr 90px 110px 20px',padding:'4px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                {['Min','Título','Tono','Lead / Voz',''].map((h,i)=>(
+                  <span key={i} style={{fontSize:8,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>{h}</span>
+                ))}
+              </div>
+
+              {/* Rows */}
+              {blocks.length===0&&(
+                <div style={{padding:'40px',textAlign:'center',color:C.muted,fontSize:12,fontWeight:300}}>
+                  Sin items. Agrega una canción o bloque.
                 </div>
-
-                {/* Blocks list */}
-                <div className="divide-y divide-gray-50">
-                  {blocks.length===0&&(
-                    <div className="py-12 text-center">
-                      <p className="text-gray-300 text-4xl mb-3">📋</p>
-                      <p className="text-gray-400 text-sm">Sin items. Agrega una canción o bloque.</p>
+              )}
+              {blocks.map(block=>{
+                const isEditing=editingBlock===block.id
+                const isSong=block.tipo==='cancion'
+                const songDur=(block.song as any)?.duracion_min
+                return(
+                  <div key={block.id} style={{display:'grid',gridTemplateColumns:'44px 1fr 90px 110px 20px',padding:'7px 14px',borderBottom:`0.5px solid ${C.crema}`,alignItems:'center',background:isSong?'white':C.bg}}>
+                    {/* Duration */}
+                    <div>
+                      {isSong && songDur ? (
+                        <span style={{fontSize:9,fontWeight:500,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'1px 5px',borderRadius:4,fontVariantNumeric:'tabular-nums'}}>{toMMSS(songDur)}</span>
+                      ) : isSong ? (
+                        <span style={{fontSize:9,fontWeight:300,color:'#CCC'}}>—</span>
+                      ) : isEditing ? (
+                        <input type="text" placeholder="mm:ss" defaultValue={block.duracion_min?toMMSS(block.duracion_min):''} onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
+                          style={{width:40,fontSize:9,padding:'2px 4px',border:`0.5px solid ${C.cremaDark}`,borderRadius:4,fontFamily:'inherit',textAlign:'center'}}/>
+                      ) : (
+                        <span style={{fontSize:9,fontWeight:300,color:C.muted,fontVariantNumeric:'tabular-nums'}}>{block.duracion_min?toMMSS(block.duracion_min):'—'}</span>
+                      )}
                     </div>
-                  )}
-                  {blocks.map((block)=>{
-                    const isEditing=editingBlock===block.id
-                    const isSong=block.tipo==='cancion'
-                    return(
-                      <div key={block.id} className={`grid grid-cols-12 gap-2 px-5 py-3 items-center hover:bg-gray-50 transition-colors ${isSong?'':'bg-gray-50/50'}`}>
-                        {/* Duration — read-only for songs, editable for blocks */}
-                        <div className="col-span-1">
-                          {isSong && block.song && (block.song as any).duracion_min ? (
-                            <span className="text-xs font-mono text-navy bg-navy/10 px-1.5 py-0.5 rounded" title="Duración desde base de datos">
-                              {toMMSS((block.song as any).duracion_min)}
-                            </span>
-                          ) : isSong ? (
-                            <span className="text-xs font-mono text-gray-300 bg-gray-50 px-1.5 py-0.5 rounded">—</span>
-                          ) : isEditing ? (
-                            <input type="text" placeholder="mm:ss" className="w-full border border-gray-200 rounded-lg px-1.5 py-1 text-xs text-center focus:outline-none focus:border-navy"
-                              defaultValue={block.duracion_min ? toMMSS(block.duracion_min) : ''}
-                              onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}/>
-                          ) : (
-                            <span className="text-xs font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
-                              {block.duracion_min ? toMMSS(block.duracion_min) : '—'}
-                            </span>
-                          )}
-                        </div>
 
-                        {/* Title / Song */}
-                        <div className="col-span-5">
-                          {isSong?(
-                            <select className="w-full bg-transparent border-none text-sm font-semibold text-[#1F2A44] focus:outline-none cursor-pointer"
-                              value={block.song_id||''}
-                              onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
-                              <option value="">— Seleccionar canción —</option>
-                              {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
-                            </select>
-                          ):(
-                            isEditing?(
-                              <input className="w-full border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-navy"
-                                value={block.titulo||''}
-                                onChange={e=>updateBlock(block.id,{titulo:e.target.value})}/>
-                            ):(
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-medium">bloque</span>
-                                <span className="text-sm text-gray-600 font-medium">{block.titulo||'—'}</span>
-                              </div>
-                            )
-                          )}
-                          {block.song&&!isEditing&&(
-                            <div className="flex gap-1.5 mt-1">
-                              {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" className="text-xs text-green-600 hover:underline">Spotify</a>}
-                              {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" className="text-xs text-blue-600 hover:underline">Letras</a>}
-                              {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" className="text-xs text-purple-600 hover:underline">Recursos</a>}
+                    {/* Title */}
+                    <div>
+                      {isSong ? (
+                        <>
+                          <select style={{...sel,fontSize:11,fontWeight:600}} value={block.song_id||''} onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
+                            <option value="">— Seleccionar canción —</option>
+                            {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
+                          </select>
+                          {block.song&&(
+                            <div style={{display:'flex',gap:5,marginTop:2}}>
+                              {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{fontSize:9,color:'#2D6A4F',textDecoration:'none',fontWeight:500}}>Spotify</a>}
+                              {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" style={{fontSize:9,color:'#1971C2',textDecoration:'none',fontWeight:500}}>Letras</a>}
+                              {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{fontSize:9,color:'#6B3FA0',textDecoration:'none',fontWeight:500}}>Recursos</a>}
                             </div>
                           )}
+                        </>
+                      ) : isEditing ? (
+                        <input defaultValue={block.titulo||''} onBlur={e=>updateBlock(block.id,{titulo:e.target.value})}
+                          style={{width:'90%',fontSize:11,padding:'3px 6px',border:`0.5px solid ${C.cremaDark}`,borderRadius:6,fontFamily:'inherit'}}/>
+                      ) : (
+                        <div style={{display:'flex',alignItems:'center',gap:5}}>
+                          <span style={{fontSize:9,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'1px 5px',borderRadius:3,letterSpacing:0.3}}>bloque</span>
+                          <span style={{fontSize:11,fontWeight:300,color:C.muted,fontStyle:'italic'}}>{block.titulo||'—'}</span>
                         </div>
+                      )}
+                    </div>
 
-                        {/* Tono */}
-                        <div className="col-span-2">
-                          {isSong?(
-                            <select className="w-full bg-transparent border-none text-sm text-gray-600 focus:outline-none cursor-pointer"
-                              value={block.tono||''}
-                              onChange={e=>updateBlock(block.id,{tono:e.target.value||undefined})}>
-                              <option value="">—</option>
-                              {NOTAS.map(n=><option key={n}>{n}</option>)}
-                            </select>
-                          ):(
-                            isEditing&&<input type="number" placeholder="min" className="w-full border border-gray-200 rounded-lg px-1.5 py-1 text-xs focus:outline-none focus:border-navy"
-                              value={block.duracion_min||''}
-                              onChange={e=>updateBlock(block.id,{duracion_min:parseInt(e.target.value)||0})}/>
-                          )}
-                        </div>
+                    {/* Tono */}
+                    <div>
+                      {isSong&&(
+                        <select style={{...sel,fontSize:10}} value={block.tono||''} onChange={e=>updateBlock(block.id,{tono:e.target.value||undefined})}>
+                          <option value="">—</option>
+                          {NOTAS.map(n=><option key={n}>{n}</option>)}
+                        </select>
+                      )}
+                    </div>
 
-                        {/* Lead */}
-                        <div className="col-span-3">
-                          {isSong&&(
-                            <select className="w-full bg-transparent border-none text-sm text-gray-600 focus:outline-none cursor-pointer"
-                              value={block.lead_id||''}
-                              onChange={e=>updateBlock(block.id,{lead_id:e.target.value||undefined})}>
-                              <option value="">— Lead —</option>
-                              {members.filter(m=>m.instrumentos.includes('Voz')).map(m=>(
-                                <option key={m.id} value={m.id}>{m.nombre}</option>
-                              ))}
-                            </select>
-                          )}
-                        </div>
+                    {/* Lead */}
+                    <div>
+                      {isSong&&(
+                        <select style={{...sel,fontSize:10}} value={block.lead_id||''} onChange={e=>updateBlock(block.id,{lead_id:e.target.value||undefined})}>
+                          <option value="">— Lead —</option>
+                          {members.filter(m=>m.instrumentos.includes('Voz')).map(m=>(
+                            <option key={m.id} value={m.id}>{m.nombre}</option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
 
-                        {/* Actions */}
-                        <div className="col-span-1 flex justify-end gap-1">
-                          <button onClick={()=>setEditingBlock(isEditing?null:block.id)}
-                            className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs transition-colors ${isEditing?'bg-navy text-white':'hover:bg-gray-100 text-gray-400'}`}>
-                            {isEditing?'✓':'✏'}
-                          </button>
-                          <button onClick={()=>deleteBlock(block.id)}
-                            className="w-6 h-6 rounded-lg flex items-center justify-center text-xs hover:bg-red-50 text-gray-300 hover:text-red-400 transition-colors">
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-
-                {/* Footer total */}
-                {blocks.length>0&&(
-                  <div className="px-5 py-3 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
-                    <span className="text-xs text-gray-400">{blocks.length} items</span>
-                    <span className="text-sm font-bold text-[#1F2A44]">Total: {totalToDisplay(totalMin)}</span>
+                    {/* Actions */}
+                    <div style={{display:'flex',gap:3,justifyContent:'flex-end'}}>
+                      <button onClick={()=>setEditingBlock(isEditing?null:block.id)}
+                        style={{width:18,height:18,borderRadius:4,border:`0.5px solid ${C.cremaDark}`,background:isEditing?C.txt:'white',color:isEditing?C.crema:C.muted,fontSize:9,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                        {isEditing?'✓':'✏'}
+                      </button>
+                      <button onClick={()=>deleteBlock(block.id)}
+                        style={{width:18,height:18,borderRadius:4,border:'none',background:'none',color:'#CCC',fontSize:14,cursor:'pointer',lineHeight:1,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                        ×
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
+                )
+              })}
+
+              {/* Footer total */}
+              {blocks.length>0&&(
+                <div style={{padding:'6px 14px',background:C.crema,borderTop:`0.5px solid ${C.cremaDark}`,display:'flex',justifyContent:'flex-end',alignItems:'baseline',gap:8}}>
+                  <span style={{fontSize:9,fontWeight:300,color:C.muted,letterSpacing:0.5,textTransform:'uppercase'}}>Total</span>
+                  <span style={{fontSize:13,fontWeight:700,color:C.txt}}>{totalToDisplay(totalSecs)}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
