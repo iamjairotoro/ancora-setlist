@@ -111,21 +111,10 @@ export default function AdminPage() {
   function getBanda(pos: string){ return bandaItems.find(b=>b.posicion===pos) }
 
   if(!authed) return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1F2A44] to-[#2E3D5C] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#1F2A44] rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-[#C9A14A] font-black text-2xl">A</span>
-          </div>
-          <h1 className="text-2xl font-black text-[#1F2A44]">Ancora</h1>
-          <p className="text-gray-400 text-sm mt-1">Panel de administración</p>
-        </div>
-        <input type="password" placeholder="Contraseña"
-          className={`input mb-3 ${pwError?'border-red-400':''}`}
-          value={pw} onChange={e=>setPw(e.target.value)}
-          onKeyDown={e=>e.key==='Enter'&&login()} />
-        {pwError && <p className="text-red-500 text-xs mb-2 text-center">Contraseña incorrecta</p>}
-        <button onClick={login} className="btn-primary w-full py-3 text-base">Entrar</button>
+    <div className="min-h-screen bg-gradient-to-br from-[#1F2A44] to-[#2E3D5C] flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-10 h-10 border-2 border-[#C9A14A] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+        <p className="text-white/60 text-sm">Verificando acceso...</p>
       </div>
     </div>
   )
