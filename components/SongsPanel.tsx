@@ -3,6 +3,23 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Song } from '@/lib/types'
 
+
+function toMMSS(totalSeconds: number): string {
+  if (!totalSeconds) return ''
+  const m = Math.floor(totalSeconds / 60)
+  const s = Math.round(totalSeconds % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
+}
+
+function fromMMSS(val: string): number {
+  if (!val) return 0
+  if (val.includes(':')) {
+    const [m, s] = val.split(':').map(Number)
+    return (m || 0) * 60 + (s || 0)
+  }
+  return parseFloat(val) * 60 // fallback: plain number treated as minutes
+}
+
 const NOTAS   = ['A','A#','Bb','B','C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab']
 const COMPASES = ['4/4','3/4','6/8','12/8','2/4','5/4','7/8']
 
@@ -79,7 +96,13 @@ export default function SongsPanel({ songs, onRefresh }: Props) {
             </div>
             <div>
               <label className="text-xs text-gray-500 mb-1 block font-medium">Duración (min)</label>
-              <input className="input" type="number" placeholder="ej: 4.5" step="0.5" min="0" value={editing.duracion_min||''} onChange={e => setEditing({...editing,duracion_min:parseFloat(e.target.value)||undefined})} />
+              <input className="input" type="text" placeholder="ej: 6:59" 
+                value={editing.duracion_min ? toMMSS(editing.duracion_min) : ''}
+                onChange={e => setEditing({...editing, duracion_min: fromMMSS(e.target.value) || undefined})}
+                onBlur={e => {
+                  const secs = fromMMSS(e.target.value)
+                  if (secs) setEditing(prev => prev ? {...prev, duracion_min: secs} : prev)
+                }} />
             </div>
             <div>
               <label className="text-xs text-gray-500 mb-1 block font-medium">Link Spotify</label>
@@ -120,6 +143,7 @@ export default function SongsPanel({ songs, onRefresh }: Props) {
                   <div className="flex gap-1 text-xs">
                     {s.tono_original && <span className="bg-navy/10 text-navy px-1.5 py-0.5 rounded font-medium">{s.tono_original}</span>}
                     {s.bpm && <span className="bg-gold/20 text-yellow-700 px-1.5 py-0.5 rounded">{s.bpm} BPM</span>}
+                  {s.duracion_min && <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{toMMSS(s.duracion_min)}</span>}
                     {s.compas && <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{s.compas}</span>}
                   </div>
                 </div>

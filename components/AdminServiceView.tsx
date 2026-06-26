@@ -2,6 +2,30 @@
 import { useState } from 'react'
 import type { Service, Member, Song, BandaAssignment, Invitation, ServiceBlock } from '@/lib/types'
 
+
+function toMMSS(totalSeconds: number): string {
+  if (!totalSeconds) return '—'
+  const m = Math.floor(totalSeconds / 60)
+  const s = Math.round(totalSeconds % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
+}
+
+function fromMMSS(val: string): number {
+  if (!val) return 0
+  if (val.includes(':')) {
+    const [m, s] = val.split(':').map(Number)
+    return (m || 0) * 60 + (s || 0)
+  }
+  return parseFloat(val) * 60
+}
+
+function totalToDisplay(seconds: number): string {
+  if (!seconds) return '0:00'
+  const m = Math.floor(seconds / 60)
+  const s = Math.round(seconds % 60)
+  return s > 0 ? `${m}:${s.toString().padStart(2,'0')}` : `${m} min`
+}
+
 const NOTAS = ['A','A#','Bb','B','C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab']
 
 const POS_ICON: Record<string,string> = {
@@ -92,7 +116,7 @@ export default function AdminServiceView({
     onBlocksChange()
   }
 
-  const totalMin = blocks.reduce((s,b)=>{ const dur = b.tipo==='cancion' && (b.song as any)?.duracion_min ? (b.song as any).duracion_min : (b.duracion_min||0); return s+dur },0)
+  const totalMin = blocks.reduce((s,b)=>{ const dur = b.tipo==='cancion' && (b.song as any)?.duracion_min ? (b.song as any).duracion_min : (b.duracion_min||0); return s+dur },0) // stored as seconds
   const confirmed  = invitations.filter(i=>i.status==='confirmado').length
   const declined   = invitations.filter(i=>i.status==='declinado').length
   const pending    = invitations.filter(i=>i.status==='pendiente').length
@@ -265,8 +289,7 @@ export default function AdminServiceView({
                   <div>
                     <p className="font-bold text-[#1F2A44]">Orden del servicio</p>
                     <p className="text-xs text-gray-400 mt-0.5">
-                      {blocks.length} items · {totalMin} min total
-                      {totalMin>0&&` (${Math.floor(totalMin/60)}h ${totalMin%60}m)`}
+                      {blocks.length} items · {totalToDisplay(totalMin)} total
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -317,17 +340,17 @@ export default function AdminServiceView({
                         <div className="col-span-1">
                           {isSong && block.song && (block.song as any).duracion_min ? (
                             <span className="text-xs font-mono text-navy bg-navy/10 px-1.5 py-0.5 rounded" title="Duración desde base de datos">
-                              {(block.song as any).duracion_min}m
+                              {toMMSS((block.song as any).duracion_min)}
                             </span>
                           ) : isSong ? (
-                            <span className="text-xs font-mono text-gray-300 bg-gray-50 px-1.5 py-0.5 rounded">—m</span>
+                            <span className="text-xs font-mono text-gray-300 bg-gray-50 px-1.5 py-0.5 rounded">—</span>
                           ) : isEditing ? (
-                            <input type="number" className="w-full border border-gray-200 rounded-lg px-1.5 py-1 text-xs text-center focus:outline-none focus:border-navy"
-                              value={block.duracion_min||''} min={0} step={0.5}
-                              onChange={e=>updateBlock(block.id,{duracion_min:parseFloat(e.target.value)||0})}/>
+                            <input type="text" placeholder="mm:ss" className="w-full border border-gray-200 rounded-lg px-1.5 py-1 text-xs text-center focus:outline-none focus:border-navy"
+                              defaultValue={block.duracion_min ? toMMSS(block.duracion_min) : ''}
+                              onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}/>
                           ) : (
                             <span className="text-xs font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
-                              {block.duracion_min||'—'}m
+                              {block.duracion_min ? toMMSS(block.duracion_min) : '—'}
                             </span>
                           )}
                         </div>
@@ -412,7 +435,7 @@ export default function AdminServiceView({
                 {blocks.length>0&&(
                   <div className="px-5 py-3 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
                     <span className="text-xs text-gray-400">{blocks.length} items</span>
-                    <span className="text-sm font-bold text-[#1F2A44]">Total: {totalMin} min</span>
+                    <span className="text-sm font-bold text-[#1F2A44]">Total: {totalToDisplay(totalMin)}</span>
                   </div>
                 )}
               </div>

@@ -2,6 +2,13 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 
+
+function toMMSS(secs: number): string {
+  const m = Math.floor(secs / 60)
+  const s = Math.round(secs % 60)
+  return `${m}:${s.toString().padStart(2,'0')}`
+}
+
 interface Song {
   id: string; nombre: string; artista: string
   tono_original?: string; bpm?: number; compas?: string
@@ -261,7 +268,7 @@ export default function PortalPage() {
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-semibold text-navy truncate">{item.song?.nombre||'—'}</p>
                                   <div className="flex items-center gap-2 flex-wrap">
-                                    <p className="text-xs text-gray-500">{item.song?.artista}{item.tono?` · ${item.tono}`:''}{item.song?.bpm?` · ${item.song.bpm} BPM`:''}</p>
+                                    <p className="text-xs text-gray-500">{item.song?.artista}{item.tono?` · ${item.tono}`:''}{item.song?.bpm?` · ${item.song.bpm} BPM`:''}{(item.song as any)?.duracion_min?` · ${toMMSS((item.song as any).duracion_min)}`:''}</p>
                                     {item.lead && (
                                       <span className="text-xs bg-gold/20 text-yellow-700 px-1.5 py-0.5 rounded-full font-semibold">
                                         Lead: {item.lead.nombre}
@@ -308,6 +315,7 @@ export default function PortalPage() {
                         <div className="flex gap-1.5 mt-1.5 flex-wrap">
                           {song.tono_original && <span className="text-xs bg-navy/10 text-navy px-2 py-0.5 rounded-full font-semibold">{song.tono_original}</span>}
                           {song.bpm && <span className="text-xs bg-gold/20 text-yellow-700 px-2 py-0.5 rounded-full">♩{song.bpm}</span>}
+                          {(song as any).duracion_min && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{toMMSS((song as any).duracion_min)}</span>}
                           {song.compas && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{song.compas}</span>}
                         </div>
                       </div>
