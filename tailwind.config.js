@@ -4,10 +4,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        navy: { DEFAULT: '#1F2A44', light: '#2E3D5C' },
-        gold:  { DEFAULT: '#C9A14A', light: '#E8C87A' },
+        crema: { DEFAULT: '#F5F0E6', dark: '#E0D8C8' },
+        ancora: { DEFAULT: '#1A1A1A' },
       },
-      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+      fontFamily: {
+        sans: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+        script: ['"Dancing Script"', 'cursive'],
+      },
     },
   },
   plugins: [],

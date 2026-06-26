@@ -5,6 +5,7 @@ import type { Service, Member, Song, BandaAssignment, Invitation, ServiceBlock }
 import TeamPanel from '@/components/TeamPanel'
 import SongsPanel from '@/components/SongsPanel'
 import AdminServiceView from '@/components/AdminServiceView'
+import TexBg from '@/components/TexBg'
 
 const POSICIONES_BANDA = ['AG1','AG2','EG','KEYS','BASS','DRUMS','MD','SONIDO'] as const
 const POSICIONES_VX    = ['VX1','VX2','VX3','VX4'] as const

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import AvatarUpload from '@/components/AvatarUpload'
+import TexBg from '@/components/TexBg'
 import { supabase } from '@/lib/supabase'
 import { useParams } from 'next/navigation'
 
