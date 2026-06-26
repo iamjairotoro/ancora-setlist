@@ -20,6 +20,7 @@ type Tab = 'setlist'|'equipo'|'canciones'
 export default function AdminPage() {
   const [authed, setAuthed]   = useState(false)
   const [tab, setTab]         = useState<Tab>('setlist')
+  const [portalToken, setPortalToken] = useState<string|null>(null)
 
   const [services, setServices]             = useState<Service[]>([])
   const [members, setMembers]               = useState<Member[]>([])
@@ -35,8 +36,16 @@ export default function AdminPage() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { window.location.href = '/login'; return }
       const { data } = await supabase.from('admin_emails').select('email').eq('email', session.user.email!).single()
-      if (data) setAuthed(true)
-      else window.location.href = '/login'
+      if (data) {
+        setAuthed(true)
+        // Find portal token for this admin (if they're also a member)
+        const email = session.user.email!
+        const { data: member } = await supabase.from('members').select('id').eq('email', email).single()
+        if (member) {
+          const { data: inv } = await supabase.from('invitations').select('token').eq('member_id', member.id).order('created_at', { ascending: false }).limit(1).single()
+          if (inv) setPortalToken(inv.token)
+        }
+      } else window.location.href = '/login'
     })
   },[])
 
@@ -134,7 +143,15 @@ export default function AdminPage() {
               <span className="hidden sm:inline">{icon} </span>{label}
             </button>
           ))}
-          <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }} className="ml-2 text-white/40 hover:text-white text-xs">Salir</button>
+          <div className="flex items-center gap-2 ml-2">
+            {portalToken && (
+              <a href={`/portal/${portalToken}`} target="_blank"
+                className="text-xs bg-gold/20 hover:bg-gold/30 text-gold px-3 py-1.5 rounded-lg font-medium transition-colors">
+                👤 Mi portal
+              </a>
+            )}
+            <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }} className="text-white/40 hover:text-white text-xs">Salir</button>
+          </div>
         </div>
       </header>
 
