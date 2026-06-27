@@ -332,11 +332,14 @@ export default function AdminServiceView({
                 </div>
               </div>
 
-              {/* Column headers: Min · Título · Tono · Lead · ✕ */}
-              <div style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'5px 16px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+              {/* Column headers */}
+              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'5px 16px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
                 {['Min','Título','Tono','Lead / Voz',''].map((h,i)=>(
                   <span key={i} style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>{h}</span>
                 ))}
+              </div>
+              <div className="mobile-cols-header" style={{display:'none',padding:'5px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                <span style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>Canciones</span>
               </div>
 
               {blocks.length===0&&(
@@ -354,7 +357,7 @@ export default function AdminServiceView({
 
                 return(
                   <div key={block.id}>
-                    <div style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'7px 16px',borderBottom:`0.5px solid ${C.crema}`,alignItems:'center',background:isSong?'white':C.bg}}>
+                    <div className="order-row-desktop" style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'7px 16px',borderBottom:`0.5px solid ${C.crema}`,alignItems:'center',background:isSong?'white':C.bg}}>
 
                       {/* Min */}
                       <div>

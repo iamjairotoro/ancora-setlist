@@ -208,25 +208,7 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* Mobile service selector */}
-      <div className="show-mobile" style={{display:'none',background:'white',padding:'10px 14px',borderBottom:'0.5px solid #E0D8C8'}}>
-        <p style={{fontSize:9,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:'#999',marginBottom:5}}>Servicio activo</p>
-        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',background:'#F5F0E6',border:'0.5px solid #E0D8C8',borderRadius:10,padding:'8px 12px'}}>
-          <div>
-            <p style={{fontSize:13,fontWeight:600,color:'#1A1A1A'}}>{selectedService?`${new Date(selectedService.fecha+'T12:00:00').toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'short'})}`:' Sin servicio'}</p>
-            <p style={{fontSize:10,fontWeight:300,color:'#999',marginTop:1}}>{selectedService?.titulo||''}</p>
-          </div>
-          <div style={{display:'flex',alignItems:'center',gap:6}}>
-            <div style={{display:'flex',alignItems:'center',gap:4,background:'#D8F3DC',padding:'3px 8px',borderRadius:20}}>
-              <span style={{width:5,height:5,borderRadius:'50%',background:'#52B788',display:'inline-block'}}/>
-              <span style={{fontSize:9,fontWeight:600,color:'#1B4332'}}>En vivo</span>
-            </div>
-            <span style={{fontSize:12,color:'#999'}}>▼</span>
-          </div>
-        </div>
-      </div>
-
-      <div style={{maxWidth:1200,margin:'0 auto',padding:'16px'}}>
+      <div style={{maxWidth:1200,margin:'0 auto',padding:'16px',paddingBottom:80}}>
         {tab==='setlist' && (
           <AdminServiceView
             services={services} selectedService={selectedService}
@@ -246,20 +228,18 @@ export default function AdminPage() {
       </div>
 
       {/* Mobile bottom nav */}
-      <div className="show-mobile" style={{display:'none',position:'fixed',bottom:0,left:0,right:0,background:'white',borderTop:'0.5px solid #E0D8C8',padding:'6px 0 8px',zIndex:40}}>
-        <div style={{display:'flex'}}>
-          {([['setlist','📋','Setlist'],['equipo','👥','Equipo'],['canciones','🎵','Canciones']] as [Tab,string,string][]).map(([t,icon,label])=>(
+      <div className="show-mobile" style={{display:'none',position:'fixed',bottom:0,left:0,right:0,background:'white',borderTop:'0.5px solid #E0D8C8',zIndex:40,boxShadow:'0 -2px 12px rgba(0,0,0,0.06)'}}>
+        <div style={{display:'flex',height:56}}>
+          {([['setlist','Setlist'],['equipo','Equipo'],['canciones','Canciones']] as [Tab,string][]).map(([t,label])=>(
             <button key={t} onClick={()=>setTab(t)}
-              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
-              <span style={{fontSize:20,opacity:tab===t?1:0.3}}>{icon}</span>
-              <span style={{fontSize:9,color:tab===t?'#1A1A1A':'#999',fontWeight:tab===t?700:400}}>{label}</span>
+              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:3,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',borderTop:tab===t?'2px solid #1A1A1A':'2px solid transparent'}}>
+              <span style={{fontSize:11,color:tab===t?'#1A1A1A':'#999',fontWeight:tab===t?700:400,letterSpacing:0.3}}>{label}</span>
             </button>
           ))}
           {portalToken&&(
             <a href={`/portal/${portalToken}`} target="_blank"
-              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2,textDecoration:'none'}}>
-              <span style={{fontSize:20,opacity:0.3}}>👤</span>
-              <span style={{fontSize:9,color:'#999'}}>Portal</span>
+              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textDecoration:'none',borderTop:'2px solid transparent'}}>
+              <span style={{fontSize:11,color:'#999',fontWeight:400}}>Mi portal</span>
             </a>
           )}
         </div>

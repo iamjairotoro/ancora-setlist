@@ -133,3 +133,28 @@ body {
   .show-mobile { display: none !important; }
   .hidden-mobile { display: flex !important; }
 }
+
+/* ── MOBILE ORDER OF SERVICE ── */
+@media (max-width: 768px) {
+  .desktop-cols-header { display: none !important; }
+  .mobile-cols-header  { display: block !important; }
+
+  .order-row-desktop {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 10px 12px !important;
+  }
+
+  /* On mobile, Tono and Lead show inline below title */
+  .order-row-desktop > div:nth-child(3),
+  .order-row-desktop > div:nth-child(4) {
+    flex: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-cols-header { display: none !important; }
+  .desktop-cols-header { display: grid !important; }
+  .order-row-desktop { display: grid !important; }
+}
