@@ -130,33 +130,45 @@ export default function AdminPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{minHeight:'100vh',background:'#F5F0E6',fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif'}}>
       {/* Top nav */}
-      <header className="bg-[#1F2A44] text-white h-14 flex items-center px-5 justify-between sticky top-0 z-30 shadow-lg">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#C9A14A] rounded-lg flex items-center justify-center font-black text-[#1F2A44] text-sm">A</div>
-          <span className="font-bold text-base">Ancora Setlist</span>
-        </div>
-        <div className="flex items-center gap-1">
-          {([['setlist','🎵','Setlist'],['equipo','👥','Equipo'],['canciones','🎶','Canciones'],['estadisticas','📊','Stats']] as [Tab,string,string][]).map(([t,icon,label])=>(
-            <button key={t} onClick={()=>setTab(t)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${tab===t?'bg-white/20 text-white':'text-white/60 hover:text-white hover:bg-white/10'}`}>
-              <span className="hidden sm:inline">{icon} </span>{label}
-            </button>
-          ))}
-          <div className="flex items-center gap-2 ml-2">
-            {portalToken && (
-              <a href={`/portal/${portalToken}`} target="_blank"
-                className="text-xs bg-gold/20 hover:bg-gold/30 text-gold px-3 py-1.5 rounded-lg font-medium transition-colors">
-                👤 Mi portal
-              </a>
-            )}
-            <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }} className="text-white/40 hover:text-white text-xs">Salir</button>
+      <TexBg className="sticky top-0 z-30 shadow-lg">
+        <header style={{height:52,display:'flex',alignItems:'center',padding:'0 20px',justifyContent:'space-between'}}>
+          {/* Logo */}
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <div style={{width:28,height:28,background:'#F5F0E6',borderRadius:7,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <span style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:19,color:'#1A1A1A',lineHeight:1}}>Á</span>
+            </div>
+            <div>
+              <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:16,color:'#F5F0E6',lineHeight:1}}>Áncora</div>
+              <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:300,fontSize:7,letterSpacing:3,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.4)'}}>Worship</div>
+            </div>
           </div>
-        </div>
-      </header>
+          {/* Nav */}
+          <div style={{display:'flex',alignItems:'center',gap:2}}>
+            {(['setlist','equipo','canciones'] as Tab[]).map(t=>(
+              <button key={t} onClick={()=>setTab(t)}
+                style={{fontSize:10,padding:'4px 10px',borderRadius:20,fontWeight:tab===t?500:400,background:tab===t?'rgba(245,240,230,0.15)':'transparent',color:tab===t?'#F5F0E6':'rgba(245,240,230,0.5)',border:'none',cursor:'pointer',fontFamily:'inherit',textTransform:'capitalize' as const}}>
+                {t==='setlist'?'Setlist':t==='equipo'?'Equipo':'Canciones'}
+              </button>
+            ))}
+            <div style={{display:'flex',alignItems:'center',gap:8,marginLeft:8}}>
+              {portalToken && (
+                <a href={`/portal/${portalToken}`} target="_blank"
+                  style={{fontSize:9,background:'rgba(245,240,230,0.1)',border:'0.5px solid rgba(245,240,230,0.22)',color:'#F5F0E6',padding:'3px 9px',borderRadius:20,textDecoration:'none',fontWeight:500}}>
+                  👤 Mi portal
+                </a>
+              )}
+              <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }}
+                style={{fontSize:10,color:'rgba(245,240,230,0.4)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+                Salir
+              </button>
+            </div>
+          </div>
+        </header>
+      </TexBg>
 
-      <div className="max-w-7xl mx-auto px-4 py-5">
+      <div style={{maxWidth:1200,margin:'0 auto',padding:'20px 16px'}}>
         {tab==='setlist' && (
           <AdminServiceView
             services={services} selectedService={selectedService}
