@@ -4,7 +4,6 @@ import type { Service, Member, Song, BandaAssignment, Invitation, ServiceBlock }
 import TexBg from './TexBg'
 
 const NOTAS = ['A','A#','Bb','B','C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab']
-
 const BLOQUES_PRESET = [
   {titulo:'Preroll',duracion_min:180},
   {titulo:'MC / Bienvenida',duracion_min:300},
@@ -17,8 +16,7 @@ const BLOQUES_PRESET = [
 
 function toMMSS(secs: number): string {
   if (!secs) return '—'
-  const m = Math.floor(secs / 60)
-  const s = Math.round(secs % 60)
+  const m = Math.floor(secs / 60), s = Math.round(secs % 60)
   return `${m}:${s.toString().padStart(2,'0')}`
 }
 function fromMMSS(val: string): number {
@@ -28,18 +26,11 @@ function fromMMSS(val: string): number {
 }
 function totalToDisplay(seconds: number): string {
   if (!seconds) return '0:00'
-  const m = Math.floor(seconds/60)
-  const s = Math.round(seconds%60)
+  const m = Math.floor(seconds/60), s = Math.round(seconds%60)
   return s > 0 ? `${m}:${s.toString().padStart(2,'0')}` : `${m} min`
 }
 
-const C = {
-  crema: '#F5F0E6',
-  cremaDark: '#E0D8C8',
-  txt: '#1A1A1A',
-  muted: '#999',
-  bg: '#FDFCF9',
-}
+const C = { crema:'#F5F0E6', cremaDark:'#E0D8C8', txt:'#1A1A1A', muted:'#999', bg:'#FDFCF9' }
 
 interface Props {
   services: Service[]
@@ -66,7 +57,7 @@ interface Props {
 
 const sel: React.CSSProperties = {
   width:'100%', background:'transparent', border:'none',
-  fontSize:11, fontWeight:500, color:C.txt, outline:'none', cursor:'pointer',
+  fontSize:13, fontWeight:500, color:C.txt, outline:'none', cursor:'pointer',
   fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif',
 }
 
@@ -78,12 +69,13 @@ export default function AdminServiceView({
   sendInvites,sending,msg,onBlocksChange,
   POSICIONES_BANDA,POSICIONES_VX
 }: Props) {
-  const [showNew,setShowNew]     = useState(false)
-  const [newFecha,setNewFecha]   = useState('')
-  const [showDup,setShowDup]     = useState(false)
-  const [dupFecha,setDupFecha]   = useState('')
-  const [editingBlock,setEditingBlock] = useState<string|null>(null)
-  const [showPresets,setShowPresets]   = useState(false)
+  const [showNew,setShowNew]         = useState(false)
+  const [newFecha,setNewFecha]       = useState('')
+  const [showDup,setShowDup]         = useState(false)
+  const [dupFecha,setDupFecha]       = useState('')
+  const [showPresets,setShowPresets] = useState(false)
+  const [editingObs,setEditingObs]   = useState<string|null>(null)
+  const [obsText,setObsText]         = useState<Record<string,string>>({})
 
   function fmt(fecha:string) {
     const d=new Date(fecha+'T12:00:00')
@@ -105,8 +97,7 @@ export default function AdminServiceView({
       body:JSON.stringify({service_id:selectedService.id,orden,tipo,
         titulo:preset?.titulo||(tipo==='cancion'?'Nueva canción':'Nuevo bloque'),
         duracion_min:preset?.duracion_min||300})})
-    onBlocksChange()
-    setShowPresets(false)
+    onBlocksChange(); setShowPresets(false)
   }
   async function updateBlock(id:string, updates:Partial<ServiceBlock>) {
     await fetch('/api/service-blocks',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,...updates})})
@@ -116,9 +107,13 @@ export default function AdminServiceView({
     await fetch('/api/service-blocks',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})})
     onBlocksChange()
   }
+  function saveObs(blockId:string) {
+    updateBlock(blockId,{notas:obsText[blockId]||''})
+    setEditingObs(null)
+  }
 
   const totalSecs = blocks.reduce((s,b)=>{
-    const dur = b.tipo==='cancion' && (b.song as any)?.duracion_min ? (b.song as any).duracion_min : (b.duracion_min||0)
+    const dur = b.tipo==='cancion'&&(b.song as any)?.duracion_min?(b.song as any).duracion_min:(b.duracion_min||0)
     return s+dur
   },0)
   const confirmed = invitations.filter(i=>i.status==='confirmado').length
@@ -129,28 +124,21 @@ export default function AdminServiceView({
     if(!memberId) return null
     return invitations.find(i=>i.member_id===memberId)?.status||null
   }
-
   function statusDot(status:string) {
-    const color = status==='confirmado'?'#52B788':status==='declinado'?'#E24B4A':'#F4A261'
-    return <span style={{width:6,height:6,borderRadius:'50%',background:color,display:'inline-block',flexShrink:0}}/>
+    const color=status==='confirmado'?'#52B788':status==='declinado'?'#E24B4A':'#F4A261'
+    return <span style={{width:7,height:7,borderRadius:'50%',background:color,display:'inline-block',flexShrink:0}}/>
   }
 
-  const input: React.CSSProperties = {
-    border:`0.5px solid ${C.cremaDark}`, borderRadius:8, padding:'6px 10px',
-    fontSize:12, fontFamily:'inherit', outline:'none', background:'white', color:C.txt,
-  }
-  const btn: React.CSSProperties = {
-    border:`0.5px solid ${C.cremaDark}`, borderRadius:8, padding:'6px 12px',
-    fontSize:11, fontWeight:500, fontFamily:'inherit', cursor:'pointer',
-    background:'white', color:C.txt,
-  }
-  const btnDark: React.CSSProperties = {
-    ...btn, background:C.txt, color:C.crema, border:'none',
-  }
+  const input:React.CSSProperties = {border:`0.5px solid ${C.cremaDark}`,borderRadius:8,padding:'7px 11px',fontSize:13,fontFamily:'inherit',outline:'none',background:'white',color:C.txt}
+  const btn:React.CSSProperties   = {border:`0.5px solid ${C.cremaDark}`,borderRadius:8,padding:'7px 14px',fontSize:12,fontWeight:500,fontFamily:'inherit',cursor:'pointer',background:'white',color:C.txt}
+  const btnDark:React.CSSProperties = {...btn,background:C.txt,color:C.crema,border:'none'}
+
+  // Song counter for numbering
+  let songCounter = 0
 
   return (
     <div>
-      {/* Service selector bar */}
+      {/* Service selector */}
       <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,padding:'10px 14px',marginBottom:12,display:'flex',flexWrap:'wrap',gap:10,alignItems:'center'}}>
         <select style={{...input,flex:1,minWidth:200,fontWeight:500}}
           value={selectedService?.id||''}
@@ -170,7 +158,7 @@ export default function AdminServiceView({
       {showNew&&(
         <div style={{background:'white',border:`1px solid ${C.txt}`,borderRadius:12,padding:'12px 14px',marginBottom:12,display:'flex',gap:10,alignItems:'flex-end'}}>
           <div style={{flex:1}}>
-            <div style={{fontSize:10,fontWeight:600,color:C.muted,marginBottom:4,textTransform:'uppercase',letterSpacing:1}}>Fecha</div>
+            <div style={{fontSize:10,fontWeight:700,color:C.muted,marginBottom:4,textTransform:'uppercase',letterSpacing:1}}>Fecha</div>
             <input type="date" style={input} value={newFecha} onChange={e=>setNewFecha(e.target.value)}/>
           </div>
           <button style={btnDark} onClick={()=>{if(newFecha){createService(newFecha);setNewFecha('');setShowNew(false)}}}>Crear</button>
@@ -180,7 +168,7 @@ export default function AdminServiceView({
       {showDup&&selectedService&&(
         <div style={{background:'white',border:`1px solid ${C.cremaDark}`,borderRadius:12,padding:'12px 14px',marginBottom:12,display:'flex',gap:10,alignItems:'flex-end'}}>
           <div style={{flex:1}}>
-            <div style={{fontSize:10,fontWeight:600,color:C.muted,marginBottom:4,textTransform:'uppercase',letterSpacing:1}}>Duplicar a fecha</div>
+            <div style={{fontSize:10,fontWeight:700,color:C.muted,marginBottom:4,textTransform:'uppercase',letterSpacing:1}}>Duplicar a fecha</div>
             <input type="date" style={input} value={dupFecha} onChange={e=>setDupFecha(e.target.value)}/>
           </div>
           <button style={btnDark} onClick={()=>{if(dupFecha){duplicateService(selectedService.id,dupFecha);setDupFecha('');setShowDup(false)}}}>Duplicar</button>
@@ -190,91 +178,76 @@ export default function AdminServiceView({
 
       {selectedService&&(
         <div>
-          {/* Title + live badge */}
           <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:14}}>
             <div>
-              <h2 style={{fontSize:20,fontWeight:700,color:C.txt,letterSpacing:'-0.3px'}}>{fmtLong(selectedService.fecha)}</h2>
-              <p style={{fontSize:11,fontWeight:300,color:C.muted,marginTop:2}}>{selectedService.titulo}</p>
+              <h2 style={{fontSize:22,fontWeight:700,color:C.txt,letterSpacing:'-0.3px'}}>{fmtLong(selectedService.fecha)}</h2>
+              <p style={{fontSize:12,fontWeight:300,color:C.muted,marginTop:2}}>{selectedService.titulo}</p>
             </div>
             <div style={{display:'flex',alignItems:'center',gap:5,background:'#D8F3DC',padding:'3px 10px',borderRadius:20}}>
               <span style={{width:6,height:6,borderRadius:'50%',background:'#52B788',display:'inline-block'}}/>
-              <span style={{fontSize:9,fontWeight:600,color:'#1B4332'}}>En vivo</span>
+              <span style={{fontSize:10,fontWeight:600,color:'#1B4332'}}>En vivo</span>
             </div>
           </div>
 
-          {/* 3-col layout */}
-          <div style={{display:'grid',gridTemplateColumns:'minmax(0,240px) 1fr',gap:12}} className='admin-layout-grid'>
+          <div className="admin-layout-grid" style={{display:'grid',gridTemplateColumns:'minmax(0,260px) 1fr',gap:12}}>
 
-            {/* LEFT — Banda + Invitaciones */}
+            {/* LEFT COL — Banda + Invitaciones */}
             <div style={{display:'flex',flexDirection:'column',gap:10}}>
-
-              {/* Invitaciones card */}
-              <div style={{background:C.txt,borderRadius:12,padding:'12px 14px'}}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
-                  <span style={{fontSize:9,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.crema}}>Invitaciones</span>
-                  {invitations.length>0&&(
-                    <div style={{display:'flex',gap:4}}>
-                      <span style={{fontSize:7,fontWeight:700,background:'rgba(82,183,136,0.25)',color:'#A8F0C6',padding:'1px 5px',borderRadius:10}}>✓ {confirmed}</span>
-                      <span style={{fontSize:7,fontWeight:700,background:'rgba(226,75,74,0.25)',color:'#FFB3B3',padding:'1px 5px',borderRadius:10}}>✗ {declined}</span>
-                      <span style={{fontSize:7,fontWeight:700,background:'rgba(244,162,97,0.25)',color:'#FFD4A3',padding:'1px 5px',borderRadius:10}}>⏳ {pending}</span>
-                    </div>
-                  )}
-                </div>
-                <button onClick={sendInvites} disabled={sending}
-                  style={{width:'100%',background:'#C9A14A',color:'white',border:'none',borderRadius:8,padding:'8px',fontSize:11,fontWeight:700,fontFamily:'inherit',cursor:'pointer',opacity:sending?0.6:1}}>
-                  {sending?'Enviando...':`${invitations.length?'Reenviar':'Enviar'} invitaciones`}
-                </button>
-                {msg&&<p style={{fontSize:9,color:'#A8F0C6',marginTop:6,textAlign:'center'}}>{msg}</p>}
-              </div>
 
               {/* Banda */}
               <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
-                <div style={{padding:'8px 12px',borderBottom:`0.5px solid ${C.cremaDark}`,background:C.crema}}>
-                  <span style={{fontSize:8,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Banda</span>
+                <div style={{padding:'8px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                  <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Banda</span>
                 </div>
-                <div>
-                  {POSICIONES_BANDA.map(pos=>{
-                    const asig=getBanda(pos)
-                    const opts=membersFor(pos)
-                    const status=getMemberInvStatus(asig?.member_id)
-                    return(
-                      <div key={pos} style={{display:'flex',alignItems:'center',gap:6,padding:'7px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
-                        <span style={{fontSize:11,fontWeight:700,color:C.muted,width:40,flexShrink:0,letterSpacing:0.3}}>{pos}</span>
-                        <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
-                          <option value="">— Asignar —</option>
-                          {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
-                        </select>
-                        {status&&statusDot(status)}
-                      </div>
-                    )
-                  })}
+                {POSICIONES_BANDA.map(pos=>{
+                  const asig=getBanda(pos), opts=membersFor(pos), status=getMemberInvStatus(asig?.member_id)
+                  return(
+                    <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderBottom:`0.5px solid ${C.crema}`}}>
+                      <span style={{fontSize:11,fontWeight:700,color:C.muted,width:48,flexShrink:0}}>{pos}</span>
+                      <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
+                        <option value=""></option>
+                        {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
+                      </select>
+                      {status&&statusDot(status)}
+                    </div>
+                  )
+                })}
+                <div style={{padding:'8px 14px',background:C.crema,borderTop:`0.5px solid ${C.cremaDark}`,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                  <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Voces</span>
                 </div>
-                <div style={{padding:'6px 12px',background:C.crema,borderTop:`0.5px solid ${C.cremaDark}`}}>
-                  <span style={{fontSize:8,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Voces</span>
-                </div>
-                <div>
-                  {POSICIONES_VX.map(pos=>{
-                    const asig=getBanda(pos)
-                    const opts=membersFor(pos)
-                    const status=getMemberInvStatus(asig?.member_id)
-                    return(
-                      <div key={pos} style={{display:'flex',alignItems:'center',gap:6,padding:'7px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
-                        <span style={{fontSize:11,fontWeight:700,color:C.muted,width:40,flexShrink:0}}>{pos}</span>
-                        <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
-                          <option value="">— Asignar —</option>
-                          {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
-                        </select>
-                        {status&&statusDot(status)}
-                      </div>
-                    )
-                  })}
+                {POSICIONES_VX.map(pos=>{
+                  const asig=getBanda(pos), opts=membersFor(pos), status=getMemberInvStatus(asig?.member_id)
+                  return(
+                    <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderBottom:`0.5px solid ${C.crema}`}}>
+                      <span style={{fontSize:11,fontWeight:700,color:C.muted,width:48,flexShrink:0}}>{pos}</span>
+                      <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
+                        <option value=""></option>
+                        {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
+                      </select>
+                      {status&&statusDot(status)}
+                    </div>
+                  )
+                })}
+
+                {/* Botón invitaciones — debajo de Voces */}
+                <div style={{padding:'12px 14px',borderTop:`0.5px solid ${C.cremaDark}`}}>
+                  <div style={{display:'flex',gap:5,marginBottom:10}}>
+                    <span style={{fontSize:9,fontWeight:700,background:'rgba(82,183,136,0.2)',color:'#1B4332',padding:'2px 7px',borderRadius:10}}>✓ {confirmed}</span>
+                    <span style={{fontSize:9,fontWeight:700,background:'rgba(226,75,74,0.2)',color:'#991B1B',padding:'2px 7px',borderRadius:10}}>✗ {declined}</span>
+                    <span style={{fontSize:9,fontWeight:700,background:'rgba(244,162,97,0.2)',color:'#664D03',padding:'2px 7px',borderRadius:10}}>⏳ {pending}</span>
+                  </div>
+                  <button onClick={sendInvites} disabled={sending}
+                    style={{width:'100%',background:'#C9A14A',color:'white',border:'none',borderRadius:8,padding:'10px',fontSize:13,fontWeight:700,fontFamily:'inherit',cursor:'pointer',opacity:sending?0.6:1}}>
+                    {sending?'Enviando...':`${invitations.length?'Reenviar':'Enviar'} invitaciones`}
+                  </button>
+                  {msg&&<p style={{fontSize:10,color:'#2D6A4F',marginTop:6,textAlign:'center'}}>{msg}</p>}
                 </div>
               </div>
 
               {/* Equipo unificado */}
               {(()=>{
                 const allPos=[...POSICIONES_BANDA,...POSICIONES_VX]
-                const byMember: Record<string,{member:any,roles:string[],status:string|null}> = {}
+                const byMember:Record<string,{member:any,roles:string[],status:string|null}>={}
                 allPos.forEach(pos=>{
                   const asig=getBanda(pos)
                   if(!asig?.member_id||!asig.member) return
@@ -285,24 +258,24 @@ export default function AdminServiceView({
                 if(!entries.length) return null
                 return(
                   <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
-                    <div style={{padding:'8px 12px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
-                      <span style={{fontSize:8,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Equipo del domingo</span>
+                    <div style={{padding:'8px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                      <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Equipo del domingo</span>
                     </div>
                     <div style={{padding:'8px'}}>
                       {entries.map(({member,roles,status})=>(
-                        <div key={member.id} style={{display:'flex',alignItems:'center',gap:8,background:C.bg,borderRadius:8,padding:'5px 8px',marginBottom:4}}>
-                          <div style={{width:28,height:28,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,fontWeight:700,flexShrink:0}}>
+                        <div key={member.id} style={{display:'flex',alignItems:'center',gap:8,background:C.bg,borderRadius:8,padding:'6px 10px',marginBottom:4}}>
+                          <div style={{width:30,height:30,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,flexShrink:0}}>
                             {member.nombre?.[0]}{member.apellido?.[0]||''}
                           </div>
                           <div style={{flex:1,minWidth:0}}>
                             <div style={{fontSize:12,fontWeight:600,color:C.txt,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{member.nombre} {member.apellido}</div>
                             <div style={{display:'flex',gap:2,flexWrap:'wrap',marginTop:2}}>
-                              {roles.map(r=><span key={r} style={{fontSize:6,fontWeight:700,background:'rgba(0,0,0,0.07)',color:C.txt,padding:'1px 3px',borderRadius:3}}>{r}</span>)}
+                              {roles.map(r=><span key={r} style={{fontSize:8,fontWeight:700,background:'rgba(0,0,0,0.07)',color:C.txt,padding:'1px 4px',borderRadius:3}}>{r}</span>)}
                             </div>
                           </div>
-                          {status==='confirmado'&&<span style={{fontSize:9,background:'#D8F3DC',color:'#1B4332',padding:'1px 5px',borderRadius:10,fontWeight:700}}>✓</span>}
-                          {status==='declinado' &&<span style={{fontSize:9,background:'#FEE2E2',color:'#991B1B',padding:'1px 5px',borderRadius:10,fontWeight:700}}>✗</span>}
-                          {status==='pendiente' &&<span style={{fontSize:9,background:'#FFF3CD',color:'#664D03',padding:'1px 5px',borderRadius:10,fontWeight:700}}>⏳</span>}
+                          {status==='confirmado'&&<span style={{fontSize:9,background:'#D8F3DC',color:'#1B4332',padding:'1px 6px',borderRadius:10,fontWeight:700}}>✓</span>}
+                          {status==='declinado' &&<span style={{fontSize:9,background:'#FEE2E2',color:'#991B1B',padding:'1px 6px',borderRadius:10,fontWeight:700}}>✗</span>}
+                          {status==='pendiente' &&<span style={{fontSize:9,background:'#FFF3CD',color:'#664D03',padding:'1px 6px',borderRadius:10,fontWeight:700}}>⏳</span>}
                         </div>
                       ))}
                     </div>
@@ -313,15 +286,15 @@ export default function AdminServiceView({
               {/* Respuestas */}
               {invitations.length>0&&(
                 <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
-                  <div style={{padding:'8px 12px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
-                    <span style={{fontSize:8,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Respuestas</span>
+                  <div style={{padding:'8px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                    <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Respuestas</span>
                   </div>
-                  <div style={{padding:'6px 0'}}>
+                  <div style={{padding:'4px 0'}}>
                     {invitations.map(inv=>(
-                      <div key={inv.id} style={{display:'flex',alignItems:'center',gap:8,padding:'4px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
+                      <div key={inv.id} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 14px',borderBottom:`0.5px solid ${C.crema}`}}>
                         {statusDot(inv.status)}
                         <span style={{fontSize:12,fontWeight:500,color:C.txt,flex:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{inv.member?.nombre} {inv.member?.apellido}</span>
-                        {inv.comentario&&<span style={{fontSize:8,fontWeight:300,color:C.muted,fontStyle:'italic',flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>"{inv.comentario}"</span>}
+                        {inv.comentario&&<span style={{fontSize:10,fontWeight:300,color:C.muted,fontStyle:'italic',flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>"{inv.comentario}"</span>}
                       </div>
                     ))}
                   </div>
@@ -332,25 +305,24 @@ export default function AdminServiceView({
             {/* RIGHT — Order of service */}
             <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
               {/* Header */}
-              <div style={{padding:'10px 14px',borderBottom:`0.5px solid ${C.cremaDark}`,display:'flex',alignItems:'baseline',justifyContent:'space-between'}}>
+              <div style={{padding:'10px 16px',borderBottom:`0.5px solid ${C.cremaDark}`,display:'flex',alignItems:'baseline',justifyContent:'space-between'}}>
                 <div>
-                  <span style={{fontSize:11,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.txt}}>Orden del servicio</span>
-                  <span style={{fontSize:9,fontWeight:300,color:C.muted,marginLeft:8}}>{blocks.length} items · {totalToDisplay(totalSecs)}</span>
+                  <span style={{fontSize:12,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.txt}}>Orden del servicio</span>
+                  <span style={{fontSize:11,fontWeight:300,color:C.muted,marginLeft:8}}>{blocks.length} items · {totalToDisplay(totalSecs)}</span>
                 </div>
                 <div style={{display:'flex',gap:6,position:'relative'}}>
                   <div style={{position:'relative'}}>
                     <button style={btn} onClick={()=>setShowPresets(v=>!v)}>+ Bloque ▾</button>
                     {showPresets&&(
-                      <div style={{position:'absolute',right:0,top:'calc(100% + 4px)',background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.08)',zIndex:20,width:180,padding:'4px 0'}}>
+                      <div style={{position:'absolute',right:0,top:'calc(100% + 4px)',background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.08)',zIndex:20,width:190,padding:'4px 0'}}>
                         {BLOQUES_PRESET.map(b=>(
                           <button key={b.titulo} onClick={()=>addBlock('bloque',b)}
-                            style={{width:'100%',textAlign:'left',padding:'7px 14px',fontSize:11,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.txt,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                            {b.titulo}<span style={{fontSize:9,color:C.muted}}>{toMMSS(b.duracion_min)}</span>
+                            style={{width:'100%',textAlign:'left',padding:'8px 16px',fontSize:12,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.txt,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            {b.titulo}<span style={{fontSize:10,color:C.muted}}>{toMMSS(b.duracion_min)}</span>
                           </button>
                         ))}
                         <div style={{borderTop:`0.5px solid ${C.cremaDark}`,margin:'2px 0'}}/>
-                        <button onClick={()=>addBlock('bloque')}
-                          style={{width:'100%',textAlign:'left',padding:'7px 14px',fontSize:11,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.muted}}>
+                        <button onClick={()=>addBlock('bloque')} style={{width:'100%',textAlign:'left',padding:'8px 16px',fontSize:12,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.muted}}>
                           + Personalizado
                         </button>
                       </div>
@@ -360,106 +332,138 @@ export default function AdminServiceView({
                 </div>
               </div>
 
-              {/* Column headers */}
-              <div style={{display:'grid',gridTemplateColumns:'44px 1fr 90px 110px 20px',padding:'4px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+              {/* Column headers: Min · Título · Tono · Lead · ✕ */}
+              <div style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'5px 16px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
                 {['Min','Título','Tono','Lead / Voz',''].map((h,i)=>(
                   <span key={i} style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>{h}</span>
                 ))}
               </div>
 
-              {/* Rows */}
               {blocks.length===0&&(
-                <div style={{padding:'40px',textAlign:'center',color:C.muted,fontSize:12,fontWeight:300}}>
+                <div style={{padding:'48px',textAlign:'center',color:C.muted,fontSize:13,fontWeight:300}}>
                   Sin items. Agrega una canción o bloque.
                 </div>
               )}
+
               {blocks.map(block=>{
-                const isEditing=editingBlock===block.id
-                const isSong=block.tipo==='cancion'
-                const songDur=(block.song as any)?.duracion_min
+                const isSong = block.tipo==='cancion'
+                const songDur = (block.song as any)?.duracion_min
+                if(isSong) songCounter++
+                const currentNum = isSong ? songCounter : null
+                const blockObs = (block as any).notas || ''
+
                 return(
-                  <div key={block.id} style={{display:'grid',gridTemplateColumns:'44px 1fr 90px 110px 20px',padding:'5px 14px',borderBottom:`0.5px solid ${C.crema}`,alignItems:'center',background:isSong?'white':C.bg}}>
-                    {/* Duration */}
-                    <div>
-                      {isSong && songDur ? (
-                        <span style={{fontSize:11,fontWeight:500,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'1px 5px',borderRadius:4,fontVariantNumeric:'tabular-nums'}}>{toMMSS(songDur)}</span>
-                      ) : isSong ? (
-                        <span style={{fontSize:11,fontWeight:300,color:'#CCC'}}>—</span>
-                      ) : isEditing ? (
-                        <input type="text" placeholder="mm:ss" defaultValue={block.duracion_min?toMMSS(block.duracion_min):''} onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
-                          style={{width:40,fontSize:9,padding:'2px 4px',border:`0.5px solid ${C.cremaDark}`,borderRadius:4,fontFamily:'inherit',textAlign:'center'}}/>
-                      ) : (
-                        <span style={{fontSize:11,fontWeight:300,color:C.muted,fontVariantNumeric:'tabular-nums'}}>{block.duracion_min?toMMSS(block.duracion_min):'—'}</span>
-                      )}
-                    </div>
+                  <div key={block.id}>
+                    <div style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'7px 16px',borderBottom:`0.5px solid ${C.crema}`,alignItems:'center',background:isSong?'white':C.bg}}>
 
-                    {/* Title */}
-                    <div>
-                      {isSong ? (
-                        <>
-                          <select style={{...sel,fontSize:11,fontWeight:600}} value={block.song_id||''} onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
-                            <option value="">— Seleccionar canción —</option>
-                            {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
-                          </select>
-                          {block.song&&(
-                            <div style={{display:'flex',gap:5,marginTop:2}}>
-                              {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{fontSize:11,color:'#2D6A4F',textDecoration:'none',fontWeight:500}}>Spotify</a>}
-                              {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" style={{fontSize:11,color:'#1971C2',textDecoration:'none',fontWeight:500}}>Letras</a>}
-                              {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{fontSize:11,color:'#6B3FA0',textDecoration:'none',fontWeight:500}}>Recursos</a>}
+                      {/* Min */}
+                      <div>
+                        {isSong && songDur ? (
+                          <span style={{fontSize:11,fontWeight:500,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'2px 6px',borderRadius:4,fontVariantNumeric:'tabular-nums'}}>{toMMSS(songDur)}</span>
+                        ) : isSong ? (
+                          <span style={{fontSize:11,fontWeight:300,color:'#CCC'}}>—</span>
+                        ) : (
+                          <span style={{fontSize:11,fontWeight:300,color:C.muted,fontVariantNumeric:'tabular-nums'}}>{block.duracion_min?toMMSS(block.duracion_min):'—'}</span>
+                        )}
+                      </div>
+
+                      {/* Título + número + observación inline */}
+                      <div style={{minWidth:0,paddingRight:8}}>
+                        {isSong ? (
+                          <div>
+                            <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:2}}>
+                              {/* Número de canción */}
+                              {currentNum&&(
+                                <span style={{width:20,height:20,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,flexShrink:0}}>
+                                  {currentNum}
+                                </span>
+                              )}
+                              <select style={{...sel,fontSize:13,fontWeight:600}} value={block.song_id||''} onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
+                                <option value="">— Seleccionar canción —</option>
+                                {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
+                              </select>
+                              {/* Obs button */}
+                              <button onClick={()=>{
+                                if(editingObs===block.id){saveObs(block.id)}
+                                else{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:blockObs}))}
+                              }} title="Observación" style={{width:22,height:22,borderRadius:5,border:`0.5px solid ${C.cremaDark}`,background:blockObs?'#FFF3CD':'white',color:blockObs?'#92400E':C.muted,fontSize:11,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                                {editingObs===block.id?'✓':'📝'}
+                              </button>
                             </div>
-                          )}
-                        </>
-                      ) : isEditing ? (
-                        <input defaultValue={block.titulo||''} onBlur={e=>updateBlock(block.id,{titulo:e.target.value})}
-                          style={{width:'90%',fontSize:11,padding:'3px 6px',border:`0.5px solid ${C.cremaDark}`,borderRadius:6,fontFamily:'inherit'}}/>
-                      ) : (
-                        <div style={{display:'flex',alignItems:'center',gap:5}}>
-                          <span style={{fontSize:11,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'1px 5px',borderRadius:3,letterSpacing:0.3}}>bloque</span>
-                          <span style={{fontSize:13,fontWeight:300,color:C.muted,fontStyle:'italic'}}>{block.titulo||'—'}</span>
-                        </div>
-                      )}
-                    </div>
+                            {/* Links */}
+                            {block.song&&(
+                              <div style={{display:'flex',gap:6,marginLeft:27}}>
+                                {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{fontSize:11,color:'#2D6A4F',textDecoration:'none',fontWeight:500}}>Spotify</a>}
+                                {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" style={{fontSize:11,color:'#1971C2',textDecoration:'none',fontWeight:500}}>Letras</a>}
+                                {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{fontSize:11,color:'#6B3FA0',textDecoration:'none',fontWeight:500}}>Recursos</a>}
+                              </div>
+                            )}
+                            {/* Obs input inline */}
+                            {editingObs===block.id&&(
+                              <div style={{marginTop:6,marginLeft:27}}>
+                                <input autoFocus placeholder="Escribe una observación..." value={obsText[block.id]||''}
+                                  onChange={e=>setObsText(prev=>({...prev,[block.id]:e.target.value}))}
+                                  onKeyDown={e=>{if(e.key==='Enter')saveObs(block.id);if(e.key==='Escape')setEditingObs(null)}}
+                                  style={{width:'100%',fontSize:12,padding:'5px 8px',border:`0.5px solid #C9A14A`,borderRadius:6,fontFamily:'inherit',outline:'none',color:C.txt,background:'#FFFBEB'}}/>
+                              </div>
+                            )}
+                            {/* Obs display */}
+                            {blockObs&&editingObs!==block.id&&(
+                              <div style={{marginTop:4,marginLeft:27,display:'flex',alignItems:'center',gap:4}}>
+                                <span style={{fontSize:11,color:'#92400E',fontWeight:400,fontStyle:'italic'}}>📝 {blockObs}</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div style={{display:'flex',alignItems:'center',gap:6}}>
+                            <span style={{fontSize:11,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'1px 6px',borderRadius:3,letterSpacing:0.3,flexShrink:0}}>bloque</span>
+                            <input defaultValue={block.titulo||''} onBlur={e=>updateBlock(block.id,{titulo:e.target.value})}
+                              style={{flex:1,fontSize:13,fontWeight:300,color:C.muted,fontStyle:'italic',border:'none',outline:'none',background:'transparent',fontFamily:'inherit'}}/>
+                            {/* Duration editable for blocks */}
+                            <input type="text" placeholder="mm:ss" defaultValue={block.duracion_min?toMMSS(block.duracion_min):''}
+                              onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
+                              style={{width:44,fontSize:10,padding:'2px 4px',border:`0.5px solid ${C.cremaDark}`,borderRadius:4,fontFamily:'inherit',textAlign:'center',color:C.muted}}/>
+                          </div>
+                        )}
+                      </div>
 
-                    {/* Tono */}
-                    <div>
-                      {isSong&&(
-                        <select style={{...sel,fontSize:10}} value={block.tono||''} onChange={e=>updateBlock(block.id,{tono:e.target.value||undefined})}>
-                          <option value="">—</option>
-                          {NOTAS.map(n=><option key={n}>{n}</option>)}
-                        </select>
-                      )}
-                    </div>
+                      {/* Tono */}
+                      <div>
+                        {isSong&&(
+                          <select style={{...sel,fontSize:12}} value={block.tono||''} onChange={e=>updateBlock(block.id,{tono:e.target.value||undefined})}>
+                            <option value="">—</option>
+                            {NOTAS.map(n=><option key={n}>{n}</option>)}
+                          </select>
+                        )}
+                      </div>
 
-                    {/* Lead */}
-                    <div>
-                      {isSong&&(
-                        <select style={{...sel,fontSize:10}} value={block.lead_id||''} onChange={e=>updateBlock(block.id,{lead_id:e.target.value||undefined})}>
-                          <option value="">— Lead —</option>
-                          {members.filter(m=>m.instrumentos.includes('Voz')).map(m=>(
-                            <option key={m.id} value={m.id}>{m.nombre}</option>
-                          ))}
-                        </select>
-                      )}
-                    </div>
+                      {/* Lead */}
+                      <div>
+                        {isSong&&(
+                          <select style={{...sel,fontSize:12}} value={block.lead_id||''} onChange={e=>updateBlock(block.id,{lead_id:e.target.value||undefined})}>
+                            <option value="">— Lead —</option>
+                            {members.filter(m=>m.instrumentos.includes('Voz')).map(m=>(
+                              <option key={m.id} value={m.id}>{m.nombre}</option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
 
-                    {/* Actions */}
-                    <div style={{display:'flex',gap:3,justifyContent:'flex-end'}}>
-                      <button onClick={()=>setEditingBlock(isEditing?null:block.id)}
-                        style={{width:18,height:18,borderRadius:4,border:`0.5px solid ${C.cremaDark}`,background:isEditing?C.txt:'white',color:isEditing?C.crema:C.muted,fontSize:9,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                        {isEditing?'✓':'✏'}
-                      </button>
-                      <button onClick={()=>deleteBlock(block.id)}
-                        style={{width:18,height:18,borderRadius:4,border:'none',background:'none',color:'#CCC',fontSize:14,cursor:'pointer',lineHeight:1,display:'flex',alignItems:'center',justifyContent:'center'}}>
-                        ×
-                      </button>
+                      {/* ✕ Delete — más visible */}
+                      <div style={{display:'flex',justifyContent:'center'}}>
+                        <button onClick={()=>deleteBlock(block.id)}
+                          style={{width:24,height:24,borderRadius:6,border:'none',background:'#FEE2E2',color:'#B91C1C',fontSize:14,cursor:'pointer',fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>
+                          ×
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )
               })}
 
-              {/* Footer total */}
+              {/* Footer */}
               {blocks.length>0&&(
-                <div style={{padding:'6px 14px',background:C.crema,borderTop:`0.5px solid ${C.cremaDark}`,display:'flex',justifyContent:'flex-end',alignItems:'baseline',gap:8}}>
+                <div style={{padding:'7px 16px',background:C.crema,borderTop:`0.5px solid ${C.cremaDark}`,display:'flex',justifyContent:'flex-end',alignItems:'baseline',gap:8}}>
                   <span style={{fontSize:11,fontWeight:300,color:C.muted,letterSpacing:0.5,textTransform:'uppercase'}}>Total</span>
                   <span style={{fontSize:15,fontWeight:700,color:C.txt}}>{totalToDisplay(totalSecs)}</span>
                 </div>

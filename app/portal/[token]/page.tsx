@@ -33,7 +33,11 @@ export default function PortalPage() {
   const [savingProfile, setSavingProfile] = useState(false)
   const [profileMsg, setProfileMsg] = useState('')
   const [songSearch, setSongSearch] = useState('')
-  const [expandedSong, setExpandedSong] = useState<string|null>(null)
+  const [expandedSong, setExpandedSong]     = useState<string|null>(null)
+  const [expandedSetlist, setExpandedSetlist] = useState<string|null>(null)
+  const [confirmingDecline, setConfirmingDecline] = useState<string|null>(null)
+  const [obsComment, setObsComment]           = useState('')
+  const [actionLoading, setActionLoading]     = useState(false)
 
   const loadData = useCallback(async () => {
     const [portalRes, songsRes] = await Promise.all([
@@ -79,6 +83,19 @@ export default function PortalPage() {
     const res=await fetch('/api/member-portal',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,...profileData})})
     if(res.ok){setMember(prev=>prev?{...prev,...profileData}:prev);setProfileMsg('¡Guardado!');setEditProfile(false);setTimeout(()=>setProfileMsg(''),3000)}
     setSavingProfile(false)
+  }
+
+  async function handleRSVP(token: string, respuesta: 'si'|'no', comentario?: string) {
+    setActionLoading(true)
+    await fetch(`/api/confirm-rsvp`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({token, respuesta, comentario})
+    })
+    await loadData()
+    setConfirmingDecline(null)
+    setObsComment('')
+    setActionLoading(false)
   }
 
   const nextService = services[0]||null
@@ -211,20 +228,58 @@ export default function PortalPage() {
 
                   {isOpen&&(
                     <div style={{borderTop:`0.5px solid ${C.crema}`}}>
-                      {/* Confirm/decline */}
-                      {invitation?.status==='pendiente'&&(
-                        <div style={{padding:'10px 14px',background:'#FFFBEB',borderBottom:`0.5px solid #FDE68A`}}>
-                          <p style={{fontSize:11,fontWeight:600,color:'#92400E',marginBottom:8}}>¿Puedes asistir?</p>
-                          <div style={{display:'flex',gap:8}}>
-                            <a href={`/confirm/${invitation.token}?r=si`} style={{flex:1,background:C.txt,color:C.crema,textAlign:'center',padding:'9px 4px',borderRadius:8,fontSize:11,fontWeight:700,textDecoration:'none',display:'block'}}>✓ Confirmo</a>
-                            <a href={`/confirm/${invitation.token}?r=no`} style={{flex:1,border:`0.5px solid ${C.cremaDark}`,color:C.muted,textAlign:'center',padding:'9px 4px',borderRadius:8,fontSize:11,fontWeight:500,textDecoration:'none',display:'block'}}>✗ No puedo</a>
-                          </div>
-                        </div>
-                      )}
-                      {invitation?.status!=='pendiente'&&(
-                        <div style={{padding:'8px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                          <span style={{fontSize:10,fontWeight:500,color:C.txt}}>{invitation?.status==='confirmado'?'✓ Confirmado':'✗ Declinado'}</span>
-                          <a href={`/confirm/${invitation?.token}`} style={{fontSize:10,color:C.muted,textDecoration:'underline'}}>Cambiar</a>
+                      {/* Inline confirm/decline */}
+                      {invitation&&(
+                        <div style={{padding:'10px 14px',borderBottom:`0.5px solid ${C.crema}`,background:invitation.status==='pendiente'?'#FFFBEB':invitation.status==='confirmado'?'#F0FFF4':'#FFF5F5'}}>
+                          {confirmingDecline===service.id ? (
+                            <div>
+                              <p style={{fontSize:12,fontWeight:600,color:'#B91C1C',marginBottom:8}}>¿Seguro que no puedes asistir?</p>
+                              <input placeholder="Comentario (opcional)" value={obsComment} onChange={e=>setObsComment(e.target.value)}
+                                style={{width:'100%',fontSize:12,padding:'7px 10px',border:'0.5px solid #FCA5A5',borderRadius:7,marginBottom:8,fontFamily:'inherit',outline:'none'}}/>
+                              <div style={{display:'flex',gap:8}}>
+                                <button onClick={()=>handleRSVP(invitation.token,'no',obsComment)} disabled={actionLoading}
+                                  style={{flex:1,background:'#B91C1C',color:'white',border:'none',borderRadius:8,padding:'9px',fontSize:12,fontWeight:700,fontFamily:'inherit',cursor:'pointer'}}>
+                                  {actionLoading?'...':'Sí, no puedo'}
+                                </button>
+                                <button onClick={()=>setConfirmingDecline(null)}
+                                  style={{flex:1,background:'white',color:C.txt,border:`0.5px solid ${C.cremaDark}`,borderRadius:8,padding:'9px',fontSize:12,fontWeight:500,fontFamily:'inherit',cursor:'pointer'}}>
+                                  Cancelar
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:invitation.status==='pendiente'?8:0}}>
+                                <span style={{fontSize:12,fontWeight:600,color:invitation.status==='confirmado'?'#1B4332':invitation.status==='declinado'?'#991B1B':'#92400E'}}>
+                                  {invitation.status==='confirmado'?'✓ Confirmado':invitation.status==='declinado'?'✗ Declinado':'¿Puedes asistir?'}
+                                </span>
+                                {invitation.status!=='pendiente'&&(
+                                  <button onClick={()=>setConfirmingDecline(null)}
+                                    style={{fontSize:11,color:C.muted,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',textDecoration:'underline'}}>
+                                    Cambiar
+                                  </button>
+                                )}
+                              </div>
+                              {invitation.status==='pendiente'&&(
+                                <div style={{display:'flex',gap:8}}>
+                                  <button onClick={()=>handleRSVP(invitation.token,'si')} disabled={actionLoading}
+                                    style={{flex:1,background:C.txt,color:C.crema,border:'none',borderRadius:8,padding:'10px',fontSize:13,fontWeight:700,fontFamily:'inherit',cursor:'pointer'}}>
+                                    {actionLoading?'...':'✓ Confirmo'}
+                                  </button>
+                                  <button onClick={()=>setConfirmingDecline(service.id)}
+                                    style={{flex:1,background:'white',color:'#B91C1C',border:'0.5px solid #FCA5A5',borderRadius:8,padding:'10px',fontSize:13,fontWeight:500,fontFamily:'inherit',cursor:'pointer'}}>
+                                    ✗ No puedo
+                                  </button>
+                                </div>
+                              )}
+                              {invitation.status==='confirmado'&&(
+                                <button onClick={()=>setConfirmingDecline(service.id)}
+                                  style={{fontSize:11,color:C.muted,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',textDecoration:'underline',display:'block',marginTop:4}}>
+                                  ¿Ya no puedes? Declinar
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
 
