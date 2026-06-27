@@ -61,6 +61,190 @@ const sel: React.CSSProperties = {
   fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif',
 }
 
+// ── EDIT PANEL (móvil, slide-up) ──
+interface EditPanelProps {
+  block: ServiceBlock
+  songs: Song[]
+  members: Member[]
+  songCounter: number
+  onClose: ()=>void
+  onUpdate: (id:string, updates:Partial<ServiceBlock>)=>void
+  onDelete: (id:string)=>void
+}
+
+function EditPanel({ block, songs, members, songCounter, onClose, onUpdate, onDelete }: EditPanelProps) {
+  const isSong = block.tipo === 'cancion'
+  const song = block.song as any
+  const [tono, setTono] = useState(block.tono || '')
+  const [leadId, setLeadId] = useState(block.lead_id || '')
+  const [songId, setSongId] = useState(block.song_id || '')
+  const [titulo, setTitulo] = useState(block.titulo || '')
+  const [obs, setObs] = useState((block as any).notas || '')
+  const [durInput, setDurInput] = useState(block.duracion_min ? toMMSS(block.duracion_min) : '')
+  const [saving, setSaving] = useState(false)
+
+  const vocalistas = members.filter(m => m.instrumentos.includes('Voz'))
+
+  async function save() {
+    setSaving(true)
+    if (isSong) {
+      const selectedSong = songs.find(s => s.id === songId)
+      await onUpdate(block.id, {
+        song_id: songId || undefined,
+        titulo: selectedSong?.nombre || titulo,
+        tono: tono || undefined,
+        lead_id: leadId || undefined,
+        notas: obs,
+      } as any)
+    } else {
+      await onUpdate(block.id, {
+        titulo,
+        duracion_min: fromMMSS(durInput) || 0,
+        notas: obs,
+      } as any)
+    }
+    setSaving(false)
+    onClose()
+  }
+
+  const selectedSong = songs.find(s => s.id === songId)
+
+  return (
+    <>
+      {/* Dimmer */}
+      <div onClick={onClose} style={{
+        position:'fixed',inset:0,background:'rgba(0,0,0,0.4)',zIndex:200,
+        backdropFilter:'blur(2px)',WebkitBackdropFilter:'blur(2px)'
+      }}/>
+
+      {/* Panel */}
+      <div style={{
+        position:'fixed',bottom:0,left:0,right:0,
+        background:'white',borderRadius:'16px 16px 0 0',
+        border:'0.5px solid #E0D8C8',zIndex:201,
+        maxHeight:'85vh',overflowY:'auto',
+        paddingBottom:'env(safe-area-inset-bottom, 12px)',
+        fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif',
+      }}>
+        {/* Handle */}
+        <div style={{width:36,height:4,background:'#E0D8C8',borderRadius:2,margin:'12px auto 0'}}/>
+
+        {/* Header */}
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 16px 10px'}}>
+          <div style={{fontSize:15,fontWeight:700,color:C.txt}}>
+            {isSong ? `✏️ Canción ${songCounter}` : '✏️ Bloque'}
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <button onClick={()=>{ if(confirm('¿Eliminar este item?')) { onDelete(block.id); onClose() } }}
+              style={{fontSize:11,fontWeight:600,color:'#E24B4A',background:'#FEE2E2',border:'none',borderRadius:6,padding:'5px 10px',cursor:'pointer',fontFamily:'inherit'}}>
+              Eliminar
+            </button>
+            <button onClick={onClose}
+              style={{fontSize:20,color:'#999',background:'none',border:'none',cursor:'pointer',lineHeight:1,padding:0}}>
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div style={{padding:'0 16px 16px'}}>
+          {isSong ? (
+            <>
+              {/* Canción selector */}
+              <div style={{marginBottom:14}}>
+                <div style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase' as const,color:C.muted,marginBottom:6}}>Canción</div>
+                <select
+                  value={songId}
+                  onChange={e=>setSongId(e.target.value)}
+                  style={{width:'100%',background:'#F5F0E6',border:'0.5px solid #C8C0B4',borderRadius:8,padding:'10px 12px',fontSize:13,fontWeight:500,color:C.txt,fontFamily:'inherit',outline:'none',appearance:'none',WebkitAppearance:'none' as any}}>
+                  <option value="">— Seleccionar canción —</option>
+                  {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
+                </select>
+              </div>
+
+              {/* Tono + Lead */}
+              <div style={{display:'flex',gap:10,marginBottom:14}}>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase' as const,color:C.muted,marginBottom:6}}>Tono</div>
+                  <select value={tono} onChange={e=>setTono(e.target.value)}
+                    style={{width:'100%',background:'#F5F0E6',border:'0.5px solid #C8C0B4',borderRadius:8,padding:'10px 12px',fontSize:13,fontWeight:500,color:C.txt,fontFamily:'inherit',outline:'none',appearance:'none',WebkitAppearance:'none' as any}}>
+                    <option value="">—</option>
+                    {NOTAS.map(n=><option key={n}>{n}</option>)}
+                  </select>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase' as const,color:C.muted,marginBottom:6}}>Lead / Voz</div>
+                  <select value={leadId} onChange={e=>setLeadId(e.target.value)}
+                    style={{width:'100%',background:'#F5F0E6',border:'0.5px solid #C8C0B4',borderRadius:8,padding:'10px 12px',fontSize:13,fontWeight:500,color:C.txt,fontFamily:'inherit',outline:'none',appearance:'none',WebkitAppearance:'none' as any}}>
+                    <option value="">— Lead —</option>
+                    {vocalistas.map(m=><option key={m.id} value={m.id}>{m.nombre}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Links (solo lectura desde la canción) */}
+              {selectedSong && (selectedSong as any).link_spotify || (selectedSong as any)?.link_letras || (selectedSong as any)?.link_recursos ? (
+                <div style={{marginBottom:14}}>
+                  <div style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase' as const,color:C.muted,marginBottom:6}}>Links</div>
+                  <div style={{display:'flex',gap:8,flexWrap:'wrap' as const}}>
+                    {(selectedSong as any)?.link_spotify && (
+                      <a href={(selectedSong as any).link_spotify} target="_blank"
+                        style={{display:'flex',alignItems:'center',gap:6,background:'#D8F3DC',borderRadius:8,padding:'7px 12px',fontSize:12,fontWeight:600,color:'#1B4332',textDecoration:'none'}}>
+                        🎧 Spotify
+                      </a>
+                    )}
+                    {(selectedSong as any)?.link_letras && (
+                      <a href={(selectedSong as any).link_letras} target="_blank"
+                        style={{display:'flex',alignItems:'center',gap:6,background:'#DBE4FF',borderRadius:8,padding:'7px 12px',fontSize:12,fontWeight:600,color:'#1E3A8A',textDecoration:'none'}}>
+                        📄 Letras
+                      </a>
+                    )}
+                    {(selectedSong as any)?.link_recursos && (
+                      <a href={(selectedSong as any).link_recursos} target="_blank"
+                        style={{display:'flex',alignItems:'center',gap:6,background:'#FFF3CD',borderRadius:8,padding:'7px 12px',fontSize:12,fontWeight:600,color:'#92400E',textDecoration:'none'}}>
+                        📁 Recursos
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <>
+              {/* Título bloque */}
+              <div style={{marginBottom:14}}>
+                <div style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase' as const,color:C.muted,marginBottom:6}}>Título</div>
+                <input value={titulo} onChange={e=>setTitulo(e.target.value)}
+                  style={{width:'100%',background:'#F5F0E6',border:'0.5px solid #C8C0B4',borderRadius:8,padding:'10px 12px',fontSize:13,fontWeight:500,color:C.txt,fontFamily:'inherit',outline:'none'}}/>
+              </div>
+              {/* Duración */}
+              <div style={{marginBottom:14}}>
+                <div style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase' as const,color:C.muted,marginBottom:6}}>Duración (mm:ss)</div>
+                <input value={durInput} onChange={e=>setDurInput(e.target.value)} placeholder="ej. 5:00"
+                  style={{width:'100%',background:'#F5F0E6',border:'0.5px solid #C8C0B4',borderRadius:8,padding:'10px 12px',fontSize:13,fontWeight:500,color:C.txt,fontFamily:'inherit',outline:'none'}}/>
+              </div>
+            </>
+          )}
+
+          {/* Observación */}
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase' as const,color:C.muted,marginBottom:6}}>Observación</div>
+            <textarea value={obs} onChange={e=>setObs(e.target.value)}
+              rows={2} placeholder="ej. puente y coro, repetir estrofa..."
+              style={{width:'100%',background:'#FFFBEB',border:'0.5px solid #C9A14A',borderRadius:8,padding:'10px 12px',fontSize:13,color:C.txt,fontFamily:'inherit',outline:'none',resize:'none' as const}}/>
+          </div>
+
+          {/* Save */}
+          <button onClick={save} disabled={saving}
+            style={{width:'100%',background:C.txt,color:C.crema,border:'none',borderRadius:10,padding:'13px',fontSize:14,fontWeight:700,fontFamily:'inherit',cursor:'pointer',opacity:saving?0.6:1}}>
+            {saving ? 'Guardando...' : 'Guardar'}
+          </button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+
 export default function AdminServiceView({
   services,selectedService,setSelectedService,createService,
   deleteService,duplicateService,
@@ -76,6 +260,10 @@ export default function AdminServiceView({
   const [showPresets,setShowPresets] = useState(false)
   const [editingObs,setEditingObs]   = useState<string|null>(null)
   const [obsText,setObsText]         = useState<Record<string,string>>({})
+
+  // Mobile edit panel state
+  const [editingBlock, setEditingBlock] = useState<ServiceBlock|null>(null)
+  const [editingBlockNum, setEditingBlockNum] = useState(0)
 
   function fmt(fecha:string) {
     const d=new Date(fecha+'T12:00:00')
@@ -108,7 +296,7 @@ export default function AdminServiceView({
     onBlocksChange()
   }
   function saveObs(blockId:string) {
-    updateBlock(blockId,{notas:obsText[blockId]||''})
+    updateBlock(blockId,{notas:obsText[blockId]||''} as any)
     setEditingObs(null)
   }
 
@@ -191,9 +379,8 @@ export default function AdminServiceView({
 
           <div className="admin-layout-grid" style={{display:'grid',gridTemplateColumns:'minmax(0,260px) 1fr',gap:12}}>
 
-            {/* LEFT COL — Banda + Invitaciones */}
+            {/* LEFT COL */}
             <div style={{display:'flex',flexDirection:'column',gap:10}}>
-
               {/* Banda */}
               <div style={{background:'white',border:`1px solid #C8C0B4`,borderRadius:12,overflow:'hidden'}}>
                 <div style={{padding:'8px 14px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
@@ -228,8 +415,6 @@ export default function AdminServiceView({
                     </div>
                   )
                 })}
-
-                {/* Botón invitaciones — debajo de Voces */}
                 <div style={{padding:'12px 14px',borderTop:`1px solid #C8C0B4`}}>
                   <div style={{display:'flex',gap:5,marginBottom:10}}>
                     <span style={{fontSize:9,fontWeight:700,background:'rgba(82,183,136,0.2)',color:'#1B4332',padding:'2px 7px',borderRadius:10}}>✓ {confirmed}</span>
@@ -244,10 +429,10 @@ export default function AdminServiceView({
                 </div>
               </div>
 
-              {/* Equipo unificado */}
+              {/* Equipo del domingo */}
               {(()=>{
                 const allPos=[...POSICIONES_BANDA,...POSICIONES_VX]
-                const byMember:Record<string,{member:any,roles:string[],status:string|null}>={}
+                const byMember:Record<string,{member:any,roles:string[],status:string|null}>= {}
                 allPos.forEach(pos=>{
                   const asig=getBanda(pos)
                   if(!asig?.member_id||!asig.member) return
@@ -302,9 +487,8 @@ export default function AdminServiceView({
               )}
             </div>
 
-            {/* RIGHT — Order of service */}
+            {/* RIGHT — Order of service (desktop: grid, mobile: clean rows) */}
             <div style={{background:'white',border:`1px solid #C8C0B4`,borderRadius:12,overflow:'hidden'}}>
-              {/* Header */}
               <div style={{padding:'10px 16px',borderBottom:`1px solid #C8C0B4`,display:'flex',alignItems:'baseline',justifyContent:'space-between'}}>
                 <div>
                   <span style={{fontSize:12,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.txt}}>Orden del servicio</span>
@@ -332,14 +516,17 @@ export default function AdminServiceView({
                 </div>
               </div>
 
-              {/* Column headers */}
+              {/* ── DESKTOP column headers ── */}
               <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'5px 16px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
                 {['Min','Título','Tono','Lead / Voz',''].map((h,i)=>(
                   <span key={i} style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>{h}</span>
                 ))}
               </div>
-              <div className="mobile-cols-header" style={{display:'none',padding:'5px 14px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
+
+              {/* ── MOBILE column header ── */}
+              <div className="mobile-cols-header" style={{display:'none',padding:'5px 14px',background:C.crema,borderBottom:`1px solid #C8C0B4`,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                 <span style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>Canciones</span>
+                <span style={{fontSize:10,fontWeight:300,color:C.muted}}>toca para editar</span>
               </div>
 
               {blocks.length===0&&(
@@ -354,12 +541,12 @@ export default function AdminServiceView({
                 if(isSong) songCounter++
                 const currentNum = isSong ? songCounter : null
                 const blockObs = (block as any).notas || ''
+                const currentSongCounter = songCounter
 
                 return(
                   <div key={block.id}>
+                    {/* ── DESKTOP ROW ── */}
                     <div className="order-row-desktop" style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'7px 16px',borderBottom:`0.5px solid #E8E0D0`,alignItems:'center',background:isSong?'white':C.bg}}>
-
-                      {/* Min */}
                       <div>
                         {isSong && songDur ? (
                           <span style={{fontSize:11,fontWeight:500,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'2px 6px',borderRadius:4,fontVariantNumeric:'tabular-nums'}}>{toMMSS(songDur)}</span>
@@ -369,13 +556,10 @@ export default function AdminServiceView({
                           <span style={{fontSize:11,fontWeight:300,color:C.muted,fontVariantNumeric:'tabular-nums'}}>{block.duracion_min?toMMSS(block.duracion_min):'—'}</span>
                         )}
                       </div>
-
-                      {/* Título + número + observación inline */}
                       <div style={{minWidth:0,paddingRight:8}}>
                         {isSong ? (
                           <div>
                             <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:2}}>
-                              {/* Número de canción */}
                               {currentNum&&(
                                 <span style={{width:20,height:20,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,flexShrink:0}}>
                                   {currentNum}
@@ -385,7 +569,6 @@ export default function AdminServiceView({
                                 <option value="">— Seleccionar canción —</option>
                                 {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
                               </select>
-                              {/* Obs button */}
                               <button onClick={()=>{
                                 if(editingObs===block.id){saveObs(block.id)}
                                 else{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:blockObs}))}
@@ -393,7 +576,6 @@ export default function AdminServiceView({
                                 {editingObs===block.id?'✓':'📝'}
                               </button>
                             </div>
-                            {/* Links */}
                             {block.song&&(
                               <div style={{display:'flex',gap:4,marginLeft:27,marginTop:2}}>
                                 {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{width:20,height:20,background:'#D8F3DC',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,textDecoration:'none'}}>🎧</a>}
@@ -401,7 +583,6 @@ export default function AdminServiceView({
                                 {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{width:20,height:20,background:'#FFF3CD',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,textDecoration:'none'}}>📁</a>}
                               </div>
                             )}
-                            {/* Obs input inline */}
                             {editingObs===block.id&&(
                               <div style={{marginTop:6,marginLeft:27}}>
                                 <input autoFocus placeholder="Escribe una observación..." value={obsText[block.id]||''}
@@ -410,7 +591,6 @@ export default function AdminServiceView({
                                   style={{width:'100%',fontSize:12,padding:'5px 8px',border:`0.5px solid #C9A14A`,borderRadius:6,fontFamily:'inherit',outline:'none',color:C.txt,background:'#FFFBEB'}}/>
                               </div>
                             )}
-                            {/* Obs display */}
                             {blockObs&&editingObs!==block.id&&(
                               <div style={{marginTop:4,marginLeft:27,display:'flex',alignItems:'center',gap:4}}>
                                 <span style={{fontSize:11,color:'#92400E',fontWeight:400,fontStyle:'italic'}}>📝 {blockObs}</span>
@@ -422,15 +602,12 @@ export default function AdminServiceView({
                             <span style={{fontSize:11,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'1px 6px',borderRadius:3,letterSpacing:0.3,flexShrink:0}}>bloque</span>
                             <input defaultValue={block.titulo||''} onBlur={e=>updateBlock(block.id,{titulo:e.target.value})}
                               style={{flex:1,fontSize:13,fontWeight:300,color:C.muted,fontStyle:'italic',border:'none',outline:'none',background:'transparent',fontFamily:'inherit'}}/>
-                            {/* Duration editable for blocks */}
                             <input type="text" placeholder="mm:ss" defaultValue={block.duracion_min?toMMSS(block.duracion_min):''}
                               onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
                               style={{width:44,fontSize:10,padding:'2px 4px',border:`1px solid #C8C0B4`,borderRadius:4,fontFamily:'inherit',textAlign:'center',color:C.muted}}/>
                           </div>
                         )}
                       </div>
-
-                      {/* Tono */}
                       <div>
                         {isSong&&(
                           <select style={{...sel,fontSize:12}} value={block.tono||''} onChange={e=>updateBlock(block.id,{tono:e.target.value||undefined})}>
@@ -439,8 +616,6 @@ export default function AdminServiceView({
                           </select>
                         )}
                       </div>
-
-                      {/* Lead */}
                       <div>
                         {isSong&&(
                           <select style={{...sel,fontSize:12}} value={block.lead_id||''} onChange={e=>updateBlock(block.id,{lead_id:e.target.value||undefined})}>
@@ -451,8 +626,6 @@ export default function AdminServiceView({
                           </select>
                         )}
                       </div>
-
-                      {/* ✕ Delete — más visible */}
                       <div style={{display:'flex',justifyContent:'center'}}>
                         <button onClick={()=>deleteBlock(block.id)}
                           style={{width:24,height:24,borderRadius:6,border:'none',background:'#FEE2E2',color:'#B91C1C',fontSize:14,cursor:'pointer',fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>
@@ -460,11 +633,57 @@ export default function AdminServiceView({
                         </button>
                       </div>
                     </div>
+
+                    {/* ── MOBILE ROW — tap to edit ── */}
+                    <div className="order-row-mobile"
+                      onClick={()=>{ setEditingBlock(block); setEditingBlockNum(currentSongCounter) }}
+                      style={{
+                        display:'none',
+                        alignItems:'center',gap:10,padding:'11px 14px',
+                        borderBottom:`0.5px solid #E8E0D0`,
+                        cursor:'pointer',
+                        background: isSong ? 'white' : C.bg,
+                        WebkitTapHighlightColor:'transparent',
+                      }}>
+                      {/* Left: duration or num */}
+                      {isSong ? (
+                        <div style={{width:20,height:20,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,flexShrink:0}}>
+                          {currentNum}
+                        </div>
+                      ) : (
+                        <span style={{fontSize:10,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'2px 6px',borderRadius:3,flexShrink:0}}>bloque</span>
+                      )}
+
+                      {/* Center: title + sub */}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:14,fontWeight:isSong?600:400,color:isSong?C.txt:C.muted,fontStyle:isSong?'normal':'italic',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                          {isSong ? ((block.song as any)?.nombre || block.titulo || '— canción —') : (block.titulo || 'Sin título')}
+                        </div>
+                        {isSong && (
+                          <div style={{fontSize:11,color:C.muted,marginTop:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                            {block.lead_id ? members.find(m=>m.id===block.lead_id)?.nombre || '' : ''}
+                            {blockObs ? (block.lead_id ? ' · ' : '') + '📝 ' + blockObs : ''}
+                          </div>
+                        )}
+                        {!isSong && block.duracion_min ? (
+                          <div style={{fontSize:11,color:C.muted,marginTop:1}}>{toMMSS(block.duracion_min)}</div>
+                        ) : null}
+                      </div>
+
+                      {/* Right: tono + chevron */}
+                      <div style={{display:'flex',alignItems:'center',gap:8,flexShrink:0}}>
+                        {isSong && block.tono && (
+                          <span style={{fontSize:11,fontWeight:600,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'2px 7px',borderRadius:4}}>
+                            {block.tono}
+                          </span>
+                        )}
+                        <span style={{fontSize:16,color:'#CCC',lineHeight:1}}>›</span>
+                      </div>
+                    </div>
                   </div>
                 )
               })}
 
-              {/* Footer */}
               {blocks.length>0&&(
                 <div style={{padding:'7px 16px',background:C.crema,borderTop:`1px solid #C8C0B4`,display:'flex',justifyContent:'flex-end',alignItems:'baseline',gap:8}}>
                   <span style={{fontSize:11,fontWeight:300,color:C.muted,letterSpacing:0.5,textTransform:'uppercase'}}>Total</span>
@@ -474,6 +693,19 @@ export default function AdminServiceView({
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── MOBILE EDIT PANEL ── */}
+      {editingBlock && (
+        <EditPanel
+          block={editingBlock}
+          songs={songs}
+          members={members}
+          songCounter={editingBlockNum}
+          onClose={()=>setEditingBlock(null)}
+          onUpdate={async (id, updates)=>{ await updateBlock(id, updates); onBlocksChange() }}
+          onDelete={async (id)=>{ await deleteBlock(id); onBlocksChange() }}
+        />
       )}
     </div>
   )

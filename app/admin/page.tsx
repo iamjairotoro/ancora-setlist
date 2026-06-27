@@ -40,7 +40,6 @@ export default function AdminPage() {
       const { data } = await supabase.from('admin_emails').select('email').eq('email', session.user.email!).single()
       if (data) {
         setAuthed(true)
-        // Find portal token for this admin (if they're also a member)
         const email = session.user.email!
         const { data: member } = await supabase.from('members').select('id').eq('email', email).single()
         if (member) {
@@ -132,7 +131,8 @@ export default function AdminPage() {
 
   return (
     <div style={{minHeight:'100vh',background:'#F5F0E6',fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif'}}>
-      {/* Top nav */}
+
+      {/* ── NAVBAR ── */}
       <TexBg className="sticky top-0 z-30 shadow-lg">
         <header style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',justifyContent:'space-between'}}>
           {/* Logo */}
@@ -145,6 +145,7 @@ export default function AdminPage() {
               <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:300,fontSize:7,letterSpacing:3,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.4)'}}>Worship</div>
             </div>
           </div>
+
           {/* Desktop nav */}
           <div className="hidden-mobile" style={{display:'flex',alignItems:'center',gap:2}}>
             {(['setlist','equipo','canciones'] as Tab[]).map(t=>(
@@ -166,16 +167,25 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
-          {/* Mobile hamburger */}
-          <button className="show-mobile" onClick={()=>setMobileMenuOpen(v=>!v)}
-            style={{display:'none',flexDirection:'column',gap:5,background:'none',border:'none',cursor:'pointer',padding:4}}>
-            <span style={{width:22,height:2,background:'rgba(245,240,230,0.8)',borderRadius:2,display:'block'}}/>
-            <span style={{width:22,height:2,background:'rgba(245,240,230,0.8)',borderRadius:2,display:'block'}}/>
-            <span style={{width:22,height:2,background:'rgba(245,240,230,0.8)',borderRadius:2,display:'block'}}/>
-          </button>
+
+          {/* Mobile right: Portal + Hamburger */}
+          <div className="show-mobile" style={{display:'none',alignItems:'center',gap:8}}>
+            {portalToken && (
+              <a href={`/portal/${portalToken}`} target="_blank"
+                style={{fontSize:9,background:'rgba(245,240,230,0.12)',border:'0.5px solid rgba(245,240,230,0.25)',color:'#F5F0E6',padding:'4px 10px',borderRadius:20,textDecoration:'none',fontWeight:500}}>
+                👤 Portal
+              </a>
+            )}
+            <button onClick={()=>setMobileMenuOpen(v=>!v)}
+              style={{display:'flex',flexDirection:'column',gap:5,background:'none',border:'none',cursor:'pointer',padding:4}}>
+              <span style={{width:22,height:2,background:'rgba(245,240,230,0.8)',borderRadius:2,display:'block'}}/>
+              <span style={{width:22,height:2,background:'rgba(245,240,230,0.8)',borderRadius:2,display:'block'}}/>
+              <span style={{width:22,height:2,background:'rgba(245,240,230,0.8)',borderRadius:2,display:'block'}}/>
+            </button>
+          </div>
         </header>
 
-        {/* Mobile menu dropdown */}
+        {/* Mobile dropdown menu */}
         {mobileMenuOpen&&(
           <div style={{position:'absolute',top:'100%',right:0,left:0,background:'#1A1A1A',zIndex:50,padding:'8px 0',borderBottom:'0.5px solid rgba(245,240,230,0.1)'}}>
             {(['setlist','equipo','canciones'] as Tab[]).map(t=>(
@@ -184,12 +194,6 @@ export default function AdminPage() {
                 {t==='setlist'?'📋 Setlist':t==='equipo'?'👥 Equipo':'🎵 Canciones'}
               </button>
             ))}
-            {portalToken&&(
-              <a href={`/portal/${portalToken}`} target="_blank"
-                style={{display:'block',padding:'12px 20px',fontSize:14,color:'#C9A14A',textDecoration:'none',fontWeight:500}}>
-                👤 Mi portal
-              </a>
-            )}
             <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }}
               style={{width:'100%',textAlign:'left',padding:'12px 20px',fontSize:14,color:'rgba(245,240,230,0.4)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
               Salir
@@ -198,17 +202,33 @@ export default function AdminPage() {
         )}
       </TexBg>
 
-      {/* Mobile tabs */}
-      <div className="show-mobile" style={{display:'none',background:'white',padding:'10px 14px',gap:8,overflowX:'auto',borderBottom:'0.5px solid #E0D8C8'}}>
-        {(['setlist','equipo','canciones'] as Tab[]).map(t=>(
-          <button key={t} onClick={()=>setTab(t)}
-            style={{padding:'6px 16px',borderRadius:20,fontSize:12,fontWeight:tab===t?600:500,whiteSpace:'nowrap',border:'0.5px solid #E0D8C8',background:tab===t?'#1A1A1A':'white',color:tab===t?'#F5F0E6':'#999',cursor:'pointer',fontFamily:'inherit',flexShrink:0}}>
-            {t==='setlist'?'Setlist':t==='equipo'?'Equipo':'Canciones'}
-          </button>
-        ))}
+      {/* ── MOBILE TABS (debajo del navbar, sin bottom nav) ── */}
+      <div className="show-mobile" style={{display:'none',background:'white',borderBottom:'0.5px solid #E0D8C8'}}>
+        <div style={{display:'flex'}}>
+          {(['setlist','equipo','canciones'] as Tab[]).map(t=>(
+            <button key={t} onClick={()=>setTab(t)}
+              style={{
+                flex:1,padding:'10px 0 8px',
+                borderBottom: tab===t ? '2px solid #1A1A1A' : '2px solid transparent',
+                background:'none',border:'none',borderBottomStyle:'solid',
+                borderBottomWidth:2,
+                borderBottomColor: tab===t ? '#1A1A1A' : 'transparent',
+                cursor:'pointer',fontFamily:'inherit',
+                display:'flex',flexDirection:'column',alignItems:'center',gap:3
+              }}>
+              <span style={{fontSize:16,lineHeight:1}}>
+                {t==='setlist'?'≡':t==='equipo'?'◎':'♪'}
+              </span>
+              <span style={{fontSize:10,fontWeight:tab===t?700:500,color:tab===t?'#1A1A1A':'#999'}}>
+                {t==='setlist'?'Setlist':t==='equipo'?'Equipo':'Canciones'}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div style={{maxWidth:1200,margin:'0 auto',padding:'16px',paddingBottom:80}}>
+      {/* ── CONTENT ── */}
+      <div style={{maxWidth:1200,margin:'0 auto',padding:'16px',paddingBottom:32}}>
         {tab==='setlist' && (
           <AdminServiceView
             services={services} selectedService={selectedService}
@@ -225,30 +245,6 @@ export default function AdminPage() {
         )}
         {tab==='equipo'       && <TeamPanel members={members} onRefresh={loadMembers} />}
         {tab==='canciones'    && <SongsPanel songs={songs} onRefresh={loadSongs} />}
-      </div>
-
-      {/* Mobile bottom nav */}
-      <div className="show-mobile" style={{display:'none',position:'fixed',bottom:0,left:0,right:0,background:'white',borderTop:'1px solid #1A1A1A',zIndex:40}}>
-        <div style={{display:'flex',height:58}}>
-          {([
-            ['setlist','☰','Setlist'],
-            ['equipo','◉','Equipo'],
-            ['canciones','♪','Canciones']
-          ] as [Tab,string,string][]).map(([t,icon,label])=>(
-            <button key={t} onClick={()=>setTab(t)}
-              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2,background:tab===t?'#1A1A1A':'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
-              <span style={{fontSize:18,color:tab===t?'#F5F0E6':'#999',lineHeight:1}}>{icon}</span>
-              <span style={{fontSize:10,color:tab===t?'#F5F0E6':'#999',fontWeight:tab===t?700:400}}>{label}</span>
-            </button>
-          ))}
-          {portalToken&&(
-            <a href={`/portal/${portalToken}`} target="_blank"
-              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2,textDecoration:'none',background:'none'}}>
-              <span style={{fontSize:18,color:'#999',lineHeight:1}}>⊙</span>
-              <span style={{fontSize:10,color:'#999',fontWeight:400}}>Portal</span>
-            </a>
-          )}
-        </div>
       </div>
     </div>
   )

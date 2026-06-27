@@ -163,3 +163,17 @@ body {
 .card {
   border: 1px solid #C0B8A8 !important;
 }
+
+/* ── MOBILE ORDER ROWS ── */
+@media (max-width: 768px) {
+  .order-row-desktop   { display: none !important; }
+  .order-row-mobile    { display: flex !important; }
+  .desktop-cols-header { display: none !important; }
+  .mobile-cols-header  { display: flex !important; }
+}
+@media (min-width: 769px) {
+  .order-row-mobile    { display: none !important; }
+  .order-row-desktop   { display: grid !important; }
+  .desktop-cols-header { display: grid !important; }
+  .mobile-cols-header  { display: none !important; }
+}
