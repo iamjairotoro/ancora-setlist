@@ -98,7 +98,7 @@ export default function TeamPanel({ members, onRefresh }: Props) {
                 return (
                   <button key={instr} type="button" onClick={() => toggleInstr(instr)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-                      active ? 'bg-navy text-white border-navy' : 'bg-white text-gray-600 border-gray-200 hover:border-navy'
+                      active ? 'bg-[#1A1A1A] text-[#F5F0E6] border-[#1A1A1A]' : 'bg-white text-[#1A1A1A] border-[#C8C0B4] hover:border-[#1A1A1A]'
                     }`}>
                     {SHORT[instr] || instr}
                   </button>

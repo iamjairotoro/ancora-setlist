@@ -129,8 +129,8 @@ export default function AdminServiceView({
     return <span style={{width:7,height:7,borderRadius:'50%',background:color,display:'inline-block',flexShrink:0}}/>
   }
 
-  const input:React.CSSProperties = {border:`0.5px solid ${C.cremaDark}`,borderRadius:8,padding:'7px 11px',fontSize:13,fontFamily:'inherit',outline:'none',background:'white',color:C.txt}
-  const btn:React.CSSProperties   = {border:`0.5px solid ${C.cremaDark}`,borderRadius:8,padding:'7px 14px',fontSize:12,fontWeight:500,fontFamily:'inherit',cursor:'pointer',background:'white',color:C.txt}
+  const input:React.CSSProperties = {border:`1px solid #C8C0B4`,borderRadius:8,padding:'7px 11px',fontSize:13,fontFamily:'inherit',outline:'none',background:'white',color:C.txt}
+  const btn:React.CSSProperties   = {border:`1px solid #C8C0B4`,borderRadius:8,padding:'7px 14px',fontSize:12,fontWeight:500,fontFamily:'inherit',cursor:'pointer',background:'white',color:C.txt}
   const btnDark:React.CSSProperties = {...btn,background:C.txt,color:C.crema,border:'none'}
 
   // Song counter for numbering
@@ -139,7 +139,7 @@ export default function AdminServiceView({
   return (
     <div>
       {/* Service selector */}
-      <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,padding:'10px 14px',marginBottom:12,display:'flex',flexWrap:'wrap',gap:10,alignItems:'center'}}>
+      <div style={{background:'white',border:`1px solid #C8C0B4`,borderRadius:12,padding:'10px 14px',marginBottom:12,display:'flex',flexWrap:'wrap',gap:10,alignItems:'center'}}>
         <select style={{...input,flex:1,minWidth:200,fontWeight:500}}
           value={selectedService?.id||''}
           onChange={e=>{const s=services.find(sv=>sv.id===e.target.value);if(s)setSelectedService(s)}}>
@@ -195,14 +195,14 @@ export default function AdminServiceView({
             <div style={{display:'flex',flexDirection:'column',gap:10}}>
 
               {/* Banda */}
-              <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
-                <div style={{padding:'8px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+              <div style={{background:'white',border:`1px solid #C8C0B4`,borderRadius:12,overflow:'hidden'}}>
+                <div style={{padding:'8px 14px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
                   <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Banda</span>
                 </div>
                 {POSICIONES_BANDA.map(pos=>{
                   const asig=getBanda(pos), opts=membersFor(pos), status=getMemberInvStatus(asig?.member_id)
                   return(
-                    <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderBottom:`0.5px solid ${C.crema}`}}>
+                    <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderBottom:`0.5px solid #E8E0D0`}}>
                       <span style={{fontSize:11,fontWeight:700,color:C.muted,width:48,flexShrink:0}}>{pos}</span>
                       <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
                         <option value=""></option>
@@ -212,13 +212,13 @@ export default function AdminServiceView({
                     </div>
                   )
                 })}
-                <div style={{padding:'8px 14px',background:C.crema,borderTop:`0.5px solid ${C.cremaDark}`,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                <div style={{padding:'8px 14px',background:C.crema,borderTop:`1px solid #C8C0B4`,borderBottom:`1px solid #C8C0B4`}}>
                   <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Voces</span>
                 </div>
                 {POSICIONES_VX.map(pos=>{
                   const asig=getBanda(pos), opts=membersFor(pos), status=getMemberInvStatus(asig?.member_id)
                   return(
-                    <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderBottom:`0.5px solid ${C.crema}`}}>
+                    <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderBottom:`0.5px solid #E8E0D0`}}>
                       <span style={{fontSize:11,fontWeight:700,color:C.muted,width:48,flexShrink:0}}>{pos}</span>
                       <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
                         <option value=""></option>
@@ -230,7 +230,7 @@ export default function AdminServiceView({
                 })}
 
                 {/* Botón invitaciones — debajo de Voces */}
-                <div style={{padding:'12px 14px',borderTop:`0.5px solid ${C.cremaDark}`}}>
+                <div style={{padding:'12px 14px',borderTop:`1px solid #C8C0B4`}}>
                   <div style={{display:'flex',gap:5,marginBottom:10}}>
                     <span style={{fontSize:9,fontWeight:700,background:'rgba(82,183,136,0.2)',color:'#1B4332',padding:'2px 7px',borderRadius:10}}>✓ {confirmed}</span>
                     <span style={{fontSize:9,fontWeight:700,background:'rgba(226,75,74,0.2)',color:'#991B1B',padding:'2px 7px',borderRadius:10}}>✗ {declined}</span>
@@ -257,8 +257,8 @@ export default function AdminServiceView({
                 const entries=Object.values(byMember)
                 if(!entries.length) return null
                 return(
-                  <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
-                    <div style={{padding:'8px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                  <div style={{background:'white',border:`1px solid #C8C0B4`,borderRadius:12,overflow:'hidden'}}>
+                    <div style={{padding:'8px 14px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
                       <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Equipo del domingo</span>
                     </div>
                     <div style={{padding:'8px'}}>
@@ -285,13 +285,13 @@ export default function AdminServiceView({
 
               {/* Respuestas */}
               {invitations.length>0&&(
-                <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
-                  <div style={{padding:'8px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+                <div style={{background:'white',border:`1px solid #C8C0B4`,borderRadius:12,overflow:'hidden'}}>
+                  <div style={{padding:'8px 14px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
                     <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Respuestas</span>
                   </div>
                   <div style={{padding:'4px 0'}}>
                     {invitations.map(inv=>(
-                      <div key={inv.id} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 14px',borderBottom:`0.5px solid ${C.crema}`}}>
+                      <div key={inv.id} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 14px',borderBottom:`0.5px solid #E8E0D0`}}>
                         {statusDot(inv.status)}
                         <span style={{fontSize:12,fontWeight:500,color:C.txt,flex:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{inv.member?.nombre} {inv.member?.apellido}</span>
                         {inv.comentario&&<span style={{fontSize:10,fontWeight:300,color:C.muted,fontStyle:'italic',flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>"{inv.comentario}"</span>}
@@ -303,9 +303,9 @@ export default function AdminServiceView({
             </div>
 
             {/* RIGHT — Order of service */}
-            <div style={{background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:12,overflow:'hidden'}}>
+            <div style={{background:'white',border:`1px solid #C8C0B4`,borderRadius:12,overflow:'hidden'}}>
               {/* Header */}
-              <div style={{padding:'10px 16px',borderBottom:`0.5px solid ${C.cremaDark}`,display:'flex',alignItems:'baseline',justifyContent:'space-between'}}>
+              <div style={{padding:'10px 16px',borderBottom:`1px solid #C8C0B4`,display:'flex',alignItems:'baseline',justifyContent:'space-between'}}>
                 <div>
                   <span style={{fontSize:12,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.txt}}>Orden del servicio</span>
                   <span style={{fontSize:11,fontWeight:300,color:C.muted,marginLeft:8}}>{blocks.length} items · {totalToDisplay(totalSecs)}</span>
@@ -314,14 +314,14 @@ export default function AdminServiceView({
                   <div style={{position:'relative'}}>
                     <button style={btn} onClick={()=>setShowPresets(v=>!v)}>+ Bloque ▾</button>
                     {showPresets&&(
-                      <div style={{position:'absolute',right:0,top:'calc(100% + 4px)',background:'white',border:`0.5px solid ${C.cremaDark}`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.08)',zIndex:20,width:190,padding:'4px 0'}}>
+                      <div style={{position:'absolute',right:0,top:'calc(100% + 4px)',background:'white',border:`1px solid #C8C0B4`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.08)',zIndex:20,width:190,padding:'4px 0'}}>
                         {BLOQUES_PRESET.map(b=>(
                           <button key={b.titulo} onClick={()=>addBlock('bloque',b)}
                             style={{width:'100%',textAlign:'left',padding:'8px 16px',fontSize:12,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.txt,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                             {b.titulo}<span style={{fontSize:10,color:C.muted}}>{toMMSS(b.duracion_min)}</span>
                           </button>
                         ))}
-                        <div style={{borderTop:`0.5px solid ${C.cremaDark}`,margin:'2px 0'}}/>
+                        <div style={{borderTop:`1px solid #C8C0B4`,margin:'2px 0'}}/>
                         <button onClick={()=>addBlock('bloque')} style={{width:'100%',textAlign:'left',padding:'8px 16px',fontSize:12,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.muted}}>
                           + Personalizado
                         </button>
@@ -333,12 +333,12 @@ export default function AdminServiceView({
               </div>
 
               {/* Column headers */}
-              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'5px 16px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'5px 16px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
                 {['Min','Título','Tono','Lead / Voz',''].map((h,i)=>(
                   <span key={i} style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>{h}</span>
                 ))}
               </div>
-              <div className="mobile-cols-header" style={{display:'none',padding:'5px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
+              <div className="mobile-cols-header" style={{display:'none',padding:'5px 14px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
                 <span style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>Canciones</span>
               </div>
 
@@ -357,7 +357,7 @@ export default function AdminServiceView({
 
                 return(
                   <div key={block.id}>
-                    <div className="order-row-desktop" style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'7px 16px',borderBottom:`0.5px solid ${C.crema}`,alignItems:'center',background:isSong?'white':C.bg}}>
+                    <div className="order-row-desktop" style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'7px 16px',borderBottom:`0.5px solid #E8E0D0`,alignItems:'center',background:isSong?'white':C.bg}}>
 
                       {/* Min */}
                       <div>
@@ -389,16 +389,16 @@ export default function AdminServiceView({
                               <button onClick={()=>{
                                 if(editingObs===block.id){saveObs(block.id)}
                                 else{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:blockObs}))}
-                              }} title="Observación" style={{width:22,height:22,borderRadius:5,border:`0.5px solid ${C.cremaDark}`,background:blockObs?'#FFF3CD':'white',color:blockObs?'#92400E':C.muted,fontSize:11,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                              }} title="Observación" style={{width:22,height:22,borderRadius:5,border:`1px solid #C8C0B4`,background:blockObs?'#FFF3CD':'white',color:blockObs?'#92400E':C.muted,fontSize:11,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                                 {editingObs===block.id?'✓':'📝'}
                               </button>
                             </div>
                             {/* Links */}
                             {block.song&&(
-                              <div style={{display:'flex',gap:6,marginLeft:27}}>
-                                {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{fontSize:11,color:'#2D6A4F',textDecoration:'none',fontWeight:500}}>Spotify</a>}
-                                {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" style={{fontSize:11,color:'#1971C2',textDecoration:'none',fontWeight:500}}>Letras</a>}
-                                {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{fontSize:11,color:'#6B3FA0',textDecoration:'none',fontWeight:500}}>Recursos</a>}
+                              <div style={{display:'flex',gap:4,marginLeft:27,marginTop:2}}>
+                                {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{width:20,height:20,background:'#D8F3DC',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,textDecoration:'none'}}>🎧</a>}
+                                {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" style={{width:20,height:20,background:'#DBE4FF',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,textDecoration:'none'}}>📄</a>}
+                                {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{width:20,height:20,background:'#FFF3CD',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,textDecoration:'none'}}>📁</a>}
                               </div>
                             )}
                             {/* Obs input inline */}
@@ -425,7 +425,7 @@ export default function AdminServiceView({
                             {/* Duration editable for blocks */}
                             <input type="text" placeholder="mm:ss" defaultValue={block.duracion_min?toMMSS(block.duracion_min):''}
                               onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
-                              style={{width:44,fontSize:10,padding:'2px 4px',border:`0.5px solid ${C.cremaDark}`,borderRadius:4,fontFamily:'inherit',textAlign:'center',color:C.muted}}/>
+                              style={{width:44,fontSize:10,padding:'2px 4px',border:`1px solid #C8C0B4`,borderRadius:4,fontFamily:'inherit',textAlign:'center',color:C.muted}}/>
                           </div>
                         )}
                       </div>
@@ -466,7 +466,7 @@ export default function AdminServiceView({
 
               {/* Footer */}
               {blocks.length>0&&(
-                <div style={{padding:'7px 16px',background:C.crema,borderTop:`0.5px solid ${C.cremaDark}`,display:'flex',justifyContent:'flex-end',alignItems:'baseline',gap:8}}>
+                <div style={{padding:'7px 16px',background:C.crema,borderTop:`1px solid #C8C0B4`,display:'flex',justifyContent:'flex-end',alignItems:'baseline',gap:8}}>
                   <span style={{fontSize:11,fontWeight:300,color:C.muted,letterSpacing:0.5,textTransform:'uppercase'}}>Total</span>
                   <span style={{fontSize:15,fontWeight:700,color:C.txt}}>{totalToDisplay(totalSecs)}</span>
                 </div>

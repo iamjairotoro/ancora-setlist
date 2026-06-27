@@ -61,7 +61,7 @@ body {
 /* ── INPUTS ── */
 .input {
   @apply w-full rounded-xl px-3.5 py-2.5 text-sm transition-all;
-  border: 0.5px solid var(--crema-dark);
+  border: 1px solid #C8C0B4;
   background: white;
   color: var(--ancora-txt);
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -75,7 +75,7 @@ body {
 .card {
   background: white;
   border-radius: 12px;
-  border: 0.5px solid var(--crema-dark);
+  border: 1px solid #C8C0B4;
 }
 
 /* ── FLOATING CARD (portal hero) ── */
@@ -157,4 +157,9 @@ body {
   .mobile-cols-header { display: none !important; }
   .desktop-cols-header { display: grid !important; }
   .order-row-desktop { display: grid !important; }
+}
+
+/* STRONGER BORDERS */
+.card {
+  border: 1px solid #C0B8A8 !important;
 }

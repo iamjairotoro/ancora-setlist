@@ -228,18 +228,24 @@ export default function AdminPage() {
       </div>
 
       {/* Mobile bottom nav */}
-      <div className="show-mobile" style={{display:'none',position:'fixed',bottom:0,left:0,right:0,background:'white',borderTop:'0.5px solid #E0D8C8',zIndex:40,boxShadow:'0 -2px 12px rgba(0,0,0,0.06)'}}>
-        <div style={{display:'flex',height:56}}>
-          {([['setlist','Setlist'],['equipo','Equipo'],['canciones','Canciones']] as [Tab,string][]).map(([t,label])=>(
+      <div className="show-mobile" style={{display:'none',position:'fixed',bottom:0,left:0,right:0,background:'white',borderTop:'1px solid #1A1A1A',zIndex:40}}>
+        <div style={{display:'flex',height:58}}>
+          {([
+            ['setlist','☰','Setlist'],
+            ['equipo','◉','Equipo'],
+            ['canciones','♪','Canciones']
+          ] as [Tab,string,string][]).map(([t,icon,label])=>(
             <button key={t} onClick={()=>setTab(t)}
-              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:3,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',borderTop:tab===t?'2px solid #1A1A1A':'2px solid transparent'}}>
-              <span style={{fontSize:11,color:tab===t?'#1A1A1A':'#999',fontWeight:tab===t?700:400,letterSpacing:0.3}}>{label}</span>
+              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2,background:tab===t?'#1A1A1A':'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+              <span style={{fontSize:18,color:tab===t?'#F5F0E6':'#999',lineHeight:1}}>{icon}</span>
+              <span style={{fontSize:10,color:tab===t?'#F5F0E6':'#999',fontWeight:tab===t?700:400}}>{label}</span>
             </button>
           ))}
           {portalToken&&(
             <a href={`/portal/${portalToken}`} target="_blank"
-              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textDecoration:'none',borderTop:'2px solid transparent'}}>
-              <span style={{fontSize:11,color:'#999',fontWeight:400}}>Mi portal</span>
+              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2,textDecoration:'none',background:'none'}}>
+              <span style={{fontSize:18,color:'#999',lineHeight:1}}>⊙</span>
+              <span style={{fontSize:10,color:'#999',fontWeight:400}}>Portal</span>
             </a>
           )}
         </div>
