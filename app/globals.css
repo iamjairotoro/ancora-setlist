@@ -120,3 +120,16 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ── RESPONSIVE NAV ── */
+@media (max-width: 768px) {
+  .hidden-mobile { display: none !important; }
+  .show-mobile { display: flex !important; }
+  .admin-layout-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+@media (min-width: 769px) {
+  .show-mobile { display: none !important; }
+  .hidden-mobile { display: flex !important; }
+}

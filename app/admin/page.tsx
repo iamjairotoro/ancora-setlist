@@ -22,6 +22,7 @@ export default function AdminPage() {
   const [authed, setAuthed]   = useState(false)
   const [tab, setTab]         = useState<Tab>('setlist')
   const [portalToken, setPortalToken] = useState<string|null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const [services, setServices]             = useState<Service[]>([])
   const [members, setMembers]               = useState<Member[]>([])
@@ -133,22 +134,22 @@ export default function AdminPage() {
     <div style={{minHeight:'100vh',background:'#F5F0E6',fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif'}}>
       {/* Top nav */}
       <TexBg className="sticky top-0 z-30 shadow-lg">
-        <header style={{height:52,display:'flex',alignItems:'center',padding:'0 20px',justifyContent:'space-between'}}>
+        <header style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',justifyContent:'space-between'}}>
           {/* Logo */}
           <div style={{display:'flex',alignItems:'center',gap:10}}>
-            <div style={{width:28,height:28,background:'#F5F0E6',borderRadius:7,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-              <span style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:19,color:'#1A1A1A',lineHeight:1}}>Á</span>
+            <div style={{width:34,height:34,background:'#F5F0E6',borderRadius:9,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <span style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:24,color:'#1A1A1A',lineHeight:1}}>Á</span>
             </div>
             <div>
-              <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:16,color:'#F5F0E6',lineHeight:1}}>Áncora</div>
+              <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:22,color:'#F5F0E6',lineHeight:1}}>Áncora</div>
               <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:300,fontSize:7,letterSpacing:3,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.4)'}}>Worship</div>
             </div>
           </div>
-          {/* Nav */}
-          <div style={{display:'flex',alignItems:'center',gap:2}}>
+          {/* Desktop nav */}
+          <div className="hidden-mobile" style={{display:'flex',alignItems:'center',gap:2}}>
             {(['setlist','equipo','canciones'] as Tab[]).map(t=>(
               <button key={t} onClick={()=>setTab(t)}
-                style={{fontSize:10,padding:'4px 10px',borderRadius:20,fontWeight:tab===t?500:400,background:tab===t?'rgba(245,240,230,0.15)':'transparent',color:tab===t?'#F5F0E6':'rgba(245,240,230,0.5)',border:'none',cursor:'pointer',fontFamily:'inherit',textTransform:'capitalize' as const}}>
+                style={{fontSize:10,padding:'4px 10px',borderRadius:20,fontWeight:tab===t?500:400,background:tab===t?'rgba(245,240,230,0.15)':'transparent',color:tab===t?'#F5F0E6':'rgba(245,240,230,0.5)',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
                 {t==='setlist'?'Setlist':t==='equipo'?'Equipo':'Canciones'}
               </button>
             ))}
@@ -165,8 +166,65 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
+          {/* Mobile hamburger */}
+          <button className="show-mobile" onClick={()=>setMobileMenuOpen(v=>!v)}
+            style={{display:'none',flexDirection:'column',gap:5,background:'none',border:'none',cursor:'pointer',padding:4}}>
+            <span style={{width:22,height:2,background:'rgba(245,240,230,0.8)',borderRadius:2,display:'block'}}/>
+            <span style={{width:22,height:2,background:'rgba(245,240,230,0.8)',borderRadius:2,display:'block'}}/>
+            <span style={{width:22,height:2,background:'rgba(245,240,230,0.8)',borderRadius:2,display:'block'}}/>
+          </button>
         </header>
+
+        {/* Mobile menu dropdown */}
+        {mobileMenuOpen&&(
+          <div style={{position:'absolute',top:'100%',right:0,left:0,background:'#1A1A1A',zIndex:50,padding:'8px 0',borderBottom:'0.5px solid rgba(245,240,230,0.1)'}}>
+            {(['setlist','equipo','canciones'] as Tab[]).map(t=>(
+              <button key={t} onClick={()=>{setTab(t);setMobileMenuOpen(false)}}
+                style={{width:'100%',textAlign:'left',padding:'12px 20px',fontSize:14,fontWeight:tab===t?600:400,background:tab===t?'rgba(245,240,230,0.08)':'none',color:'#F5F0E6',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+                {t==='setlist'?'📋 Setlist':t==='equipo'?'👥 Equipo':'🎵 Canciones'}
+              </button>
+            ))}
+            {portalToken&&(
+              <a href={`/portal/${portalToken}`} target="_blank"
+                style={{display:'block',padding:'12px 20px',fontSize:14,color:'#C9A14A',textDecoration:'none',fontWeight:500}}>
+                👤 Mi portal
+              </a>
+            )}
+            <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }}
+              style={{width:'100%',textAlign:'left',padding:'12px 20px',fontSize:14,color:'rgba(245,240,230,0.4)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+              Salir
+            </button>
+          </div>
+        )}
       </TexBg>
+
+      {/* Mobile tabs */}
+      <div className="show-mobile" style={{display:'none',background:'white',padding:'10px 14px',gap:8,overflowX:'auto',borderBottom:'0.5px solid #E0D8C8'}}>
+        {(['setlist','equipo','canciones'] as Tab[]).map(t=>(
+          <button key={t} onClick={()=>setTab(t)}
+            style={{padding:'6px 16px',borderRadius:20,fontSize:12,fontWeight:tab===t?600:500,whiteSpace:'nowrap',border:'0.5px solid #E0D8C8',background:tab===t?'#1A1A1A':'white',color:tab===t?'#F5F0E6':'#999',cursor:'pointer',fontFamily:'inherit',flexShrink:0}}>
+            {t==='setlist'?'Setlist':t==='equipo'?'Equipo':'Canciones'}
+          </button>
+        ))}
+      </div>
+
+      {/* Mobile service selector */}
+      <div className="show-mobile" style={{display:'none',background:'white',padding:'10px 14px',borderBottom:'0.5px solid #E0D8C8'}}>
+        <p style={{fontSize:9,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:'#999',marginBottom:5}}>Servicio activo</p>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',background:'#F5F0E6',border:'0.5px solid #E0D8C8',borderRadius:10,padding:'8px 12px'}}>
+          <div>
+            <p style={{fontSize:13,fontWeight:600,color:'#1A1A1A'}}>{selectedService?`${new Date(selectedService.fecha+'T12:00:00').toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'short'})}`:' Sin servicio'}</p>
+            <p style={{fontSize:10,fontWeight:300,color:'#999',marginTop:1}}>{selectedService?.titulo||''}</p>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:6}}>
+            <div style={{display:'flex',alignItems:'center',gap:4,background:'#D8F3DC',padding:'3px 8px',borderRadius:20}}>
+              <span style={{width:5,height:5,borderRadius:'50%',background:'#52B788',display:'inline-block'}}/>
+              <span style={{fontSize:9,fontWeight:600,color:'#1B4332'}}>En vivo</span>
+            </div>
+            <span style={{fontSize:12,color:'#999'}}>▼</span>
+          </div>
+        </div>
+      </div>
 
       <div style={{maxWidth:1200,margin:'0 auto',padding:'16px'}}>
         {tab==='setlist' && (
@@ -185,6 +243,26 @@ export default function AdminPage() {
         )}
         {tab==='equipo'       && <TeamPanel members={members} onRefresh={loadMembers} />}
         {tab==='canciones'    && <SongsPanel songs={songs} onRefresh={loadSongs} />}
+      </div>
+
+      {/* Mobile bottom nav */}
+      <div className="show-mobile" style={{display:'none',position:'fixed',bottom:0,left:0,right:0,background:'white',borderTop:'0.5px solid #E0D8C8',padding:'6px 0 8px',zIndex:40}}>
+        <div style={{display:'flex'}}>
+          {([['setlist','📋','Setlist'],['equipo','👥','Equipo'],['canciones','🎵','Canciones']] as [Tab,string,string][]).map(([t,icon,label])=>(
+            <button key={t} onClick={()=>setTab(t)}
+              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+              <span style={{fontSize:20,opacity:tab===t?1:0.3}}>{icon}</span>
+              <span style={{fontSize:9,color:tab===t?'#1A1A1A':'#999',fontWeight:tab===t?700:400}}>{label}</span>
+            </button>
+          ))}
+          {portalToken&&(
+            <a href={`/portal/${portalToken}`} target="_blank"
+              style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2,textDecoration:'none'}}>
+              <span style={{fontSize:20,opacity:0.3}}>👤</span>
+              <span style={{fontSize:9,color:'#999'}}>Portal</span>
+            </a>
+          )}
+        </div>
       </div>
     </div>
   )
