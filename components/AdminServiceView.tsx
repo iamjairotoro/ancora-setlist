@@ -517,8 +517,8 @@ export default function AdminServiceView({
               </div>
 
               {/* ── DESKTOP column headers ── */}
-              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'5px 16px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
-                {['Min','Título','Tono','Lead / Voz',''].map((h,i)=>(
+              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'20px 52px 1fr 70px 120px 32px',gap:6,padding:'5px 12px 5px 8px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
+                {['','Min','Título / Obs / Links','Tono','Lead',''].map((h,i)=>(
                   <span key={i} style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>{h}</span>
                 ))}
               </div>
@@ -544,57 +544,103 @@ export default function AdminServiceView({
                 const currentSongCounter = songCounter
 
                 return(
-                  <div key={block.id}>
-                    {/* ── DESKTOP ROW ── */}
-                    <div className="order-row-desktop" style={{display:'grid',gridTemplateColumns:'52px 1fr 80px 110px 36px',padding:'7px 16px',borderBottom:`0.5px solid #E8E0D0`,alignItems:'center',background:isSong?'white':C.bg}}>
+                  <div key={block.id}
+                    draggable
+                    onDragStart={e=>{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('blockId', block.id) }}
+                    onDragOver={e=>{ e.preventDefault(); e.currentTarget.style.background='#EEE8DC' }}
+                    onDragLeave={e=>{ e.currentTarget.style.background='' }}
+                    onDrop={async e=>{
+                      e.preventDefault(); e.currentTarget.style.background=''
+                      const draggedId = e.dataTransfer.getData('blockId')
+                      if(draggedId === block.id) return
+                      const draggedIdx = blocks.findIndex(b=>b.id===draggedId)
+                      const targetIdx  = blocks.findIndex(b=>b.id===block.id)
+                      const newOrder = [...blocks]
+                      const [moved] = newOrder.splice(draggedIdx,1)
+                      newOrder.splice(targetIdx,0,moved)
+                      // Persist new orden values
+                      await Promise.all(newOrder.map((b,i)=>
+                        fetch('/api/service-blocks',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:b.id,orden:i+1})})
+                      ))
+                      onBlocksChange()
+                    }}
+                  >
+                    {/* ── DESKTOP ROW ──
+                        Cols: drag(20) | min(52) | título+links+obs(1fr) | tono(70) | lead(110) | del(32)
+                    */}
+                    <div className="order-row-desktop" style={{
+                      display:'grid',
+                      gridTemplateColumns:'20px 52px 1fr 70px 120px 32px',
+                      padding:'7px 12px 7px 8px',
+                      borderBottom:`0.5px solid #E8E0D0`,
+                      alignItems:'center',
+                      gap:6,
+                      background:isSong?'white':C.bg
+                    }}>
+
+                      {/* Drag handle */}
+                      <div style={{cursor:'grab',display:'flex',flexDirection:'column',gap:2.5,alignItems:'center',padding:'2px 0',opacity:0.3}}
+                        onMouseEnter={e=>(e.currentTarget.style.opacity='0.7')}
+                        onMouseLeave={e=>(e.currentTarget.style.opacity='0.3')}>
+                        {[0,1,2].map(i=>(
+                          <div key={i} style={{display:'flex',gap:2}}>
+                            <div style={{width:2,height:2,borderRadius:'50%',background:C.txt}}/>
+                            <div style={{width:2,height:2,borderRadius:'50%',background:C.txt}}/>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Min */}
                       <div>
                         {isSong && songDur ? (
-                          <span style={{fontSize:11,fontWeight:500,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'2px 6px',borderRadius:4,fontVariantNumeric:'tabular-nums'}}>{toMMSS(songDur)}</span>
+                          <span style={{fontSize:11,fontWeight:500,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'2px 5px',borderRadius:4,fontVariantNumeric:'tabular-nums'}}>{toMMSS(songDur)}</span>
                         ) : isSong ? (
                           <span style={{fontSize:11,fontWeight:300,color:'#CCC'}}>—</span>
                         ) : (
                           <span style={{fontSize:11,fontWeight:300,color:C.muted,fontVariantNumeric:'tabular-nums'}}>{block.duracion_min?toMMSS(block.duracion_min):'—'}</span>
                         )}
                       </div>
-                      <div style={{minWidth:0,paddingRight:8}}>
+
+                      {/* Título + links inline + obs inline */}
+                      <div style={{minWidth:0}}>
                         {isSong ? (
-                          <div>
-                            <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:2}}>
-                              {currentNum&&(
-                                <span style={{width:20,height:20,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,flexShrink:0}}>
-                                  {currentNum}
-                                </span>
-                              )}
-                              <select style={{...sel,fontSize:13,fontWeight:600}} value={block.song_id||''} onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
-                                <option value="">— Seleccionar canción —</option>
-                                {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
-                              </select>
-                              <button onClick={()=>{
-                                if(editingObs===block.id){saveObs(block.id)}
-                                else{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:blockObs}))}
-                              }} title="Observación" style={{width:22,height:22,borderRadius:5,border:`1px solid #C8C0B4`,background:blockObs?'#FFF3CD':'white',color:blockObs?'#92400E':C.muted,fontSize:11,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                                {editingObs===block.id?'✓':'📝'}
-                              </button>
-                            </div>
+                          <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'nowrap' as const}}>
+                            {/* Número */}
+                            {currentNum&&(
+                              <span style={{width:20,height:20,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,flexShrink:0}}>
+                                {currentNum}
+                              </span>
+                            )}
+                            {/* Canción selector */}
+                            <select style={{...sel,fontSize:13,fontWeight:600,minWidth:0,flex:1}} value={block.song_id||''} onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
+                              <option value="">— Seleccionar canción —</option>
+                              {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
+                            </select>
+                            {/* Links inline a la derecha del selector */}
                             {block.song&&(
-                              <div style={{display:'flex',gap:4,marginLeft:27,marginTop:2}}>
-                                {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{width:20,height:20,background:'#D8F3DC',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,textDecoration:'none'}}>🎧</a>}
-                                {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" style={{width:20,height:20,background:'#DBE4FF',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,textDecoration:'none'}}>📄</a>}
-                                {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{width:20,height:20,background:'#FFF3CD',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,textDecoration:'none'}}>📁</a>}
+                              <div style={{display:'flex',gap:3,flexShrink:0}}>
+                                {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{width:20,height:20,background:'#D8F3DC',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,textDecoration:'none'}}>🎧</a>}
+                                {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" style={{width:20,height:20,background:'#DBE4FF',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,textDecoration:'none'}}>📄</a>}
+                                {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{width:20,height:20,background:'#FFF3CD',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,textDecoration:'none'}}>📁</a>}
                               </div>
                             )}
-                            {editingObs===block.id&&(
-                              <div style={{marginTop:6,marginLeft:27}}>
-                                <input autoFocus placeholder="Escribe una observación..." value={obsText[block.id]||''}
-                                  onChange={e=>setObsText(prev=>({...prev,[block.id]:e.target.value}))}
-                                  onKeyDown={e=>{if(e.key==='Enter')saveObs(block.id);if(e.key==='Escape')setEditingObs(null)}}
-                                  style={{width:'100%',fontSize:12,padding:'5px 8px',border:`0.5px solid #C9A14A`,borderRadius:6,fontFamily:'inherit',outline:'none',color:C.txt,background:'#FFFBEB'}}/>
-                              </div>
-                            )}
-                            {blockObs&&editingObs!==block.id&&(
-                              <div style={{marginTop:4,marginLeft:27,display:'flex',alignItems:'center',gap:4}}>
-                                <span style={{fontSize:11,color:'#92400E',fontWeight:400,fontStyle:'italic'}}>📝 {blockObs}</span>
-                              </div>
+                            {/* Obs inline — input or badge */}
+                            {editingObs===block.id ? (
+                              <input autoFocus placeholder="Observación..." value={obsText[block.id]||''}
+                                onChange={e=>setObsText(prev=>({...prev,[block.id]:e.target.value}))}
+                                onKeyDown={e=>{if(e.key==='Enter')saveObs(block.id);if(e.key==='Escape')setEditingObs(null)}}
+                                style={{width:140,fontSize:11,padding:'3px 7px',border:`0.5px solid #C9A14A`,borderRadius:5,fontFamily:'inherit',outline:'none',color:C.txt,background:'#FFFBEB',flexShrink:0}}/>
+                            ) : blockObs ? (
+                              <span onClick={()=>{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:blockObs}))}}
+                                style={{fontSize:11,color:'#92400E',fontStyle:'italic',background:'#FFF3CD',padding:'2px 7px',borderRadius:4,whiteSpace:'nowrap' as const,cursor:'pointer',flexShrink:0,maxWidth:160,overflow:'hidden',textOverflow:'ellipsis',display:'block'}}>
+                                📝 {blockObs}
+                              </span>
+                            ) : (
+                              <button onClick={()=>{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:''}))} }
+                                title="Agregar observación"
+                                style={{width:20,height:20,borderRadius:4,border:`0.5px solid #C8C0B4`,background:'white',color:C.muted,fontSize:10,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,opacity:0.5}}>
+                                📝
+                              </button>
                             )}
                           </div>
                         ) : (
@@ -608,24 +654,36 @@ export default function AdminServiceView({
                           </div>
                         )}
                       </div>
-                      <div>
+
+                      {/* Tono — label + select en columna */}
+                      <div style={{display:'flex',flexDirection:'column',gap:1}}>
                         {isSong&&(
-                          <select style={{...sel,fontSize:12}} value={block.tono||''} onChange={e=>updateBlock(block.id,{tono:e.target.value||undefined})}>
-                            <option value="">—</option>
-                            {NOTAS.map(n=><option key={n}>{n}</option>)}
-                          </select>
+                          <>
+                            <span style={{fontSize:9,fontWeight:700,letterSpacing:0.5,textTransform:'uppercase' as const,color:'#BBB'}}>Tono</span>
+                            <select style={{...sel,fontSize:12,fontWeight:600}} value={block.tono||''} onChange={e=>updateBlock(block.id,{tono:e.target.value||undefined})}>
+                              <option value="">—</option>
+                              {NOTAS.map(n=><option key={n}>{n}</option>)}
+                            </select>
+                          </>
                         )}
                       </div>
-                      <div>
+
+                      {/* Lead — label + select en columna */}
+                      <div style={{display:'flex',flexDirection:'column',gap:1}}>
                         {isSong&&(
-                          <select style={{...sel,fontSize:12}} value={block.lead_id||''} onChange={e=>updateBlock(block.id,{lead_id:e.target.value||undefined})}>
-                            <option value="">— Lead —</option>
-                            {members.filter(m=>m.instrumentos.includes('Voz')).map(m=>(
-                              <option key={m.id} value={m.id}>{m.nombre}</option>
-                            ))}
-                          </select>
+                          <>
+                            <span style={{fontSize:9,fontWeight:700,letterSpacing:0.5,textTransform:'uppercase' as const,color:'#BBB'}}>Lead</span>
+                            <select style={{...sel,fontSize:12}} value={block.lead_id||''} onChange={e=>updateBlock(block.id,{lead_id:e.target.value||undefined})}>
+                              <option value="">—</option>
+                              {members.filter(m=>m.instrumentos.includes('Voz')).map(m=>(
+                                <option key={m.id} value={m.id}>{m.nombre}</option>
+                              ))}
+                            </select>
+                          </>
                         )}
                       </div>
+
+                      {/* Delete */}
                       <div style={{display:'flex',justifyContent:'center'}}>
                         <button onClick={()=>deleteBlock(block.id)}
                           style={{width:24,height:24,borderRadius:6,border:'none',background:'#FEE2E2',color:'#B91C1C',fontSize:14,cursor:'pointer',fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>

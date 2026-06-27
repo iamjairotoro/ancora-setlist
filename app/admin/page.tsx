@@ -202,26 +202,20 @@ export default function AdminPage() {
         )}
       </TexBg>
 
-      {/* ── MOBILE TABS (debajo del navbar, sin bottom nav) ── */}
-      <div className="show-mobile" style={{display:'none',background:'white',borderBottom:'0.5px solid #E0D8C8'}}>
-        <div style={{display:'flex'}}>
+      {/* ── MOBILE TABS — pill style ── */}
+      <div className="show-mobile" style={{display:'none',background:'white',borderBottom:'0.5px solid #E0D8C8',padding:'10px 14px'}}>
+        <div style={{display:'flex',gap:8}}>
           {(['setlist','equipo','canciones'] as Tab[]).map(t=>(
             <button key={t} onClick={()=>setTab(t)}
               style={{
-                flex:1,padding:'10px 0 8px',
-                borderBottom: tab===t ? '2px solid #1A1A1A' : '2px solid transparent',
-                background:'none',border:'none',borderBottomStyle:'solid',
-                borderBottomWidth:2,
-                borderBottomColor: tab===t ? '#1A1A1A' : 'transparent',
+                flex:1,padding:'7px 0',borderRadius:20,
+                background:tab===t?'#1A1A1A':'transparent',
+                border:`0.5px solid ${tab===t?'#1A1A1A':'#E0D8C8'}`,
+                color:tab===t?'#F5F0E6':'#999',
+                fontSize:12,fontWeight:tab===t?600:500,
                 cursor:'pointer',fontFamily:'inherit',
-                display:'flex',flexDirection:'column',alignItems:'center',gap:3
               }}>
-              <span style={{fontSize:16,lineHeight:1}}>
-                {t==='setlist'?'≡':t==='equipo'?'◎':'♪'}
-              </span>
-              <span style={{fontSize:10,fontWeight:tab===t?700:500,color:tab===t?'#1A1A1A':'#999'}}>
-                {t==='setlist'?'Setlist':t==='equipo'?'Equipo':'Canciones'}
-              </span>
+              {t==='setlist'?'Setlist':t==='equipo'?'Equipo':'Canciones'}
             </button>
           ))}
         </div>
