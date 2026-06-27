@@ -234,7 +234,7 @@ export default function PortalPage() {
                           {confirmingDecline===service.id ? (
                             <div>
                               <p style={{fontSize:12,fontWeight:600,color:'#B91C1C',marginBottom:8}}>¿Seguro que no puedes asistir?</p>
-                              <input placeholder="Comentario (opcional)" value={obsComment} onChange={e=>setObsComment(e.target.value)}
+                              <input placeholder="Motivo (obligatorio) *" value={obsComment} onChange={e=>setObsComment(e.target.value)}
                                 style={{width:'100%',fontSize:12,padding:'7px 10px',border:'0.5px solid #FCA5A5',borderRadius:7,marginBottom:8,fontFamily:'inherit',outline:'none'}}/>
                               <div style={{display:'flex',gap:8}}>
                                 <button onClick={()=>handleRSVP(invitation.token,'no',obsComment)} disabled={actionLoading}
@@ -276,6 +276,12 @@ export default function PortalPage() {
                                 <button onClick={()=>setConfirmingDecline(service.id)}
                                   style={{fontSize:11,color:C.muted,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',textDecoration:'underline',display:'block',marginTop:4}}>
                                   ¿Ya no puedes? Declinar
+                                </button>
+                              )}
+                              {invitation.status==='declinado'&&(
+                                <button onClick={()=>handleRSVP(invitation.token,'si')} disabled={actionLoading}
+                                  style={{marginTop:8,width:'100%',background:C.txt,color:C.crema,border:'none',borderRadius:8,padding:'9px',fontSize:12,fontWeight:700,fontFamily:'inherit',cursor:'pointer'}}>
+                                  {actionLoading?'...':'✓ Confirmar asistencia'}
                                 </button>
                               )}
                             </div>
