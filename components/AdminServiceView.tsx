@@ -203,7 +203,7 @@ export default function AdminServiceView({
           </div>
 
           {/* 3-col layout */}
-          <div style={{display:'grid',gridTemplateColumns:'160px 1fr',gap:12}}>
+          <div style={{display:'grid',gridTemplateColumns:'minmax(0,240px) 1fr',gap:12}} className='admin-layout-grid'>
 
             {/* LEFT — Banda + Invitaciones */}
             <div style={{display:'flex',flexDirection:'column',gap:10}}>
@@ -238,8 +238,8 @@ export default function AdminServiceView({
                     const opts=membersFor(pos)
                     const status=getMemberInvStatus(asig?.member_id)
                     return(
-                      <div key={pos} style={{display:'flex',alignItems:'center',gap:6,padding:'5px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
-                        <span style={{fontSize:8,fontWeight:700,color:C.muted,width:36,flexShrink:0,letterSpacing:0.3}}>{pos}</span>
+                      <div key={pos} style={{display:'flex',alignItems:'center',gap:6,padding:'7px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
+                        <span style={{fontSize:11,fontWeight:700,color:C.muted,width:40,flexShrink:0,letterSpacing:0.3}}>{pos}</span>
                         <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
                           <option value="">— Asignar —</option>
                           {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
@@ -258,8 +258,8 @@ export default function AdminServiceView({
                     const opts=membersFor(pos)
                     const status=getMemberInvStatus(asig?.member_id)
                     return(
-                      <div key={pos} style={{display:'flex',alignItems:'center',gap:6,padding:'5px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
-                        <span style={{fontSize:8,fontWeight:700,color:C.muted,width:36,flexShrink:0}}>{pos}</span>
+                      <div key={pos} style={{display:'flex',alignItems:'center',gap:6,padding:'7px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
+                        <span style={{fontSize:11,fontWeight:700,color:C.muted,width:40,flexShrink:0}}>{pos}</span>
                         <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
                           <option value="">— Asignar —</option>
                           {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
@@ -295,14 +295,14 @@ export default function AdminServiceView({
                             {member.nombre?.[0]}{member.apellido?.[0]||''}
                           </div>
                           <div style={{flex:1,minWidth:0}}>
-                            <div style={{fontSize:9,fontWeight:600,color:C.txt,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{member.nombre} {member.apellido}</div>
+                            <div style={{fontSize:12,fontWeight:600,color:C.txt,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{member.nombre} {member.apellido}</div>
                             <div style={{display:'flex',gap:2,flexWrap:'wrap',marginTop:2}}>
                               {roles.map(r=><span key={r} style={{fontSize:6,fontWeight:700,background:'rgba(0,0,0,0.07)',color:C.txt,padding:'1px 3px',borderRadius:3}}>{r}</span>)}
                             </div>
                           </div>
-                          {status==='confirmado'&&<span style={{fontSize:7,background:'#D8F3DC',color:'#1B4332',padding:'1px 5px',borderRadius:10,fontWeight:700}}>✓</span>}
-                          {status==='declinado' &&<span style={{fontSize:7,background:'#FEE2E2',color:'#991B1B',padding:'1px 5px',borderRadius:10,fontWeight:700}}>✗</span>}
-                          {status==='pendiente' &&<span style={{fontSize:7,background:'#FFF3CD',color:'#664D03',padding:'1px 5px',borderRadius:10,fontWeight:700}}>⏳</span>}
+                          {status==='confirmado'&&<span style={{fontSize:9,background:'#D8F3DC',color:'#1B4332',padding:'1px 5px',borderRadius:10,fontWeight:700}}>✓</span>}
+                          {status==='declinado' &&<span style={{fontSize:9,background:'#FEE2E2',color:'#991B1B',padding:'1px 5px',borderRadius:10,fontWeight:700}}>✗</span>}
+                          {status==='pendiente' &&<span style={{fontSize:9,background:'#FFF3CD',color:'#664D03',padding:'1px 5px',borderRadius:10,fontWeight:700}}>⏳</span>}
                         </div>
                       ))}
                     </div>
@@ -320,7 +320,7 @@ export default function AdminServiceView({
                     {invitations.map(inv=>(
                       <div key={inv.id} style={{display:'flex',alignItems:'center',gap:8,padding:'4px 12px',borderBottom:`0.5px solid ${C.crema}`}}>
                         {statusDot(inv.status)}
-                        <span style={{fontSize:9,fontWeight:500,color:C.txt,flex:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{inv.member?.nombre} {inv.member?.apellido}</span>
+                        <span style={{fontSize:12,fontWeight:500,color:C.txt,flex:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{inv.member?.nombre} {inv.member?.apellido}</span>
                         {inv.comentario&&<span style={{fontSize:8,fontWeight:300,color:C.muted,fontStyle:'italic',flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>"{inv.comentario}"</span>}
                       </div>
                     ))}
@@ -363,7 +363,7 @@ export default function AdminServiceView({
               {/* Column headers */}
               <div style={{display:'grid',gridTemplateColumns:'44px 1fr 90px 110px 20px',padding:'4px 14px',background:C.crema,borderBottom:`0.5px solid ${C.cremaDark}`}}>
                 {['Min','Título','Tono','Lead / Voz',''].map((h,i)=>(
-                  <span key={i} style={{fontSize:8,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>{h}</span>
+                  <span key={i} style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>{h}</span>
                 ))}
               </div>
 
@@ -378,18 +378,18 @@ export default function AdminServiceView({
                 const isSong=block.tipo==='cancion'
                 const songDur=(block.song as any)?.duracion_min
                 return(
-                  <div key={block.id} style={{display:'grid',gridTemplateColumns:'44px 1fr 90px 110px 20px',padding:'7px 14px',borderBottom:`0.5px solid ${C.crema}`,alignItems:'center',background:isSong?'white':C.bg}}>
+                  <div key={block.id} style={{display:'grid',gridTemplateColumns:'44px 1fr 90px 110px 20px',padding:'5px 14px',borderBottom:`0.5px solid ${C.crema}`,alignItems:'center',background:isSong?'white':C.bg}}>
                     {/* Duration */}
                     <div>
                       {isSong && songDur ? (
-                        <span style={{fontSize:9,fontWeight:500,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'1px 5px',borderRadius:4,fontVariantNumeric:'tabular-nums'}}>{toMMSS(songDur)}</span>
+                        <span style={{fontSize:11,fontWeight:500,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'1px 5px',borderRadius:4,fontVariantNumeric:'tabular-nums'}}>{toMMSS(songDur)}</span>
                       ) : isSong ? (
-                        <span style={{fontSize:9,fontWeight:300,color:'#CCC'}}>—</span>
+                        <span style={{fontSize:11,fontWeight:300,color:'#CCC'}}>—</span>
                       ) : isEditing ? (
                         <input type="text" placeholder="mm:ss" defaultValue={block.duracion_min?toMMSS(block.duracion_min):''} onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
                           style={{width:40,fontSize:9,padding:'2px 4px',border:`0.5px solid ${C.cremaDark}`,borderRadius:4,fontFamily:'inherit',textAlign:'center'}}/>
                       ) : (
-                        <span style={{fontSize:9,fontWeight:300,color:C.muted,fontVariantNumeric:'tabular-nums'}}>{block.duracion_min?toMMSS(block.duracion_min):'—'}</span>
+                        <span style={{fontSize:11,fontWeight:300,color:C.muted,fontVariantNumeric:'tabular-nums'}}>{block.duracion_min?toMMSS(block.duracion_min):'—'}</span>
                       )}
                     </div>
 
@@ -403,9 +403,9 @@ export default function AdminServiceView({
                           </select>
                           {block.song&&(
                             <div style={{display:'flex',gap:5,marginTop:2}}>
-                              {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{fontSize:9,color:'#2D6A4F',textDecoration:'none',fontWeight:500}}>Spotify</a>}
-                              {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" style={{fontSize:9,color:'#1971C2',textDecoration:'none',fontWeight:500}}>Letras</a>}
-                              {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{fontSize:9,color:'#6B3FA0',textDecoration:'none',fontWeight:500}}>Recursos</a>}
+                              {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{fontSize:11,color:'#2D6A4F',textDecoration:'none',fontWeight:500}}>Spotify</a>}
+                              {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" style={{fontSize:11,color:'#1971C2',textDecoration:'none',fontWeight:500}}>Letras</a>}
+                              {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{fontSize:11,color:'#6B3FA0',textDecoration:'none',fontWeight:500}}>Recursos</a>}
                             </div>
                           )}
                         </>
@@ -414,8 +414,8 @@ export default function AdminServiceView({
                           style={{width:'90%',fontSize:11,padding:'3px 6px',border:`0.5px solid ${C.cremaDark}`,borderRadius:6,fontFamily:'inherit'}}/>
                       ) : (
                         <div style={{display:'flex',alignItems:'center',gap:5}}>
-                          <span style={{fontSize:9,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'1px 5px',borderRadius:3,letterSpacing:0.3}}>bloque</span>
-                          <span style={{fontSize:11,fontWeight:300,color:C.muted,fontStyle:'italic'}}>{block.titulo||'—'}</span>
+                          <span style={{fontSize:11,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'1px 5px',borderRadius:3,letterSpacing:0.3}}>bloque</span>
+                          <span style={{fontSize:13,fontWeight:300,color:C.muted,fontStyle:'italic'}}>{block.titulo||'—'}</span>
                         </div>
                       )}
                     </div>
@@ -460,8 +460,8 @@ export default function AdminServiceView({
               {/* Footer total */}
               {blocks.length>0&&(
                 <div style={{padding:'6px 14px',background:C.crema,borderTop:`0.5px solid ${C.cremaDark}`,display:'flex',justifyContent:'flex-end',alignItems:'baseline',gap:8}}>
-                  <span style={{fontSize:9,fontWeight:300,color:C.muted,letterSpacing:0.5,textTransform:'uppercase'}}>Total</span>
-                  <span style={{fontSize:13,fontWeight:700,color:C.txt}}>{totalToDisplay(totalSecs)}</span>
+                  <span style={{fontSize:11,fontWeight:300,color:C.muted,letterSpacing:0.5,textTransform:'uppercase'}}>Total</span>
+                  <span style={{fontSize:15,fontWeight:700,color:C.txt}}>{totalToDisplay(totalSecs)}</span>
                 </div>
               )}
             </div>

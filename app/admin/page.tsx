@@ -121,12 +121,12 @@ export default function AdminPage() {
   function getBanda(pos: string){ return bandaItems.find(b=>b.posicion===pos) }
 
   if(!authed) return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1F2A44] to-[#2E3D5C] flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-10 h-10 border-2 border-[#C9A14A] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-        <p className="text-white/60 text-sm">Verificando acceso...</p>
+    <TexBg className="min-h-screen flex items-center justify-center">
+      <div style={{textAlign:'center'}}>
+        <div style={{width:36,height:36,border:'2px solid #F5F0E6',borderTopColor:'transparent',borderRadius:'50%',animation:'spin 1s linear infinite',margin:'0 auto 12px'}}/>
+        <p style={{color:'rgba(245,240,230,0.5)',fontSize:13,fontWeight:300}}>Verificando acceso...</p>
       </div>
-    </div>
+    </TexBg>
   )
 
   return (
@@ -168,7 +168,7 @@ export default function AdminPage() {
         </header>
       </TexBg>
 
-      <div style={{maxWidth:1200,margin:'0 auto',padding:'20px 16px'}}>
+      <div style={{maxWidth:1200,margin:'0 auto',padding:'16px'}}>
         {tab==='setlist' && (
           <AdminServiceView
             services={services} selectedService={selectedService}

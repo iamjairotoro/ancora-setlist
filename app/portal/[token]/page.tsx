@@ -85,7 +85,7 @@ export default function PortalPage() {
   const filteredSongs = allSongs.filter(s=>s.nombre.toLowerCase().includes(songSearch.toLowerCase())||s.artista.toLowerCase().includes(songSearch.toLowerCase()))
 
   const tabStyle = (t:Tab):React.CSSProperties => ({
-    flex:1,textAlign:'center' as const,fontSize:11,fontWeight:tab===t?700:500,
+    flex:1,textAlign:'center' as const,fontSize:13,fontWeight:tab===t?700:500,
     color:tab===t?C.txt:C.muted,padding:'10px 4px',
     cursor:'pointer',background:'none',border:'none',
     borderBottom:tab===t?`2px solid ${C.txt}`:'2px solid transparent',
@@ -163,7 +163,7 @@ export default function PortalPage() {
         <div style={{background:'white',borderRadius:14,padding:'4px',display:'flex',boxShadow:'0 2px 12px rgba(0,0,0,0.08)',position:'relative',top:-20}}>
           {(['home','recursos','perfil'] as Tab[]).map(t=>(
             <button key={t} onClick={()=>setTab(t)}
-              style={{flex:1,padding:'8px 4px',borderRadius:10,fontSize:11,fontWeight:tab===t?700:500,color:tab===t?'white':C.muted,background:tab===t?C.txt:'transparent',border:'none',cursor:'pointer',fontFamily:'inherit',transition:'all 0.15s'}}>
+              style={{flex:1,padding:'8px 4px',borderRadius:10,fontSize:13,fontWeight:tab===t?700:500,color:tab===t?'white':C.muted,background:tab===t?C.txt:'transparent',border:'none',cursor:'pointer',fontFamily:'inherit',transition:'all 0.15s'}}>
               {t==='home'?'🏠 Inicio':t==='recursos'?'🎵 Canciones':'👤 Perfil'}
             </button>
           ))}
@@ -195,7 +195,7 @@ export default function PortalPage() {
                       <span style={{fontSize:7,fontWeight:300,color:C.muted,textTransform:'uppercase'}}>{fecha.split(' ')[1]}</span>
                     </div>
                     <div style={{flex:1}}>
-                      <p style={{fontSize:12,fontWeight:700,color:C.txt}}>{dia}, {fecha}</p>
+                      <p style={{fontSize:14,fontWeight:700,color:C.txt}}>{dia}, {fecha}</p>
                       <div style={{display:'flex',gap:4,marginTop:4,flexWrap:'wrap'}}>
                         {posiciones.map(p=><span key={p} style={{fontSize:8,fontWeight:700,background:C.txt,color:C.crema,padding:'1px 5px',borderRadius:3}}>{p}</span>)}
                         {invitation&&(
@@ -230,7 +230,7 @@ export default function PortalPage() {
 
                       {/* Banda */}
                       <div style={{padding:'12px 14px',borderBottom:`0.5px solid ${C.crema}`}}>
-                        <p style={{fontSize:8,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase',color:C.muted,marginBottom:8}}>Banda del día</p>
+                        <p style={{fontSize:10,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase',color:C.muted,marginBottom:8}}>Banda del día</p>
                         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:5}}>
                           {['AG1','AG2','EG','KEYS','BASS','DRUMS','MD','SONIDO','VX1','VX2','VX3','VX4'].map(pos=>{
                             const b=banda.find(x=>x.posicion===pos)
@@ -239,7 +239,7 @@ export default function PortalPage() {
                             return(
                               <div key={pos} style={{display:'flex',alignItems:'center',gap:6,padding:'5px 8px',borderRadius:8,background:isMe?C.txt:C.crema}}>
                                 <span style={{fontSize:8,fontWeight:700,color:isMe?'#C9A14A':C.muted,width:28,flexShrink:0}}>{pos}</span>
-                                <span style={{fontSize:9,fontWeight:500,color:isMe?'white':C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{b.member.nombre}</span>
+                                <span style={{fontSize:11,fontWeight:500,color:isMe?'white':C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{b.member.nombre}</span>
                               </div>
                             )
                           })}
@@ -249,14 +249,14 @@ export default function PortalPage() {
                       {/* Setlist */}
                       {setlist.filter(i=>i.tipo==='cancion'||!i.tipo).length>0&&(
                         <div style={{padding:'12px 14px'}}>
-                          <p style={{fontSize:8,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase',color:C.muted,marginBottom:8}}>Setlist</p>
+                          <p style={{fontSize:10,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase',color:C.muted,marginBottom:8}}>Setlist</p>
                           <div style={{display:'flex',flexDirection:'column',gap:5}}>
                             {setlist.map((item,idx)=>(
                               <div key={idx} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',background:C.crema,borderRadius:8}}>
                                 <span style={{width:16,height:16,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:8,fontWeight:700,flexShrink:0}}>{item.orden}</span>
                                 <div style={{flex:1,minWidth:0}}>
-                                  <p style={{fontSize:11,fontWeight:600,color:C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.song?.nombre||item.titulo||'—'}</p>
-                                  <p style={{fontSize:9,fontWeight:300,color:C.muted}}>{item.song?.artista}{item.tono?` · ${item.tono}`:''}{item.song?.bpm?` · ${item.song.bpm} BPM`:''}{item.song?.duracion_min?` · ${toMMSS(item.song.duracion_min)}`:''}</p>
+                                  <p style={{fontSize:13,fontWeight:600,color:C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.song?.nombre||item.titulo||'—'}</p>
+                                  <p style={{fontSize:11,fontWeight:300,color:C.muted}}>{item.song?.artista}{item.tono?` · ${item.tono}`:''}{item.song?.bpm?` · ${item.song.bpm} BPM`:''}{item.song?.duracion_min?` · ${toMMSS(item.song.duracion_min)}`:''}</p>
                                 </div>
                                 {item.lead&&<span style={{fontSize:8,fontWeight:600,background:'rgba(201,161,74,0.15)',color:'#92400E',padding:'1px 5px',borderRadius:10,flexShrink:0,whiteSpace:'nowrap'}}>Lead: {item.lead.nombre}</span>}
                                 <div style={{display:'flex',gap:3,flexShrink:0}}>
@@ -293,8 +293,8 @@ export default function PortalPage() {
                       style={{width:'100%',textAlign:'left',padding:'10px 12px',display:'flex',alignItems:'center',gap:10,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
                       <div style={{width:36,height:36,borderRadius:8,background:C.txt,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16}}>🎵</div>
                       <div style={{flex:1,minWidth:0}}>
-                        <p style={{fontSize:11,fontWeight:700,color:C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{song.nombre}</p>
-                        <p style={{fontSize:9,fontWeight:300,color:C.muted,marginTop:1}}>{song.artista}</p>
+                        <p style={{fontSize:13,fontWeight:700,color:C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{song.nombre}</p>
+                        <p style={{fontSize:11,fontWeight:300,color:C.muted,marginTop:1}}>{song.artista}</p>
                         <div style={{display:'flex',gap:4,marginTop:4,flexWrap:'wrap'}}>
                           {song.tono_original&&<span style={{fontSize:8,fontWeight:700,background:'rgba(0,0,0,0.07)',color:C.txt,padding:'1px 5px',borderRadius:10}}>{song.tono_original}</span>}
                           {song.bpm&&<span style={{fontSize:8,background:'rgba(201,161,74,0.15)',color:'#92400E',padding:'1px 5px',borderRadius:10}}>♩{song.bpm}</span>}
@@ -360,8 +360,8 @@ export default function PortalPage() {
                   <div>
                     {[{label:'Nombre completo',value:`${member?.nombre} ${member?.apellido}`},{label:'Email',value:member?.email},{label:'Teléfono',value:member?.telefono||'—'}].map(({label,value})=>(
                       <div key={label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:`0.5px solid ${C.crema}`}}>
-                        <span style={{fontSize:11,fontWeight:300,color:C.muted}}>{label}</span>
-                        <span style={{fontSize:12,fontWeight:500,color:C.txt}}>{value}</span>
+                        <span style={{fontSize:13,fontWeight:300,color:C.muted}}>{label}</span>
+                        <span style={{fontSize:14,fontWeight:500,color:C.txt}}>{value}</span>
                       </div>
                     ))}
                     <button onClick={()=>setEditProfile(true)}

@@ -70,34 +70,34 @@ export default function TeamPanel({ members, onRefresh }: Props) {
           <h3 className="font-semibold text-navy mb-4">{editing.id ? 'Editar' : 'Nuevo'} integrante</h3>
           <div className="grid grid-cols-2 gap-3 mb-3">
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Nombre *</label>
+              <label className="text-sm text-gray-500 mb-1 block">Nombre *</label>
               <input className="input" value={editing.nombre || ''}
                 onChange={e => setEditing({...editing, nombre: e.target.value})} />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Apellido</label>
+              <label className="text-sm text-gray-500 mb-1 block">Apellido</label>
               <input className="input" value={editing.apellido || ''}
                 onChange={e => setEditing({...editing, apellido: e.target.value})} />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Email *</label>
+              <label className="text-sm text-gray-500 mb-1 block">Email *</label>
               <input className="input" type="email" value={editing.email || ''}
                 onChange={e => setEditing({...editing, email: e.target.value})} />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Teléfono</label>
+              <label className="text-sm text-gray-500 mb-1 block">Teléfono</label>
               <input className="input" value={editing.telefono || ''}
                 onChange={e => setEditing({...editing, telefono: e.target.value})} />
             </div>
           </div>
           <div className="mb-4">
-            <label className="text-xs text-gray-500 mb-2 block">Instrumentos</label>
+            <label className="text-sm text-gray-500 mb-2 block">Instrumentos</label>
             <div className="flex flex-wrap gap-2">
               {ALL_INSTRUMENTOS.map(instr => {
                 const active = (editing.instrumentos || []).includes(instr)
                 return (
                   <button key={instr} type="button" onClick={() => toggleInstr(instr)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                       active ? 'bg-navy text-white border-navy' : 'bg-white text-gray-600 border-gray-200 hover:border-navy'
                     }`}>
                     {SHORT[instr] || instr}
@@ -106,7 +106,7 @@ export default function TeamPanel({ members, onRefresh }: Props) {
               })}
             </div>
           </div>
-          {err && <p className="text-red-500 text-xs mb-2">{err}</p>}
+          {err && <p className="text-red-500 text-sm mb-2">{err}</p>}
           <div className="flex gap-2">
             <button type="button" onClick={save} disabled={saving} className="btn-primary text-sm">
               {saving ? 'Guardando...' : 'Guardar'}
@@ -128,10 +128,10 @@ export default function TeamPanel({ members, onRefresh }: Props) {
             <AvatarUpload memberId={m.id} currentUrl={m.avatar_url} nombre={m.nombre} apellido={m.apellido} size="sm" />
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm">{m.nombre} {m.apellido}</p>
-              <p className="text-xs text-gray-500 truncate">{m.email}</p>
+              <p className="text-sm text-gray-500 truncate">{m.email}</p>
               <div className="flex flex-wrap gap-1 mt-1">
                 {(m.instrumentos || []).map(i => (
-                  <span key={i} className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-1.5 py-0.5 rounded">
+                  <span key={i} className="text-sm bg-yellow-50 text-yellow-700 border border-yellow-200 px-1.5 py-0.5 rounded">
                     {SHORT[i] || i}
                   </span>
                 ))}
@@ -139,9 +139,9 @@ export default function TeamPanel({ members, onRefresh }: Props) {
             </div>
             <div className="flex gap-1">
               <button type="button" onClick={() => { setErr(''); setEditing({...m}) }}
-                className="text-xs text-gray-400 hover:text-navy px-2 py-1">Editar</button>
+                className="text-sm text-gray-400 hover:text-navy px-2 py-1">Editar</button>
               <button type="button" onClick={() => del(m.id)}
-                className="text-xs text-gray-400 hover:text-red-500 px-2 py-1">Eliminar</button>
+                className="text-sm text-gray-400 hover:text-red-500 px-2 py-1">Eliminar</button>
             </div>
           </div>
         ))}

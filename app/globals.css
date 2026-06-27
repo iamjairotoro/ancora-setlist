@@ -105,3 +105,18 @@ body {
   height: 100%;
   pointer-events: none;
 }
+
+/* ── RESPONSIVE ADMIN ── */
+@media (max-width: 768px) {
+  .admin-layout-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── DANCING SCRIPT IMPORT ── */
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+
+/* ── SPIN KEYFRAME ── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

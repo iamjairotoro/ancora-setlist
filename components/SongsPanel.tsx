@@ -69,33 +69,33 @@ export default function SongsPanel({ songs, onRefresh }: Props) {
           <h3 className="font-bold text-navy mb-4 text-base">{editing.id ? 'Editar' : 'Nueva'} canción</h3>
           <div className="grid grid-cols-2 gap-3 mb-3">
             <div className="col-span-2">
-              <label className="text-xs text-gray-500 mb-1 block font-medium">Nombre *</label>
+              <label className="text-sm text-gray-500 mb-1 block font-medium">Nombre *</label>
               <input className="input" placeholder="Nombre de la canción" value={editing.nombre||''} onChange={e => setEditing({...editing,nombre:e.target.value})} />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block font-medium">Artista / Autor</label>
+              <label className="text-sm text-gray-500 mb-1 block font-medium">Artista / Autor</label>
               <input className="input" value={editing.artista||''} onChange={e => setEditing({...editing,artista:e.target.value})} />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block font-medium">Tono original</label>
+              <label className="text-sm text-gray-500 mb-1 block font-medium">Tono original</label>
               <select className="input" value={editing.tono_original||''} onChange={e => setEditing({...editing,tono_original:e.target.value})}>
                 <option value="">—</option>
                 {NOTAS.map(n => <option key={n}>{n}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block font-medium">BPM / Tempo</label>
+              <label className="text-sm text-gray-500 mb-1 block font-medium">BPM / Tempo</label>
               <input className="input" type="number" placeholder="ej: 72.5" step="0.1" min="0" value={editing.bpm||''} onChange={e => setEditing({...editing,bpm:parseFloat(e.target.value)||undefined})} />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block font-medium">Compás</label>
+              <label className="text-sm text-gray-500 mb-1 block font-medium">Compás</label>
               <select className="input" value={editing.compas||''} onChange={e => setEditing({...editing,compas:e.target.value})}>
                 <option value="">—</option>
                 {COMPASES.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block font-medium">Duración (min)</label>
+              <label className="text-sm text-gray-500 mb-1 block font-medium">Duración (min)</label>
               <input className="input" type="text" placeholder="ej: 6:59" 
                 value={editing.duracion_min ? toMMSS(editing.duracion_min) : ''}
                 onChange={e => setEditing({...editing, duracion_min: fromMMSS(e.target.value) || undefined})}
@@ -105,19 +105,19 @@ export default function SongsPanel({ songs, onRefresh }: Props) {
                 }} />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block font-medium">Link Spotify</label>
+              <label className="text-sm text-gray-500 mb-1 block font-medium">Link Spotify</label>
               <input className="input" placeholder="https://open.spotify.com/..." value={editing.link_spotify||''} onChange={e => setEditing({...editing,link_spotify:e.target.value})} />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block font-medium">Letras / Acordes</label>
+              <label className="text-sm text-gray-500 mb-1 block font-medium">Letras / Acordes</label>
               <input className="input" placeholder="https://drive.google.com/..." value={editing.link_letras||''} onChange={e => setEditing({...editing,link_letras:e.target.value})} />
             </div>
             <div className="col-span-2">
-              <label className="text-xs text-gray-500 mb-1 block font-medium">📁 Recursos (Drive, MultiTracks, etc.)</label>
+              <label className="text-sm text-gray-500 mb-1 block font-medium">📁 Recursos (Drive, MultiTracks, etc.)</label>
               <input className="input" placeholder="https://drive.google.com/... o cualquier link de archivos" value={editing.link_recursos||''} onChange={e => setEditing({...editing,link_recursos:e.target.value})} />
             </div>
             <div className="col-span-2">
-              <label className="text-xs text-gray-500 mb-1 block font-medium">Notas internas</label>
+              <label className="text-sm text-gray-500 mb-1 block font-medium">Notas internas</label>
               <input className="input" placeholder="ej: intro con solo de guitarra, coda larga..." value={editing.notas||''} onChange={e => setEditing({...editing,notas:e.target.value})} />
             </div>
           </div>
@@ -137,10 +137,10 @@ export default function SongsPanel({ songs, onRefresh }: Props) {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="font-semibold text-sm text-navy">{s.nombre}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{s.artista}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{s.artista}</p>
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
-                  <div className="flex gap-1 text-xs">
+                  <div className="flex gap-1 text-sm">
                     {s.tono_original && <span className="bg-navy/10 text-navy px-1.5 py-0.5 rounded font-medium">{s.tono_original}</span>}
                     {s.bpm && <span className="bg-gold/20 text-yellow-700 px-1.5 py-0.5 rounded">{s.bpm} BPM</span>}
                   {s.duracion_min && <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{toMMSS(s.duracion_min)}</span>}
@@ -149,20 +149,20 @@ export default function SongsPanel({ songs, onRefresh }: Props) {
                 </div>
               </div>
               <div className="flex gap-2 mt-2 flex-wrap">
-                {s.link_spotify   && <a href={s.link_spotify}   target="_blank" className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-lg hover:bg-green-200">🎧 Spotify</a>}
-                {s.link_letras    && <a href={s.link_letras}    target="_blank" className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-200">📄 Letras</a>}
-                {s.link_recursos  && <a href={s.link_recursos}  target="_blank" className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-lg hover:bg-purple-200">📁 Recursos</a>}
+                {s.link_spotify   && <a href={s.link_spotify}   target="_blank" className="text-sm bg-green-100 text-green-700 px-2 py-1 rounded-lg hover:bg-green-200">🎧 Spotify</a>}
+                {s.link_letras    && <a href={s.link_letras}    target="_blank" className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-200">📄 Letras</a>}
+                {s.link_recursos  && <a href={s.link_recursos}  target="_blank" className="text-sm bg-purple-100 text-purple-700 px-2 py-1 rounded-lg hover:bg-purple-200">📁 Recursos</a>}
               </div>
-              {s.notas && <p className="text-xs text-gray-400 mt-1 italic">{s.notas}</p>}
+              {s.notas && <p className="text-sm text-gray-400 mt-1 italic">{s.notas}</p>}
             </div>
             <div className="flex gap-1 flex-shrink-0">
-              <button onClick={() => setEditing({...s})} className="text-xs text-gray-400 hover:text-navy px-2 py-1">Editar</button>
-              <button onClick={() => del(s.id)} className="text-xs text-gray-400 hover:text-red-500 px-2 py-1">×</button>
+              <button onClick={() => setEditing({...s})} className="text-sm text-gray-400 hover:text-navy px-2 py-1">Editar</button>
+              <button onClick={() => del(s.id)} className="text-sm text-gray-400 hover:text-red-500 px-2 py-1">×</button>
             </div>
           </div>
         ))}
       </div>
-      <p className="text-xs text-gray-400 text-center">{filtered.length} canción{filtered.length!==1?'es':''}</p>
+      <p className="text-sm text-gray-400 text-center">{filtered.length} canción{filtered.length!==1?'es':''}</p>
     </div>
   )
 }
