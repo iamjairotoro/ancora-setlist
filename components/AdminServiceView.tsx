@@ -524,7 +524,7 @@ export default function AdminServiceView({
               </div>
 
               {/* ── MOBILE column header ── */}
-              <div className="mobile-cols-header" style={{display:'none',padding:'5px 14px',background:C.crema,borderBottom:`1px solid #C8C0B4`,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <div className="mobile-cols-header" style={{padding:'5px 14px',background:C.crema,borderBottom:`1px solid #C8C0B4`,alignItems:'center',justifyContent:'space-between'}}>
                 <span style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>Canciones</span>
                 <span style={{fontSize:10,fontWeight:300,color:C.muted}}>toca para editar</span>
               </div>
