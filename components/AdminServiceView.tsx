@@ -517,8 +517,8 @@ export default function AdminServiceView({
               </div>
 
               {/* ── DESKTOP column headers ── */}
-              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'28px 60px 1fr 160px 90px 130px 36px',padding:'6px 16px 6px 10px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
-                {['','MIN','TÍTULO / LINKS','OBSERVACIONES','TONO','LEAD',''].map((h,i)=>(
+              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'28px 60px 1fr 80px 160px 90px 130px 36px',padding:'6px 16px 6px 10px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
+                {['','MIN','TÍTULO','LINKS','OBSERVACIONES','TONO','LEAD',''].map((h,i)=>(
                   <span key={i} style={{fontSize:10,fontWeight:700,letterSpacing:1,color:C.muted}}>{h}</span>
                 ))}
               </div>
@@ -570,7 +570,7 @@ export default function AdminServiceView({
                     */}
                     <div className="order-row-desktop" style={{
                       display:'grid',
-                      gridTemplateColumns:'28px 60px 1fr 160px 90px 130px 36px',
+                      gridTemplateColumns:'28px 60px 1fr 80px 160px 90px 130px 36px',
                       padding:'9px 16px 9px 10px',
                       borderBottom:`0.5px solid #E8E0D0`,
                       alignItems:'center',
@@ -578,7 +578,7 @@ export default function AdminServiceView({
                       minHeight:52,
                     }}>
 
-                      {/* Drag handle — 6 puntos */}
+                      {/* Drag handle */}
                       <div style={{cursor:'grab',display:'flex',flexDirection:'column',gap:3,alignItems:'center',opacity:0.25,userSelect:'none' as const}}
                         onMouseEnter={e=>(e.currentTarget.style.opacity='0.6')}
                         onMouseLeave={e=>(e.currentTarget.style.opacity='0.25')}>
@@ -601,59 +601,61 @@ export default function AdminServiceView({
                         )}
                       </div>
 
-                      {/* TÍTULO + LINKS */}
+                      {/* TÍTULO — solo el nombre */}
                       <div style={{minWidth:0,display:'flex',alignItems:'center',gap:8}}>
                         {isSong ? (
                           <>
-                            {/* Número círculo */}
                             {currentNum&&(
                               <span style={{width:24,height:24,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,flexShrink:0}}>
                                 {currentNum}
                               </span>
                             )}
-                            {/* Selector canción */}
                             <select style={{...sel,fontSize:14,fontWeight:700,flex:1,minWidth:0}} value={block.song_id||''} onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
                               <option value="">— Seleccionar canción —</option>
                               {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
                             </select>
-                            {/* Links cuadrados con logo */}
-                            {block.song&&(
-                              <div style={{display:'flex',gap:4,flexShrink:0}}>
-                                {(block.song as any).link_spotify&&(
-                                  <a href={(block.song as any).link_spotify} target="_blank"
-                                    style={{width:24,height:24,background:'#D8F3DC',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,textDecoration:'none'}}>
-                                    🎧
-                                  </a>
-                                )}
-                                {(block.song as any).link_letras&&(
-                                  <a href={(block.song as any).link_letras} target="_blank"
-                                    style={{width:24,height:24,background:'#DBE4FF',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,textDecoration:'none'}}>
-                                    📄
-                                  </a>
-                                )}
-                                {(block.song as any).link_recursos&&(
-                                  <a href={(block.song as any).link_recursos} target="_blank"
-                                    style={{width:24,height:24,background:'#FFF3CD',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,textDecoration:'none'}}>
-                                    📁
-                                  </a>
-                                )}
-                              </div>
-                            )}
                           </>
                         ) : (
-                          <div style={{display:'flex',alignItems:'center',gap:8,flex:1}}>
+                          <div style={{display:'flex',alignItems:'center',gap:8,flex:1,minWidth:0}}>
                             <span style={{fontSize:11,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'2px 7px',borderRadius:4,letterSpacing:0.3,flexShrink:0}}>bloque</span>
                             <input defaultValue={block.titulo||''} onBlur={e=>updateBlock(block.id,{titulo:e.target.value})}
-                              style={{flex:1,fontSize:13,fontWeight:300,color:C.muted,fontStyle:'italic',border:'none',outline:'none',background:'transparent',fontFamily:'inherit'}}/>
-                            <input type="text" placeholder="mm:ss" defaultValue={block.duracion_min?toMMSS(block.duracion_min):''}
-                              onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
-                              style={{width:52,fontSize:11,padding:'3px 6px',border:`1px solid #C8C0B4`,borderRadius:5,fontFamily:'inherit',textAlign:'center',color:C.muted}}/>
+                              style={{flex:1,fontSize:13,fontWeight:300,color:C.muted,fontStyle:'italic',border:'none',outline:'none',background:'transparent',fontFamily:'inherit',minWidth:0}}/>
                           </div>
                         )}
                       </div>
 
-                      {/* OBSERVACIONES — columna propia con separador izquierdo */}
-                      <div style={{minWidth:0,borderLeft:`1px solid #E8E0D0`,paddingLeft:10}}>
+                      {/* LINKS — columna fija 80px */}
+                      <div style={{display:'flex',gap:4,alignItems:'center'}}>
+                        {isSong && block.song ? (
+                          <>
+                            {(block.song as any).link_spotify&&(
+                              <a href={(block.song as any).link_spotify} target="_blank"
+                                style={{width:24,height:24,background:'#D8F3DC',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,textDecoration:'none',flexShrink:0}}>
+                                🎧
+                              </a>
+                            )}
+                            {(block.song as any).link_letras&&(
+                              <a href={(block.song as any).link_letras} target="_blank"
+                                style={{width:24,height:24,background:'#DBE4FF',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,textDecoration:'none',flexShrink:0}}>
+                                📄
+                              </a>
+                            )}
+                            {(block.song as any).link_recursos&&(
+                              <a href={(block.song as any).link_recursos} target="_blank"
+                                style={{width:24,height:24,background:'#FFF3CD',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,textDecoration:'none',flexShrink:0}}>
+                                📁
+                              </a>
+                            )}
+                          </>
+                        ) : !isSong && block.duracion_min ? (
+                          <input type="text" placeholder="mm:ss" defaultValue={block.duracion_min?toMMSS(block.duracion_min):''}
+                            onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
+                            style={{width:52,fontSize:11,padding:'3px 6px',border:`1px solid #C8C0B4`,borderRadius:5,fontFamily:'inherit',textAlign:'center',color:C.muted}}/>
+                        ) : null}
+                      </div>
+
+                      {/* OBSERVACIONES — columna propia */}
+                      <div style={{minWidth:0,paddingLeft:4}}>
                         {isSong&&(
                           editingObs===block.id ? (
                             <input autoFocus placeholder="Observación..."
