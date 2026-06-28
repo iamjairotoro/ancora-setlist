@@ -22,10 +22,10 @@ function toMMSS(secs:number):string {
 // Logo Áncora SVG inline — versión blanca para fondo oscuro
 function LogoAncora() {
   return (
-    <div style={{display:'inline-flex',flexDirection:'column',alignItems:'center',background:'#F5F0E6',borderRadius:12,padding:'8px 18px',marginBottom:20}}>
-      <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:32,color:'#1A1A1A',lineHeight:1}}>Áncora</div>
-      <div style={{width:32,height:0.5,background:'rgba(0,0,0,0.2)',margin:'3px 0'}}/>
-      <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:300,fontSize:8,letterSpacing:4,textTransform:'uppercase' as const,color:'#AAA'}}>Worship</div>
+    <div style={{display:'inline-flex',flexDirection:'column',alignItems:'center',background:'#1A1A1A',borderRadius:12,padding:'10px 20px',marginBottom:20}}>
+      <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:34,color:'#F5F0E6',lineHeight:1}}>Áncora</div>
+      <div style={{width:32,height:0.5,background:'rgba(245,240,230,0.35)',margin:'4px 0'}}/>
+      <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:400,fontSize:9,letterSpacing:5,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.75)'}}>Worship</div>
     </div>
   )
 }

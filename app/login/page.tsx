@@ -27,11 +27,11 @@ function LoginContent() {
   return (
     <TexBg className="min-h-screen flex items-center justify-center p-4">
       <div style={{ background: 'white', borderRadius: 14, padding: '28px 24px', width: '100%', maxWidth: 320, textAlign: 'center' }}>
-        {/* Logo — fondo crema vertical */}
+        {/* Logo — fondo oscuro vertical */}
         <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:24}}>
           <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:42,color:'#1A1A1A',lineHeight:1}}>Áncora</div>
-          <div style={{width:36,height:0.5,background:'rgba(0,0,0,0.2)',margin:'4px 0'}}/>
-          <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:300,fontSize:9,letterSpacing:5,textTransform:'uppercase' as const,color:'#AAA'}}>Worship</div>
+          <div style={{width:36,height:0.5,background:'rgba(0,0,0,0.25)',margin:'4px 0'}}/>
+          <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:500,fontSize:10,letterSpacing:5,textTransform:'uppercase' as const,color:'#666'}}>Worship</div>
         </div>
 
         {error && (
