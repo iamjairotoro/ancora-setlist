@@ -517,9 +517,9 @@ export default function AdminServiceView({
               </div>
 
               {/* ── DESKTOP column headers ── */}
-              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'20px 52px 1fr 120px 70px 120px 32px',gap:6,padding:'5px 12px 5px 8px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
-                {['','Min','Título / Links','Observaciones','Tono','Lead',''].map((h,i)=>(
-                  <span key={i} style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>{h}</span>
+              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'28px 60px 1fr 160px 90px 130px 36px',padding:'6px 16px 6px 10px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
+                {['','MIN','TÍTULO / LINKS','OBSERVACIONES','TONO','LEAD',''].map((h,i)=>(
+                  <span key={i} style={{fontSize:10,fontWeight:700,letterSpacing:1,color:C.muted}}>{h}</span>
                 ))}
               </div>
 
@@ -570,116 +570,119 @@ export default function AdminServiceView({
                     */}
                     <div className="order-row-desktop" style={{
                       display:'grid',
-                      gridTemplateColumns:'20px 52px 1fr 120px 70px 120px 32px',
-                      padding:'7px 12px 7px 8px',
+                      gridTemplateColumns:'28px 60px 1fr 160px 90px 130px 36px',
+                      padding:'9px 16px 9px 10px',
                       borderBottom:`0.5px solid #E8E0D0`,
                       alignItems:'center',
-                      gap:6,
-                      background:isSong?'white':C.bg
+                      background:isSong?'white':C.bg,
+                      minHeight:52,
                     }}>
 
-                      {/* Drag handle */}
-                      <div style={{cursor:'grab',display:'flex',flexDirection:'column',gap:2.5,alignItems:'center',padding:'2px 0',opacity:0.3}}
-                        onMouseEnter={e=>(e.currentTarget.style.opacity='0.7')}
-                        onMouseLeave={e=>(e.currentTarget.style.opacity='0.3')}>
+                      {/* Drag handle — 6 puntos */}
+                      <div style={{cursor:'grab',display:'flex',flexDirection:'column',gap:3,alignItems:'center',opacity:0.25,userSelect:'none' as const}}
+                        onMouseEnter={e=>(e.currentTarget.style.opacity='0.6')}
+                        onMouseLeave={e=>(e.currentTarget.style.opacity='0.25')}>
                         {[0,1,2].map(i=>(
-                          <div key={i} style={{display:'flex',gap:2}}>
-                            <div style={{width:2,height:2,borderRadius:'50%',background:C.txt}}/>
-                            <div style={{width:2,height:2,borderRadius:'50%',background:C.txt}}/>
+                          <div key={i} style={{display:'flex',gap:3}}>
+                            <div style={{width:3,height:3,borderRadius:'50%',background:C.txt}}/>
+                            <div style={{width:3,height:3,borderRadius:'50%',background:C.txt}}/>
                           </div>
                         ))}
                       </div>
 
-                      {/* Min */}
+                      {/* MIN */}
                       <div>
                         {isSong && songDur ? (
-                          <span style={{fontSize:11,fontWeight:500,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'2px 5px',borderRadius:4,fontVariantNumeric:'tabular-nums'}}>{toMMSS(songDur)}</span>
+                          <span style={{fontSize:12,fontWeight:500,background:'rgba(0,0,0,0.06)',color:C.txt,padding:'3px 7px',borderRadius:6,fontVariantNumeric:'tabular-nums'}}>{toMMSS(songDur)}</span>
                         ) : isSong ? (
-                          <span style={{fontSize:11,fontWeight:300,color:'#CCC'}}>—</span>
+                          <span style={{fontSize:12,color:'#CCC'}}>—</span>
                         ) : (
-                          <span style={{fontSize:11,fontWeight:300,color:C.muted,fontVariantNumeric:'tabular-nums'}}>{block.duracion_min?toMMSS(block.duracion_min):'—'}</span>
+                          <span style={{fontSize:12,fontWeight:400,color:C.muted,fontVariantNumeric:'tabular-nums'}}>{block.duracion_min?toMMSS(block.duracion_min):'—'}</span>
                         )}
                       </div>
 
-                      {/* Título + links (en la misma fila, a la derecha del título) */}
-                      <div style={{minWidth:0}}>
+                      {/* TÍTULO + LINKS */}
+                      <div style={{minWidth:0,display:'flex',alignItems:'center',gap:8}}>
                         {isSong ? (
-                          <div style={{display:'flex',alignItems:'center',gap:6}}>
-                            {/* Número */}
+                          <>
+                            {/* Número círculo */}
                             {currentNum&&(
-                              <span style={{width:20,height:20,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,flexShrink:0}}>
+                              <span style={{width:24,height:24,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,flexShrink:0}}>
                                 {currentNum}
                               </span>
                             )}
-                            {/* Selector */}
-                            <select style={{...sel,fontSize:13,fontWeight:600,flex:1,minWidth:0}} value={block.song_id||''} onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
+                            {/* Selector canción */}
+                            <select style={{...sel,fontSize:14,fontWeight:700,flex:1,minWidth:0}} value={block.song_id||''} onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
                               <option value="">— Seleccionar canción —</option>
                               {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
                             </select>
-                            {/* Links como cuadrados con logo a la derecha del título */}
+                            {/* Links cuadrados con logo */}
                             {block.song&&(
-                              <div style={{display:'flex',gap:3,flexShrink:0}}>
+                              <div style={{display:'flex',gap:4,flexShrink:0}}>
                                 {(block.song as any).link_spotify&&(
                                   <a href={(block.song as any).link_spotify} target="_blank"
-                                    style={{width:22,height:22,background:'#D8F3DC',borderRadius:5,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,textDecoration:'none',flexShrink:0}}>
+                                    style={{width:24,height:24,background:'#D8F3DC',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,textDecoration:'none'}}>
                                     🎧
                                   </a>
                                 )}
                                 {(block.song as any).link_letras&&(
                                   <a href={(block.song as any).link_letras} target="_blank"
-                                    style={{width:22,height:22,background:'#DBE4FF',borderRadius:5,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,textDecoration:'none',flexShrink:0}}>
+                                    style={{width:24,height:24,background:'#DBE4FF',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,textDecoration:'none'}}>
                                     📄
                                   </a>
                                 )}
                                 {(block.song as any).link_recursos&&(
                                   <a href={(block.song as any).link_recursos} target="_blank"
-                                    style={{width:22,height:22,background:'#FFF3CD',borderRadius:5,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,textDecoration:'none',flexShrink:0}}>
+                                    style={{width:24,height:24,background:'#FFF3CD',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,textDecoration:'none'}}>
                                     📁
                                   </a>
                                 )}
                               </div>
                             )}
-                          </div>
+                          </>
                         ) : (
-                          <div style={{display:'flex',alignItems:'center',gap:6}}>
-                            <span style={{fontSize:11,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'1px 6px',borderRadius:3,letterSpacing:0.3,flexShrink:0}}>bloque</span>
+                          <div style={{display:'flex',alignItems:'center',gap:8,flex:1}}>
+                            <span style={{fontSize:11,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'2px 7px',borderRadius:4,letterSpacing:0.3,flexShrink:0}}>bloque</span>
                             <input defaultValue={block.titulo||''} onBlur={e=>updateBlock(block.id,{titulo:e.target.value})}
                               style={{flex:1,fontSize:13,fontWeight:300,color:C.muted,fontStyle:'italic',border:'none',outline:'none',background:'transparent',fontFamily:'inherit'}}/>
                             <input type="text" placeholder="mm:ss" defaultValue={block.duracion_min?toMMSS(block.duracion_min):''}
                               onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
-                              style={{width:44,fontSize:10,padding:'2px 4px',border:`1px solid #C8C0B4`,borderRadius:4,fontFamily:'inherit',textAlign:'center',color:C.muted}}/>
+                              style={{width:52,fontSize:11,padding:'3px 6px',border:`1px solid #C8C0B4`,borderRadius:5,fontFamily:'inherit',textAlign:'center',color:C.muted}}/>
                           </div>
                         )}
                       </div>
 
-                      {/* OBSERVACIONES — columna propia, clickeable para editar */}
-                      <div style={{minWidth:0}}>
+                      {/* OBSERVACIONES — columna propia con separador izquierdo */}
+                      <div style={{minWidth:0,borderLeft:`1px solid #E8E0D0`,paddingLeft:10}}>
                         {isSong&&(
                           editingObs===block.id ? (
-                            <input autoFocus placeholder="Observación..." value={obsText[block.id]||''}
+                            <input autoFocus placeholder="Observación..."
+                              value={obsText[block.id]||''}
                               onChange={e=>setObsText(prev=>({...prev,[block.id]:e.target.value}))}
                               onKeyDown={e=>{if(e.key==='Enter')saveObs(block.id);if(e.key==='Escape')setEditingObs(null)}}
-                              style={{width:'100%',fontSize:11,padding:'4px 7px',border:`0.5px solid #C9A14A`,borderRadius:5,fontFamily:'inherit',outline:'none',color:C.txt,background:'#FFFBEB'}}/>
+                              style={{width:'100%',fontSize:12,padding:'4px 8px',border:`0.5px solid #C9A14A`,borderRadius:6,fontFamily:'inherit',outline:'none',color:C.txt,background:'#FFFBEB'}}/>
                           ) : blockObs ? (
-                            <span onClick={()=>{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:blockObs}))}}
-                              style={{fontSize:11,color:'#92400E',fontStyle:'italic',cursor:'pointer',display:'block',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const,padding:'2px 0'}}>
+                            <span
+                              onClick={()=>{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:blockObs}))}}
+                              style={{fontSize:12,color:'#C0392B',fontStyle:'italic',cursor:'pointer',display:'block',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const}}>
                               "{blockObs}"
                             </span>
                           ) : (
-                            <button onClick={()=>{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:''}))} }
-                              style={{fontSize:10,color:'#CCC',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',padding:0,textAlign:'left' as const}}>
+                            <button
+                              onClick={()=>{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:''}))} }
+                              style={{fontSize:12,color:'#CCC',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',padding:0}}>
                               + obs
                             </button>
                           )
                         )}
                       </div>
 
-                      {/* Tono */}
+                      {/* TONO */}
                       <div style={{display:'flex',flexDirection:'column',gap:1}}>
                         {isSong&&(
                           <>
-                            <span style={{fontSize:9,fontWeight:700,letterSpacing:0.5,textTransform:'uppercase' as const,color:'#BBB'}}>Tono</span>
-                            <select style={{...sel,fontSize:12,fontWeight:600}} value={block.tono||''} onChange={e=>updateBlock(block.id,{tono:e.target.value||undefined})}>
+                            <span style={{fontSize:9,fontWeight:700,letterSpacing:0.8,textTransform:'uppercase' as const,color:'#BBB'}}>Tono</span>
+                            <select style={{...sel,fontSize:13,fontWeight:700,color:C.txt}} value={block.tono||''} onChange={e=>updateBlock(block.id,{tono:e.target.value||undefined})}>
                               <option value="">—</option>
                               {NOTAS.map(n=><option key={n}>{n}</option>)}
                             </select>
@@ -687,12 +690,12 @@ export default function AdminServiceView({
                         )}
                       </div>
 
-                      {/* Lead */}
+                      {/* LEAD */}
                       <div style={{display:'flex',flexDirection:'column',gap:1}}>
                         {isSong&&(
                           <>
-                            <span style={{fontSize:9,fontWeight:700,letterSpacing:0.5,textTransform:'uppercase' as const,color:'#BBB'}}>Lead</span>
-                            <select style={{...sel,fontSize:12}} value={block.lead_id||''} onChange={e=>updateBlock(block.id,{lead_id:e.target.value||undefined})}>
+                            <span style={{fontSize:9,fontWeight:700,letterSpacing:0.8,textTransform:'uppercase' as const,color:'#BBB'}}>Lead</span>
+                            <select style={{...sel,fontSize:13}} value={block.lead_id||''} onChange={e=>updateBlock(block.id,{lead_id:e.target.value||undefined})}>
                               <option value="">—</option>
                               {members.filter(m=>m.instrumentos.includes('Voz')).map(m=>(
                                 <option key={m.id} value={m.id}>{m.nombre}</option>
@@ -702,10 +705,10 @@ export default function AdminServiceView({
                         )}
                       </div>
 
-                      {/* Delete */}
+                      {/* DELETE */}
                       <div style={{display:'flex',justifyContent:'center'}}>
                         <button onClick={()=>deleteBlock(block.id)}
-                          style={{width:24,height:24,borderRadius:6,border:'none',background:'#FEE2E2',color:'#B91C1C',fontSize:14,cursor:'pointer',fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>
+                          style={{width:26,height:26,borderRadius:6,border:'none',background:'#FEE2E2',color:'#B91C1C',fontSize:15,cursor:'pointer',fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>
                           ×
                         </button>
                       </div>
