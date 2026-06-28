@@ -517,8 +517,8 @@ export default function AdminServiceView({
               </div>
 
               {/* ── DESKTOP column headers ── */}
-              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'20px 52px 1fr 70px 120px 32px',gap:6,padding:'5px 12px 5px 8px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
-                {['','Min','Título / Obs / Links','Tono','Lead',''].map((h,i)=>(
+              <div className="desktop-cols-header" style={{display:'grid',gridTemplateColumns:'20px 52px 1fr 120px 70px 120px 32px',gap:6,padding:'5px 12px 5px 8px',background:C.crema,borderBottom:`1px solid #C8C0B4`}}>
+                {['','Min','Título / Links','Observaciones','Tono','Lead',''].map((h,i)=>(
                   <span key={i} style={{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.muted}}>{h}</span>
                 ))}
               </div>
@@ -570,7 +570,7 @@ export default function AdminServiceView({
                     */}
                     <div className="order-row-desktop" style={{
                       display:'grid',
-                      gridTemplateColumns:'20px 52px 1fr 70px 120px 32px',
+                      gridTemplateColumns:'20px 52px 1fr 120px 70px 120px 32px',
                       padding:'7px 12px 7px 8px',
                       borderBottom:`0.5px solid #E8E0D0`,
                       alignItems:'center',
@@ -601,46 +601,43 @@ export default function AdminServiceView({
                         )}
                       </div>
 
-                      {/* Título + links inline + obs inline */}
+                      {/* Título + links (en la misma fila, a la derecha del título) */}
                       <div style={{minWidth:0}}>
                         {isSong ? (
-                          <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'nowrap' as const}}>
+                          <div style={{display:'flex',alignItems:'center',gap:6}}>
                             {/* Número */}
                             {currentNum&&(
                               <span style={{width:20,height:20,borderRadius:'50%',background:C.txt,color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,flexShrink:0}}>
                                 {currentNum}
                               </span>
                             )}
-                            {/* Canción selector */}
-                            <select style={{...sel,fontSize:13,fontWeight:600,minWidth:0,flex:1}} value={block.song_id||''} onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
+                            {/* Selector */}
+                            <select style={{...sel,fontSize:13,fontWeight:600,flex:1,minWidth:0}} value={block.song_id||''} onChange={e=>updateBlock(block.id,{song_id:e.target.value||undefined,titulo:songs.find(s=>s.id===e.target.value)?.nombre||''})}>
                               <option value="">— Seleccionar canción —</option>
                               {songs.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}
                             </select>
-                            {/* Links inline a la derecha del selector */}
+                            {/* Links como cuadrados con logo a la derecha del título */}
                             {block.song&&(
                               <div style={{display:'flex',gap:3,flexShrink:0}}>
-                                {(block.song as any).link_spotify&&<a href={(block.song as any).link_spotify} target="_blank" style={{width:20,height:20,background:'#D8F3DC',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,textDecoration:'none'}}>🎧</a>}
-                                {(block.song as any).link_letras&&<a href={(block.song as any).link_letras} target="_blank" style={{width:20,height:20,background:'#DBE4FF',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,textDecoration:'none'}}>📄</a>}
-                                {(block.song as any).link_recursos&&<a href={(block.song as any).link_recursos} target="_blank" style={{width:20,height:20,background:'#FFF3CD',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,textDecoration:'none'}}>📁</a>}
+                                {(block.song as any).link_spotify&&(
+                                  <a href={(block.song as any).link_spotify} target="_blank"
+                                    style={{width:22,height:22,background:'#D8F3DC',borderRadius:5,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,textDecoration:'none',flexShrink:0}}>
+                                    🎧
+                                  </a>
+                                )}
+                                {(block.song as any).link_letras&&(
+                                  <a href={(block.song as any).link_letras} target="_blank"
+                                    style={{width:22,height:22,background:'#DBE4FF',borderRadius:5,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,textDecoration:'none',flexShrink:0}}>
+                                    📄
+                                  </a>
+                                )}
+                                {(block.song as any).link_recursos&&(
+                                  <a href={(block.song as any).link_recursos} target="_blank"
+                                    style={{width:22,height:22,background:'#FFF3CD',borderRadius:5,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,textDecoration:'none',flexShrink:0}}>
+                                    📁
+                                  </a>
+                                )}
                               </div>
-                            )}
-                            {/* Obs inline — input or badge */}
-                            {editingObs===block.id ? (
-                              <input autoFocus placeholder="Observación..." value={obsText[block.id]||''}
-                                onChange={e=>setObsText(prev=>({...prev,[block.id]:e.target.value}))}
-                                onKeyDown={e=>{if(e.key==='Enter')saveObs(block.id);if(e.key==='Escape')setEditingObs(null)}}
-                                style={{width:140,fontSize:11,padding:'3px 7px',border:`0.5px solid #C9A14A`,borderRadius:5,fontFamily:'inherit',outline:'none',color:C.txt,background:'#FFFBEB',flexShrink:0}}/>
-                            ) : blockObs ? (
-                              <span onClick={()=>{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:blockObs}))}}
-                                style={{fontSize:11,color:'#92400E',fontStyle:'italic',background:'#FFF3CD',padding:'2px 7px',borderRadius:4,whiteSpace:'nowrap' as const,cursor:'pointer',flexShrink:0,maxWidth:160,overflow:'hidden',textOverflow:'ellipsis',display:'block'}}>
-                                📝 {blockObs}
-                              </span>
-                            ) : (
-                              <button onClick={()=>{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:''}))} }
-                                title="Agregar observación"
-                                style={{width:20,height:20,borderRadius:4,border:`0.5px solid #C8C0B4`,background:'white',color:C.muted,fontSize:10,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,opacity:0.5}}>
-                                📝
-                              </button>
                             )}
                           </div>
                         ) : (
@@ -655,7 +652,29 @@ export default function AdminServiceView({
                         )}
                       </div>
 
-                      {/* Tono — label + select en columna */}
+                      {/* OBSERVACIONES — columna propia, clickeable para editar */}
+                      <div style={{minWidth:0}}>
+                        {isSong&&(
+                          editingObs===block.id ? (
+                            <input autoFocus placeholder="Observación..." value={obsText[block.id]||''}
+                              onChange={e=>setObsText(prev=>({...prev,[block.id]:e.target.value}))}
+                              onKeyDown={e=>{if(e.key==='Enter')saveObs(block.id);if(e.key==='Escape')setEditingObs(null)}}
+                              style={{width:'100%',fontSize:11,padding:'4px 7px',border:`0.5px solid #C9A14A`,borderRadius:5,fontFamily:'inherit',outline:'none',color:C.txt,background:'#FFFBEB'}}/>
+                          ) : blockObs ? (
+                            <span onClick={()=>{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:blockObs}))}}
+                              style={{fontSize:11,color:'#92400E',fontStyle:'italic',cursor:'pointer',display:'block',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const,padding:'2px 0'}}>
+                              "{blockObs}"
+                            </span>
+                          ) : (
+                            <button onClick={()=>{setEditingObs(block.id);setObsText(prev=>({...prev,[block.id]:''}))} }
+                              style={{fontSize:10,color:'#CCC',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',padding:0,textAlign:'left' as const}}>
+                              + obs
+                            </button>
+                          )
+                        )}
+                      </div>
+
+                      {/* Tono */}
                       <div style={{display:'flex',flexDirection:'column',gap:1}}>
                         {isSong&&(
                           <>
@@ -668,7 +687,7 @@ export default function AdminServiceView({
                         )}
                       </div>
 
-                      {/* Lead — label + select en columna */}
+                      {/* Lead */}
                       <div style={{display:'flex',flexDirection:'column',gap:1}}>
                         {isSong&&(
                           <>
