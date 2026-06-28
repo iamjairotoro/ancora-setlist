@@ -22,14 +22,10 @@ function toMMSS(secs:number):string {
 // Logo Áncora SVG inline — versión blanca para fondo oscuro
 function LogoAncora() {
   return (
-    <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:20}}>
-      <div style={{width:36,height:36,background:'#F5F0E6',borderRadius:9,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-        <span style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:24,color:'#1A1A1A',lineHeight:1}}>Á</span>
-      </div>
-      <div>
-        <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:20,color:'#F5F0E6',lineHeight:1}}>Áncora</div>
-        <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:300,fontSize:7,letterSpacing:3,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.45)'}}>Worship</div>
-      </div>
+    <div style={{display:'inline-flex',flexDirection:'column',alignItems:'center',background:'#F5F0E6',borderRadius:12,padding:'8px 18px',marginBottom:20}}>
+      <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:32,color:'#1A1A1A',lineHeight:1}}>Áncora</div>
+      <div style={{width:32,height:0.5,background:'rgba(0,0,0,0.2)',margin:'3px 0'}}/>
+      <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:300,fontSize:8,letterSpacing:4,textTransform:'uppercase' as const,color:'#AAA'}}>Worship</div>
     </div>
   )
 }

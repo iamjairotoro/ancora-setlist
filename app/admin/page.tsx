@@ -135,15 +135,11 @@ export default function AdminPage() {
       {/* ── NAVBAR ── */}
       <TexBg className="sticky top-0 z-30 shadow-lg">
         <header style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',justifyContent:'space-between'}}>
-          {/* Logo */}
-          <div style={{display:'flex',alignItems:'center',gap:10}}>
-            <div style={{width:34,height:34,background:'#F5F0E6',borderRadius:9,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-              <span style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:24,color:'#1A1A1A',lineHeight:1}}>Á</span>
-            </div>
-            <div>
-              <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:22,color:'#F5F0E6',lineHeight:1}}>Áncora</div>
-              <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:300,fontSize:7,letterSpacing:3,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.4)'}}>Worship</div>
-            </div>
+          {/* Logo — fondo crema vertical */}
+          <div style={{background:'#F5F0E6',borderRadius:10,padding:'6px 14px',display:'flex',flexDirection:'column',alignItems:'center'}}>
+            <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:22,color:'#1A1A1A',lineHeight:1}}>Áncora</div>
+            <div style={{width:28,height:0.5,background:'rgba(0,0,0,0.2)',margin:'3px 0'}}/>
+            <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:300,fontSize:7,letterSpacing:4,textTransform:'uppercase' as const,color:'#AAA'}}>Worship</div>
           </div>
 
           {/* Desktop nav */}

@@ -27,12 +27,12 @@ function LoginContent() {
   return (
     <TexBg className="min-h-screen flex items-center justify-center p-4">
       <div style={{ background: 'white', borderRadius: 14, padding: '28px 24px', width: '100%', maxWidth: 320, textAlign: 'center' }}>
-        {/* Logo */}
-        <div style={{ width: 44, height: 44, background: '#1A1A1A', borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', flexDirection: 'column' }}>
-          <span style={{ fontFamily: '"Dancing Script", cursive', fontWeight: 700, fontSize: 28, color: '#F5F0E6', lineHeight: 1 }}>Á</span>
+        {/* Logo — fondo crema vertical */}
+        <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:24}}>
+          <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:42,color:'#1A1A1A',lineHeight:1}}>Áncora</div>
+          <div style={{width:36,height:0.5,background:'rgba(0,0,0,0.2)',margin:'4px 0'}}/>
+          <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:300,fontSize:9,letterSpacing:5,textTransform:'uppercase' as const,color:'#AAA'}}>Worship</div>
         </div>
-        <div style={{ fontFamily: '"Dancing Script", cursive', fontWeight: 700, fontSize: 26, color: '#1A1A1A', lineHeight: 1, marginBottom: 2 }}>Áncora</div>
-        <div style={{ fontFamily: '"Helvetica Neue", Helvetica, sans-serif', fontWeight: 300, fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#AAA', marginBottom: 24 }}>Worship</div>
 
         {error && (
           <div style={{ background: '#FEF2F2', color: '#B91C1C', fontSize: 12, padding: '8px 12px', borderRadius: 8, marginBottom: 14, textAlign: 'left' }}>
