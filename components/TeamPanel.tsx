@@ -6,13 +6,13 @@ import AvatarUpload from './AvatarUpload'
 
 const ALL_INSTRUMENTOS: Instrument[] = [
   'Guitarra Acustica','Guitarra Electrica','Piano',
-  'MD (Direccion Musical en vivo)','Bajo','Bateria','Voz','Sonido','Perc menores'
+  'MD (Direccion Musical en vivo)','Bajo','Bateria','Voz','Sonido','Montaje','Perc menores'
 ]
 const SHORT: Record<string, string> = {
   'Guitarra Acustica': 'AG', 'Guitarra Electrica': 'EG',
   'MD (Direccion Musical en vivo)': 'MD', 'Perc menores': 'Perc',
   'Piano': 'Piano', 'Bajo': 'Bass',
-  'Bateria': 'Drums', 'Voz': 'Voz', 'Sonido': 'Sonido',
+  'Bateria': 'Drums', 'Voz': 'Voz', 'Sonido': 'Sonido', 'Montaje': 'Montaje',
 }
 
 interface Props { members: Member[]; onRefresh: () => void }

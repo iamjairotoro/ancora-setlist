@@ -495,12 +495,13 @@ export default function AdminServiceView({
                 </div>
                 {POSICIONES_TECNICA.map(pos=>{
                   const asig=getBanda(pos), status=getMemberInvStatus(asig?.member_id)
+                  const opts=membersFor(pos)
                   return(
                     <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderBottom:`0.5px solid #E8E0D0`}}>
                       <span style={{fontSize:11,fontWeight:700,color:C.muted,width:80,flexShrink:0}}>{LABEL_TECNICA[pos]}</span>
                       <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
                         <option value=""></option>
-                        {members.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
+                        {opts.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
                       </select>
                       {status&&statusDot(status)}
                     </div>

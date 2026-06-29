@@ -20,9 +20,8 @@ const INSTR_POR_POSICION: Record<string,string[]> = {
   AG1:['Guitarra Acustica'],AG2:['Guitarra Acustica'],EG:['Guitarra Electrica'],
   KEYS:['Piano'],BASS:['Bajo'],DRUMS:['Bateria'],
   MD:['MD (Direccion Musical en vivo)'],
-  SONIDO:['Sonido'],ASIST_SONIDO:['Sonido','Técnico'],
-  ENC_MONTAJE:['Técnico','Montaje'],ASIST_MONTAJE1:['Técnico','Montaje'],
-  ASIST_MONTAJE2:['Técnico','Montaje'],ASIST_MONTAJE3:['Técnico','Montaje'],
+  SONIDO1:['Sonido'],SONIDO2:['Sonido'],
+  MONTAJE1:['Montaje'],MONTAJE2:['Montaje'],MONTAJE3:['Montaje'],MONTAJE4:['Montaje'],
   VX1:['Voz'],VX2:['Voz'],VX3:['Voz'],VX4:['Voz'],
 }
 
