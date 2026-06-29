@@ -127,15 +127,15 @@ export default function TeamPanel({ members, onRefresh }: Props) {
           <div key={m.id} className="flex items-center gap-3 p-3">
             <AvatarUpload memberId={m.id} currentUrl={m.avatar_url} nombre={m.nombre} apellido={m.apellido} size="sm" />
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm">{m.nombre} {m.apellido}</p>
-              <p className="text-sm text-gray-500 truncate">{m.email}</p>
-              <div className="flex flex-wrap gap-1 mt-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-medium text-sm">{m.nombre} {m.apellido}</p>
                 {(m.instrumentos || []).map(i => (
-                  <span key={i} className="text-sm bg-yellow-50 text-yellow-700 border border-yellow-200 px-1.5 py-0.5 rounded">
+                  <span key={i} className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-1.5 py-0.5 rounded">
                     {SHORT[i] || i}
                   </span>
                 ))}
               </div>
+              <p className="text-sm text-gray-500 truncate">{m.email}</p>
             </div>
             <div className="flex gap-1">
               <button type="button" onClick={() => { setErr(''); setEditing({...m}) }}
