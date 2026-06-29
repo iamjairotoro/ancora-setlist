@@ -28,12 +28,13 @@ interface Props {
 }
 
 export default function AvailabilityPanel({ services }: Props) {
-  const [members, setMembers]       = useState<Member[]>([])
-  const [avail, setAvail]           = useState<AvailabilityRecord[]>([])
-  const [loading, setLoading]       = useState(true)
-  const [toggling, setToggling]     = useState<string|null>(null)
-  const [sending, setSending]       = useState(false)
-  const [msg, setMsg]               = useState('')
+  const [members, setMembers]             = useState<Member[]>([])
+  const [avail, setAvail]                 = useState<AvailabilityRecord[]>([])
+  const [loading, setLoading]             = useState(true)
+  const [toggling, setToggling]           = useState<string|null>(null)
+  const [sending, setSending]             = useState(false)
+  const [msg, setMsg]                     = useState('')
+  const [consultaEnviada, setConsultaEnviada] = useState<Set<string>>(new Set())
 
   // Solo mostrar servicios futuros o del mes actual
   const now = new Date()
@@ -51,6 +52,10 @@ export default function AvailabilityPanel({ services }: Props) {
     const data = await res.json()
     setMembers(data.members || [])
     setAvail(data.availability || [])
+    try {
+      const stored = JSON.parse(localStorage.getItem('ancora_consulta_enviada')||'[]')
+      setConsultaEnviada(new Set(stored))
+    } catch {}
     setLoading(false)
   }, [services])
 
@@ -90,6 +95,13 @@ export default function AvailabilityPanel({ services }: Props) {
     })
     const data = await res.json()
     setMsg(data.message || 'Enviado ✓')
+    // Marcar todos los serviceIds como consulta enviada
+    setConsultaEnviada(prev => {
+      const next = new Set(prev)
+      serviceIds.forEach(id => next.add(id))
+      try { localStorage.setItem('ancora_consulta_enviada', JSON.stringify(Array.from(next))) } catch {}
+      return next
+    })
     setSending(false)
   }
 
@@ -120,7 +132,7 @@ export default function AvailabilityPanel({ services }: Props) {
             Disponibilidad del mes
           </h2>
           <p style={{fontSize:12,color:C.muted,fontWeight:300}}>
-            Haz clic en una celda para alternar · <span style={{color:'#1B4332',fontWeight:500}}>verde = disponible</span> · <span style={{color:'#991B1B',fontWeight:500}}>rojo = no puede</span> · gris = sin respuesta
+            Solo lectura — los músicos marcan su disponibilidad desde su portal · <span style={{color:'#1B4332',fontWeight:500}}>verde = disponible</span> · <span style={{color:'#991B1B',fontWeight:500}}>rojo = no puede</span> · gris = sin respuesta
           </p>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
@@ -169,25 +181,22 @@ export default function AvailabilityPanel({ services }: Props) {
                     const isToggling = toggling === key
                     return (
                       <td key={s.id} style={{textAlign:'center',borderBottom:`0.5px solid ${C.cremaDark}`,borderLeft:`0.5px solid ${C.cremaDark}`,padding:'8px'}}>
-                        <button
-                          onClick={() => toggle(member.id, s.id)}
-                          disabled={isToggling}
-                          style={{
-                            width:36,height:32,borderRadius:7,border:'none',cursor:'pointer',
+                        <div style={{
+                            width:36,height:32,borderRadius:7,
+                            display:'inline-flex',alignItems:'center',justifyContent:'center',
                             fontWeight:700,fontSize:14,
-                            background: isToggling ? '#EEE'
-                              : status === 'disponible' ? '#D8F3DC'
+                            background: status === 'disponible' ? '#D8F3DC'
                               : status === 'no_disponible' ? '#FEE2E2'
-                              : 'rgba(0,0,0,0.06)',
+                              : consultaEnviada.has(s.id) ? '#FFF3CD'
+                              : 'rgba(0,0,0,0.04)',
                             color: status === 'disponible' ? '#1B4332'
                               : status === 'no_disponible' ? '#991B1B'
+                              : consultaEnviada.has(s.id) ? '#92400E'
                               : '#CCC',
-                            transition:'all 0.1s',
                           }}
-                          title={status === 'disponible' ? 'Disponible — clic para cambiar' : status === 'no_disponible' ? 'No disponible — clic para cambiar' : 'Sin respuesta — clic para marcar disponible'}
-                        >
-                          {isToggling ? '·' : status === 'disponible' ? '✓' : status === 'no_disponible' ? '✗' : '—'}
-                        </button>
+                          title={status ? '' : consultaEnviada.has(s.id) ? 'Consulta enviada — esperando respuesta' : 'Sin consulta enviada'}>
+                          {status === 'disponible' ? '✓' : status === 'no_disponible' ? '✗' : consultaEnviada.has(s.id) ? '⏳' : '—'}
+                        </div>
                       </td>
                     )
                   })}
@@ -202,7 +211,8 @@ export default function AvailabilityPanel({ services }: Props) {
           {[
             {bg:'#D8F3DC',color:'#1B4332',txt:'Disponible'},
             {bg:'#FEE2E2',color:'#991B1B',txt:'No disponible'},
-            {bg:'rgba(0,0,0,0.06)',color:'#CCC',txt:'Sin respuesta'},
+            {bg:'#FFF3CD',color:'#92400E',txt:'Esperando respuesta'},
+            {bg:'rgba(0,0,0,0.04)',color:'#CCC',txt:'Sin consulta enviada'},
           ].map(({bg,color,txt})=>(
             <div key={txt} style={{display:'flex',alignItems:'center',gap:6}}>
               <div style={{width:18,height:16,borderRadius:4,background:bg,border:'none'}}/>
