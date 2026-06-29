@@ -61,9 +61,13 @@ export default function AdminPage() {
   },[])
 
   const loadServices = useCallback(async () => {
-    const { data } = await supabase.from('services').select('*').order('fecha',{ascending:false})
+    const { data } = await supabase.from('services').select('*').order('fecha',{ascending:true})
     setServices(data||[])
-    if(!selectedService && data?.length) setSelectedService(data[0])
+    if(!selectedService && data?.length) {
+      const now = new Date()
+      const next = data.find(s => new Date(s.hora_fin ? s.fecha+'T'+s.hora_fin : s.fecha+'T14:00:00') > now)
+      setSelectedService(next || data[0])
+    }
   },[selectedService])
 
   const loadMembers = useCallback(async()=>{ const{data}=await supabase.from('members').select('*').order('nombre'); setMembers(data||[]) },[])
