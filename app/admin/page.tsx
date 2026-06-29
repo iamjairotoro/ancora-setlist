@@ -203,20 +203,47 @@ export default function AdminPage() {
           </div>
         </header>
 
-        {/* Mobile dropdown menu */}
+        {/* Dropdown menu — aparece al hacer click en hamburger */}
         {mobileMenuOpen&&(
-          <div style={{position:'absolute',top:'100%',right:0,left:0,background:'#1A1A1A',zIndex:50,padding:'8px 0',borderBottom:'0.5px solid rgba(245,240,230,0.1)'}}>
-            {(['setlist','equipo','canciones','disponibilidad','ajustes'] as Tab[]).map(t=>(
-              <button key={t} onClick={()=>{setTab(t);setMobileMenuOpen(false)}}
-                style={{width:'100%',textAlign:'left',padding:'12px 20px',fontSize:14,fontWeight:tab===t?600:400,background:tab===t?'rgba(245,240,230,0.08)':'none',color:'#F5F0E6',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
-                {t==='setlist'?'📋 Setlist':t==='equipo'?'👥 Equipo':t==='canciones'?'🎵 Canciones':t==='disponibilidad'?'📅 Disponibilidad':'⚙️ Ajustes'}
+          <>
+            {/* Dimmer para cerrar al hacer click afuera */}
+            <div onClick={()=>setMobileMenuOpen(false)}
+              style={{position:'fixed',inset:0,zIndex:48}}/>
+            <div style={{
+              position:'absolute',top:'100%',right:0,
+              background:'#1A1A1A',zIndex:50,
+              padding:'8px 0',
+              borderBottom:'0.5px solid rgba(245,240,230,0.1)',
+              minWidth:220,
+              boxShadow:'0 8px 24px rgba(0,0,0,0.4)',
+              borderRadius:'0 0 12px 12px',
+            }}>
+              {(['setlist','equipo','canciones','disponibilidad','ajustes'] as Tab[]).map(t=>(
+                <button key={t} onClick={()=>{setTab(t);setMobileMenuOpen(false)}}
+                  style={{
+                    width:'100%',textAlign:'left',padding:'13px 20px',
+                    fontSize:14,fontWeight:tab===t?700:400,
+                    background:tab===t?'rgba(245,240,230,0.12)':'none',
+                    color:tab===t?'#F5F0E6':'rgba(245,240,230,0.7)',
+                    border:'none',cursor:'pointer',fontFamily:'inherit',
+                    borderLeft:tab===t?'3px solid #C9A14A':'3px solid transparent',
+                  }}>
+                  {t==='setlist'?'📋 Setlist':t==='equipo'?'👥 Equipo':t==='canciones'?'🎵 Canciones':t==='disponibilidad'?'📅 Disponibilidad':'⚙️ Ajustes'}
+                </button>
+              ))}
+              <div style={{borderTop:'0.5px solid rgba(245,240,230,0.1)',margin:'6px 0'}}/>
+              {portalToken&&(
+                <a href={`/portal/${portalToken}`} target="_blank"
+                  style={{display:'block',padding:'13px 20px',fontSize:14,color:'rgba(245,240,230,0.7)',textDecoration:'none',fontFamily:'inherit'}}>
+                  👤 Mi portal
+                </a>
+              )}
+              <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }}
+                style={{width:'100%',textAlign:'left',padding:'13px 20px',fontSize:14,color:'rgba(245,240,230,0.4)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+                Salir
               </button>
-            ))}
-            <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }}
-              style={{width:'100%',textAlign:'left',padding:'12px 20px',fontSize:14,color:'rgba(245,240,230,0.4)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
-              Salir
-            </button>
-          </div>
+            </div>
+          </>
         )}
       </TexBg>
 
