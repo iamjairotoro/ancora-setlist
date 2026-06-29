@@ -12,7 +12,7 @@ interface ServiceData { service:{id:string;fecha:string;titulo:string};posicione
 interface Member { id:string;nombre:string;apellido:string;email:string;telefono?:string;avatar_url?:string }
 
 const C = { crema:'#F5F0E6', cremaDark:'#E0D8C8', txt:'#1A1A1A', muted:'#999' }
-type Tab = 'home'|'recursos'|'perfil'
+type Tab = 'home'|'misdomingos'|'recursos'|'perfil'
 
 function toMMSS(secs:number):string {
   const m=Math.floor(secs/60),s=Math.round(secs%60)
@@ -38,6 +38,7 @@ export default function PortalPage() {
   const [loading, setLoading]   = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [tab, setTab]           = useState<Tab>('home')
+  const [availData, setAvailData] = useState<Record<string,string>>({}) // serviceId -> status
   const [expandedSvc, setExpandedSvc] = useState<string|null>(null)
   const [expandedSong, setExpandedSong] = useState<string|null>(null)
   const [expandedSetlistItem, setExpandedSetlistItem] = useState<string|null>(null)
@@ -63,6 +64,18 @@ export default function PortalPage() {
     setAllSongs(songsData.songs||[])
     setProfileData({nombre:data.member.nombre,apellido:data.member.apellido||'',telefono:data.member.telefono||''})
     if (data.services.length>0) setExpandedSvc(prev=>prev||data.services[0].service.id)
+
+    // Cargar disponibilidad del miembro
+    if (data.member?.id && data.services?.length) {
+      const svcIds = data.services.map((s:any) => s.service.id).join(',')
+      const avRes = await fetch(`/api/availability?serviceIds=${svcIds}`)
+      const avData = await avRes.json()
+      const myAvail: Record<string,string> = {}
+      ;(avData.availability||[]).forEach((a:any) => {
+        if (a.member_id === data.member.id) myAvail[a.service_id] = a.status
+      })
+      setAvailData(myAvail)
+    }
     setLoading(false)
   }, [token])
 
@@ -181,10 +194,12 @@ export default function PortalPage() {
       {/* ── TAB BAR ── */}
       <div style={{maxWidth:500,margin:'-1px auto 0',padding:'0 16px'}}>
         <div style={{background:'white',borderRadius:14,padding:'4px',display:'flex',boxShadow:'0 2px 12px rgba(0,0,0,0.08)',position:'relative',top:-20}}>
-          {(['home','recursos','perfil'] as Tab[]).map(t=>(
+          {(['home','misdomingos','recursos','perfil'] as Tab[]).map(t=>(
             <button key={t} onClick={()=>setTab(t)}
-              style={{flex:1,padding:'9px 4px',borderRadius:10,fontSize:14,fontWeight:tab===t?700:500,color:tab===t?'white':C.muted,background:tab===t?C.txt:'transparent',border:'none',cursor:'pointer',fontFamily:'inherit',transition:'all 0.15s'}}>
-              {t==='home'?'🏠 Inicio':t==='recursos'?'🎵 Canciones':'👤 Perfil'}
+              style={{flex:1,padding:'9px 4px',borderRadius:10,fontSize:12,fontWeight:tab===t?700:500,color:tab===t?'white':C.muted,background:tab===t?C.txt:'transparent',border:'none',cursor:'pointer',fontFamily:'inherit',transition:'all 0.15s'}}>
+              {t==='home'?'🏠':t==='misdomingos'?'📅':t==='recursos'?'🎵':'👤'}
+              <br/>
+              <span style={{fontSize:10}}>{t==='home'?'Inicio':t==='misdomingos'?'Mis dom.':t==='recursos'?'Canciones':'Perfil'}</span>
             </button>
           ))}
         </div>
@@ -192,6 +207,78 @@ export default function PortalPage() {
 
       {/* ── CONTENT ── */}
       <div style={{maxWidth:500,margin:'0 auto',padding:'0 16px 40px'}}>
+
+        {/* MIS DOMINGOS */}
+        {tab==='misdomingos'&&(
+          <div style={{display:'flex',flexDirection:'column',gap:10}}>
+            <div style={{background:'white',borderRadius:14,padding:'12px 16px',border:`0.5px solid ${C.cremaDark}`}}>
+              <p style={{fontSize:10,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase' as const,color:C.muted,marginBottom:4}}>Disponibilidad del mes</p>
+              <p style={{fontSize:13,fontWeight:400,color:C.muted}}>Indica en qué domingos puedes servir este mes.</p>
+            </div>
+            {services.length===0&&(
+              <div style={{background:'white',borderRadius:14,padding:32,textAlign:'center',border:`0.5px solid ${C.cremaDark}`}}>
+                <p style={{fontSize:14,color:C.muted}}>No hay servicios próximos registrados.</p>
+              </div>
+            )}
+            {services.map(({service})=>{
+              const d = new Date(service.fecha+'T12:00:00')
+              const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
+              const meses=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
+              const status = availData[service.id] || null
+              const isToggling = false
+
+              async function toggleAvail(newStatus: 'disponible'|'no_disponible') {
+                if (!member) return
+                const res = await fetch('/api/availability',{
+                  method:'POST',headers:{'Content-Type':'application/json'},
+                  body:JSON.stringify({action:'toggle',member_id:member.id,service_id:service.id,status:newStatus})
+                })
+                const data = await res.json()
+                if(data.availability) {
+                  setAvailData(prev=>({...prev,[service.id]:newStatus}))
+                }
+              }
+
+              return(
+                <div key={service.id} style={{background:'white',borderRadius:12,border:`0.5px solid ${C.cremaDark}`,overflow:'hidden'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px'}}>
+                    {/* Date box */}
+                    <div style={{width:40,height:40,background:C.crema,borderRadius:9,border:`0.5px solid ${C.cremaDark}`,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                      <span style={{fontSize:17,fontWeight:700,color:C.txt,lineHeight:1}}>{d.getDate()}</span>
+                      <span style={{fontSize:8,fontWeight:500,color:C.muted,textTransform:'uppercase' as const}}>{meses[d.getMonth()]}</span>
+                    </div>
+                    {/* Info */}
+                    <div style={{flex:1}}>
+                      <p style={{fontSize:15,fontWeight:700,color:C.txt}}>{dias[d.getDay()]} {d.getDate()} de {meses[d.getMonth()]}</p>
+                      <p style={{fontSize:11,color:C.muted,marginTop:1}}>Servicio Ancora</p>
+                    </div>
+                    {/* Buttons */}
+                    <div style={{display:'flex',gap:8}}>
+                      <button
+                        onClick={()=>toggleAvail('disponible')}
+                        style={{width:36,height:36,borderRadius:9,border:'none',cursor:'pointer',fontSize:16,fontWeight:700,background:status==='disponible'?'#D8F3DC':'rgba(0,0,0,0.06)',color:status==='disponible'?'#1B4332':'#CCC',transition:'all 0.15s'}}>
+                        ✓
+                      </button>
+                      <button
+                        onClick={()=>toggleAvail('no_disponible')}
+                        style={{width:36,height:36,borderRadius:9,border:'none',cursor:'pointer',fontSize:16,fontWeight:700,background:status==='no_disponible'?'#FEE2E2':'rgba(0,0,0,0.06)',color:status==='no_disponible'?'#991B1B':'#CCC',transition:'all 0.15s'}}>
+                        ✗
+                      </button>
+                    </div>
+                  </div>
+                  {/* Status bar */}
+                  {status&&(
+                    <div style={{padding:'6px 14px',background:status==='disponible'?'#D8F3DC':'#FEE2E2',borderTop:`0.5px solid ${status==='disponible'?'#BBE5C5':'#FCA5A5'}`}}>
+                      <span style={{fontSize:11,fontWeight:700,color:status==='disponible'?'#1B4332':'#991B1B'}}>
+                        {status==='disponible'?'✓ Disponible':'✗ No disponible'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
 
         {/* HOME */}
         {tab==='home'&&(
