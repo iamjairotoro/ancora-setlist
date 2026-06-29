@@ -151,7 +151,7 @@ export default function AdminPage() {
     <div style={{minHeight:'100vh',background:'#F5F0E6',fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif'}}>
 
       {/* ── NAVBAR ── */}
-      <TexBg className="sticky top-0 z-30 shadow-lg" style={{position:'relative'}}>
+      <TexBg className="sticky top-0 z-30 shadow-lg">
         <header style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',justifyContent:'space-between'}}>
           {/* Logo — fondo oscuro vertical */}
           <div style={{background:'#1A1A1A',borderRadius:10,padding:'7px 16px',display:'flex',flexDirection:'column',alignItems:'center'}}>
