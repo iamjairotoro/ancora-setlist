@@ -249,7 +249,7 @@ export default function PortalPage() {
               }
 
               return(
-                <div key={service.id} style={{background:'white',borderRadius:12,border:`0.5px solid ${C.cremaDark}`,overflow:'hidden'}}>
+                <div key={service.id} style={{background:'white',borderRadius:12,border:`0.5px solid ${status==='disponible'?'#BBE5C5':status==='no_disponible'?'#FCA5A5':C.cremaDark}`,overflow:'hidden'}}>
                   <div style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px'}}>
                     {/* Date box */}
                     <div style={{width:40,height:40,background:C.crema,borderRadius:9,border:`0.5px solid ${C.cremaDark}`,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flexShrink:0}}>
@@ -275,14 +275,6 @@ export default function PortalPage() {
                       </button>
                     </div>
                   </div>
-                  {/* Status bar */}
-                  {status&&(
-                    <div style={{padding:'6px 14px',background:status==='disponible'?'#D8F3DC':'#FEE2E2',borderTop:`0.5px solid ${status==='disponible'?'#BBE5C5':'#FCA5A5'}`}}>
-                      <span style={{fontSize:11,fontWeight:700,color:status==='disponible'?'#1B4332':'#991B1B'}}>
-                        {status==='disponible'?'✓ Disponible':'✗ No disponible'}
-                      </span>
-                    </div>
-                  )}
                 </div>
               )
             })}
