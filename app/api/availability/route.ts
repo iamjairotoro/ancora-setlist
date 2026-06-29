@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL
 
-    function fmtFecha(fecha: string) {
+    const fmtFecha = (fecha: string) => {
       const d = new Date(fecha + 'T12:00:00')
       const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
       const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
