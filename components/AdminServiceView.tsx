@@ -490,14 +490,14 @@ export default function AdminServiceView({
                   )
                 })}
                 {/* TÉCNICA */}
-                <div style={{padding:'8px 14px',background:'#1A1A1A',borderTop:`1px solid #C8C0B4`,borderBottom:`1px solid #333`}}>
-                  <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:'rgba(245,240,230,0.7)'}}>Técnica</span>
+                <div style={{padding:'8px 14px',background:C.crema,borderTop:`1px solid #C8C0B4`,borderBottom:`1px solid #C8C0B4`}}>
+                  <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:C.muted}}>Técnica</span>
                 </div>
                 {POSICIONES_TECNICA.map(pos=>{
                   const asig=getBanda(pos), status=getMemberInvStatus(asig?.member_id)
                   return(
-                    <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderBottom:`0.5px solid #E8E0D0`,background:'#FAFAF8'}}>
-                      <span style={{fontSize:10,fontWeight:600,color:'#666',width:48,flexShrink:0,lineHeight:1.2}}>{LABEL_TECNICA[pos]?.split(' ')[0]}</span>
+                    <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderBottom:`0.5px solid #E8E0D0`}}>
+                      <span style={{fontSize:11,fontWeight:700,color:C.muted,width:80,flexShrink:0}}>{LABEL_TECNICA[pos]}</span>
                       <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
                         <option value=""></option>
                         {members.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}

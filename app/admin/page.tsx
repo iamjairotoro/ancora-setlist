@@ -10,11 +10,11 @@ import TexBg from '@/components/TexBg'
 
 const POSICIONES_BANDA = ['AG1','AG2','EG','KEYS','BASS','DRUMS','MD'] as const
 const POSICIONES_VX    = ['VX1','VX2','VX3','VX4'] as const
-const POSICIONES_TECNICA = ['SONIDO','ASIST_SONIDO','ENC_MONTAJE','ASIST_MONTAJE1','ASIST_MONTAJE2','ASIST_MONTAJE3'] as const
+const POSICIONES_TECNICA = ['SONIDO1','SONIDO2','MONTAJE1','MONTAJE2','MONTAJE3','MONTAJE4'] as const
 const LABEL_TECNICA: Record<string,string> = {
-  SONIDO:'Sonido', ASIST_SONIDO:'Asistente Sonido',
-  ENC_MONTAJE:'Encargado Montaje', ASIST_MONTAJE1:'Asistente Montaje 1',
-  ASIST_MONTAJE2:'Asistente Montaje 2', ASIST_MONTAJE3:'Asistente Montaje 3',
+  SONIDO1:'SONIDO 1', SONIDO2:'SONIDO 2',
+  MONTAJE1:'MONTAJE 1', MONTAJE2:'MONTAJE 2',
+  MONTAJE3:'MONTAJE 3', MONTAJE4:'MONTAJE 4',
 }
 const INSTR_POR_POSICION: Record<string,string[]> = {
   AG1:['Guitarra Acustica'],AG2:['Guitarra Acustica'],EG:['Guitarra Electrica'],

@@ -385,8 +385,8 @@ export default function PortalPage() {
                       {/* Banda + Técnica colapsables */}
                       {(()=>{
                         const POS_MUSICA=['AG1','AG2','EG','KEYS','BASS','DRUMS','MD','VX1','VX2','VX3','VX4']
-                        const POS_TEC=['SONIDO','ASIST_SONIDO','ENC_MONTAJE','ASIST_MONTAJE1','ASIST_MONTAJE2','ASIST_MONTAJE3']
-                        const LABEL_TEC:Record<string,string>={SONIDO:'Sonido',ASIST_SONIDO:'Asist. Sonido',ENC_MONTAJE:'Enc. Montaje',ASIST_MONTAJE1:'Asist. Montaje 1',ASIST_MONTAJE2:'Asist. Montaje 2',ASIST_MONTAJE3:'Asist. Montaje 3'}
+                        const POS_TEC=['SONIDO1','SONIDO2','MONTAJE1','MONTAJE2','MONTAJE3','MONTAJE4']
+                        const LABEL_TEC:Record<string,string>={SONIDO1:'SONIDO 1',SONIDO2:'SONIDO 2',MONTAJE1:'MONTAJE 1',MONTAJE2:'MONTAJE 2',MONTAJE3:'MONTAJE 3',MONTAJE4:'MONTAJE 4'}
                         const isTecnico=banda.some(b=>POS_TEC.includes(b.posicion)&&b.member?.nombre===member?.nombre)
                         const isMusico=banda.some(b=>POS_MUSICA.includes(b.posicion)&&b.member?.nombre===member?.nombre)
                         const bandaKey=`banda-${service.id}`
