@@ -6,6 +6,7 @@ import TeamPanel from '@/components/TeamPanel'
 import SongsPanel from '@/components/SongsPanel'
 import AdminServiceView from '@/components/AdminServiceView'
 import AvailabilityPanel from '@/components/AvailabilityPanel'
+import AdminsPanel from '@/components/AdminsPanel'
 import TexBg from '@/components/TexBg'
 
 const POSICIONES_BANDA = ['AG1','AG2','EG','KEYS','BASS','DRUMS','MD'] as const
@@ -25,7 +26,7 @@ const INSTR_POR_POSICION: Record<string,string[]> = {
   VX1:['Voz'],VX2:['Voz'],VX3:['Voz'],VX4:['Voz'],
 }
 
-type Tab = 'setlist'|'equipo'|'canciones'|'disponibilidad'
+type Tab = 'setlist'|'equipo'|'canciones'|'disponibilidad'|'ajustes'
 
 export default function AdminPage() {
   const [authed, setAuthed]   = useState(false)
@@ -161,10 +162,10 @@ export default function AdminPage() {
 
           {/* Desktop nav */}
           <div className="hidden-mobile" style={{display:'flex',alignItems:'center',gap:2}}>
-            {(['setlist','equipo','canciones','disponibilidad'] as Tab[]).map(t=>(
+            {(['setlist','equipo','canciones','disponibilidad','ajustes'] as Tab[]).map(t=>(
               <button key={t} onClick={()=>setTab(t)}
                 style={{fontSize:10,padding:'4px 10px',borderRadius:20,fontWeight:tab===t?500:400,background:tab===t?'rgba(245,240,230,0.15)':'transparent',color:tab===t?'#F5F0E6':'rgba(245,240,230,0.5)',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
-                {t==='setlist'?'Setlist':t==='equipo'?'Equipo':t==='canciones'?'Canciones':'Disponibilidad'}
+                {t==='setlist'?'Setlist':t==='equipo'?'Equipo':t==='canciones'?'Canciones':t==='disponibilidad'?'Disponibilidad':'Ajustes'}
               </button>
             ))}
             <div style={{display:'flex',alignItems:'center',gap:8,marginLeft:8}}>
@@ -201,10 +202,10 @@ export default function AdminPage() {
         {/* Mobile dropdown menu */}
         {mobileMenuOpen&&(
           <div style={{position:'absolute',top:'100%',right:0,left:0,background:'#1A1A1A',zIndex:50,padding:'8px 0',borderBottom:'0.5px solid rgba(245,240,230,0.1)'}}>
-            {(['setlist','equipo','canciones','disponibilidad'] as Tab[]).map(t=>(
+            {(['setlist','equipo','canciones','disponibilidad','ajustes'] as Tab[]).map(t=>(
               <button key={t} onClick={()=>{setTab(t);setMobileMenuOpen(false)}}
                 style={{width:'100%',textAlign:'left',padding:'12px 20px',fontSize:14,fontWeight:tab===t?600:400,background:tab===t?'rgba(245,240,230,0.08)':'none',color:'#F5F0E6',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
-                {t==='setlist'?'📋 Setlist':t==='equipo'?'👥 Equipo':t==='canciones'?'🎵 Canciones':'📅 Disponibilidad'}
+                {t==='setlist'?'📋 Setlist':t==='equipo'?'👥 Equipo':t==='canciones'?'🎵 Canciones':t==='disponibilidad'?'📅 Disponibilidad':'⚙️ Ajustes'}
               </button>
             ))}
             <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }}
@@ -218,7 +219,7 @@ export default function AdminPage() {
       {/* ── MOBILE TABS — pill style ── */}
       <div className="show-mobile" style={{display:'none',background:'white',borderBottom:'0.5px solid #E0D8C8',padding:'10px 14px'}}>
         <div style={{display:'flex',gap:8}}>
-          {(['setlist','equipo','canciones','disponibilidad'] as Tab[]).map(t=>(
+          {(['setlist','equipo','canciones','disponibilidad','ajustes'] as Tab[]).map(t=>(
             <button key={t} onClick={()=>setTab(t)}
               style={{
                 flex:1,padding:'7px 0',borderRadius:20,
@@ -228,7 +229,7 @@ export default function AdminPage() {
                 fontSize:10,fontWeight:tab===t?600:500,
                 cursor:'pointer',fontFamily:'inherit',
               }}>
-              {t==='setlist'?'Setlist':t==='equipo'?'Equipo':t==='canciones'?'Canciones':'Disponib.'}
+              {t==='setlist'?'Setlist':t==='equipo'?'Equipo':t==='canciones'?'Songs':t==='disponibilidad'?'Dispon.':'Ajustes'}
             </button>
           ))}
         </div>
@@ -254,6 +255,7 @@ export default function AdminPage() {
         {tab==='equipo'       && <TeamPanel members={members} onRefresh={loadMembers} />}
         {tab==='canciones'        && <SongsPanel songs={songs} onRefresh={loadSongs} />}
         {tab==='disponibilidad'   && <AvailabilityPanel services={services} />}
+        {tab==='ajustes'          && <AdminsPanel />}
       </div>
     </div>
   )
