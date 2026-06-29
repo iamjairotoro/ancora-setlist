@@ -164,8 +164,8 @@ export default function AdminPage() {
           <div className="hidden-mobile" style={{display:'flex',alignItems:'center',gap:2}}>
             {(['setlist','equipo','canciones','disponibilidad','ajustes'] as Tab[]).map(t=>(
               <button key={t} onClick={()=>setTab(t)}
-                style={{fontSize:10,padding:'4px 10px',borderRadius:20,fontWeight:tab===t?500:400,background:tab===t?'rgba(245,240,230,0.15)':'transparent',color:tab===t?'#F5F0E6':'rgba(245,240,230,0.5)',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
-                {t==='setlist'?'Setlist':t==='equipo'?'Equipo':t==='canciones'?'Canciones':t==='disponibilidad'?'Disponibilidad':'Ajustes'}
+                style={{fontSize:12,padding:'6px 14px',borderRadius:20,fontWeight:tab===t?700:400,background:tab===t?'rgba(245,240,230,0.2)':'transparent',color:tab===t?'#F5F0E6':'rgba(245,240,230,0.55)',border:tab===t?'0.5px solid rgba(245,240,230,0.3)':'0.5px solid transparent',cursor:'pointer',fontFamily:'inherit'}}>
+                {t==='setlist'?'Servicio':t==='equipo'?'Equipo':t==='canciones'?'Canciones':t==='disponibilidad'?'Disponibilidad':'Ajustes'}
               </button>
             ))}
             <div style={{display:'flex',alignItems:'center',gap:8,marginLeft:8}}>
@@ -186,7 +186,7 @@ export default function AdminPage() {
           <div className="show-mobile" style={{display:'none',alignItems:'center',gap:8}}>
             {/* Tab activo visible en navbar */}
             <span style={{fontSize:11,fontWeight:600,color:'rgba(245,240,230,0.7)',letterSpacing:0.5}}>
-              {tab==='setlist'?'Setlist':tab==='equipo'?'Equipo':tab==='canciones'?'Canciones':tab==='disponibilidad'?'Disponibilidad':'Ajustes'}
+              {tab==='setlist'?'Servicio':tab==='equipo'?'Equipo':tab==='canciones'?'Canciones':tab==='disponibilidad'?'Disponibilidad':'Ajustes'}
             </span>
             {portalToken && (
               <a href={`/portal/${portalToken}`} target="_blank"
@@ -207,14 +207,14 @@ export default function AdminPage() {
 
       {/* Dropdown — fixed para evitar overflow:hidden del TexBg */}
       {mobileMenuOpen&&(
-        <div style={{position:'fixed',top:56,left:0,right:0,zIndex:100}}>
+        <div style={{position:'fixed',top:56,right:0,zIndex:100,width:240}}>
           <div onClick={()=>setMobileMenuOpen(false)}
             style={{position:'fixed',inset:0,zIndex:98,background:'transparent'}}/>
-          <div style={{position:'relative',zIndex:99,background:'#1A1A1A',padding:'8px 0',boxShadow:'0 8px 24px rgba(0,0,0,0.5)'}}>
+          <div style={{position:'relative',zIndex:99,background:'#1A1A1A',padding:'8px 0',boxShadow:'0 8px 24px rgba(0,0,0,0.5)',borderRadius:'0 0 0 12px'}}>
             {(['setlist','equipo','canciones','disponibilidad','ajustes'] as Tab[]).map(t=>(
               <button key={t} onClick={()=>{setTab(t);setMobileMenuOpen(false)}}
                 style={{width:'100%',textAlign:'left',padding:'14px 20px',fontSize:15,fontWeight:tab===t?700:400,background:tab===t?'rgba(245,240,230,0.1)':'none',color:tab===t?'#F5F0E6':'rgba(245,240,230,0.65)',border:'none',cursor:'pointer',fontFamily:'inherit',borderLeft:tab===t?'3px solid #C9A14A':'3px solid transparent'}}>
-                {t==='setlist'?'📋 Setlist':t==='equipo'?'👥 Equipo':t==='canciones'?'🎵 Canciones':t==='disponibilidad'?'📅 Disponibilidad':'⚙️ Ajustes'}
+                {t==='setlist'?'🗓 Servicio':t==='equipo'?'👥 Equipo':t==='canciones'?'🎵 Canciones':t==='disponibilidad'?'📅 Disponibilidad':'⚙️ Ajustes'}
               </button>
             ))}
             <div style={{borderTop:'0.5px solid rgba(245,240,230,0.1)',margin:'6px 0'}}/>
