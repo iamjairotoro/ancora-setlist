@@ -19,7 +19,8 @@ function getInstrumentosLabel(instrumentos: string[]): string {
     'Bajo':'BASS','Bateria':'DRUMS','MD (Direccion Musical en vivo)':'MD',
     'Sonido':'SONIDO','Voz':'VX',
   }
-  return [...new Set(instrumentos.map(i => map[i]||i))].join(' · ')
+  const mapped = instrumentos.map(i => map[i]||i)
+  return mapped.filter((v,i,a) => a.indexOf(v)===i).join(' · ')
 }
 
 interface Props {
