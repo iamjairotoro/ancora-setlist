@@ -182,8 +182,12 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Mobile right: Portal + Hamburger */}
+          {/* Mobile right: tab label + Portal + Hamburger */}
           <div className="show-mobile" style={{display:'none',alignItems:'center',gap:8}}>
+            {/* Tab activo visible en navbar */}
+            <span style={{fontSize:11,fontWeight:600,color:'rgba(245,240,230,0.7)',letterSpacing:0.5}}>
+              {tab==='setlist'?'Setlist':tab==='equipo'?'Equipo':tab==='canciones'?'Canciones':tab==='disponibilidad'?'Disponibilidad':'Ajustes'}
+            </span>
             {portalToken && (
               <a href={`/portal/${portalToken}`} target="_blank"
                 style={{fontSize:9,background:'rgba(245,240,230,0.12)',border:'0.5px solid rgba(245,240,230,0.25)',color:'#F5F0E6',padding:'4px 10px',borderRadius:20,textDecoration:'none',fontWeight:500}}>
@@ -215,25 +219,6 @@ export default function AdminPage() {
           </div>
         )}
       </TexBg>
-
-      {/* ── MOBILE TABS — pill style ── */}
-      <div className="show-mobile" style={{display:'none',background:'white',borderBottom:'0.5px solid #E0D8C8',padding:'10px 14px'}}>
-        <div style={{display:'flex',gap:8}}>
-          {(['setlist','equipo','canciones','disponibilidad','ajustes'] as Tab[]).map(t=>(
-            <button key={t} onClick={()=>setTab(t)}
-              style={{
-                flex:1,padding:'7px 0',borderRadius:20,
-                background:tab===t?'#1A1A1A':'transparent',
-                border:`0.5px solid ${tab===t?'#1A1A1A':'#E0D8C8'}`,
-                color:tab===t?'#F5F0E6':'#999',
-                fontSize:10,fontWeight:tab===t?600:500,
-                cursor:'pointer',fontFamily:'inherit',
-              }}>
-              {t==='setlist'?'Setlist':t==='equipo'?'Equipo':t==='canciones'?'Songs':t==='disponibilidad'?'Dispon.':'Ajustes'}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* ── CONTENT ── */}
       <div style={{maxWidth:1200,margin:'0 auto',padding:'16px',paddingBottom:32}}>
