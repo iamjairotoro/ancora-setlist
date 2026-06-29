@@ -38,7 +38,8 @@ export default function PortalPage() {
   const [loading, setLoading]   = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [tab, setTab]           = useState<Tab>('home')
-  const [availData, setAvailData] = useState<Record<string,string>>({}) // serviceId -> status
+  const [availData, setAvailData] = useState<Record<string,string>>({})
+  const [allFutureServices, setAllFutureServices] = useState<{id:string,fecha:string,titulo:string}[]>([])
   const [expandedSvc, setExpandedSvc] = useState<string|null>(null)
   const [expandedSong, setExpandedSong] = useState<string|null>(null)
   const [expandedSetlistItem, setExpandedSetlistItem] = useState<string|null>(null)
@@ -65,9 +66,18 @@ export default function PortalPage() {
     setProfileData({nombre:data.member.nombre,apellido:data.member.apellido||'',telefono:data.member.telefono||''})
     if (data.services.length>0) setExpandedSvc(prev=>prev||data.services[0].service.id)
 
-    // Cargar disponibilidad del miembro
-    if (data.member?.id && data.services?.length) {
-      const svcIds = data.services.map((s:any) => s.service.id).join(',')
+    // Cargar todos los servicios futuros (para Mis domingos)
+    const svcsRes = await fetch('/api/all-services')
+    const svcsData = svcsRes.ok ? await svcsRes.json() : { services: [] }
+    const now = new Date(); now.setHours(0,0,0,0)
+    const futureSvcs = (svcsData.services||[])
+      .filter((s:any) => new Date(s.fecha+'T23:59:00') >= now)
+      .sort((a:any,b:any) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
+    setAllFutureServices(futureSvcs)
+
+    // Cargar disponibilidad del miembro para todos los servicios futuros
+    if (data.member?.id && futureSvcs.length) {
+      const svcIds = futureSvcs.map((s:any) => s.id).join(',')
       const avRes = await fetch(`/api/availability?serviceIds=${svcIds}`)
       const avData = await avRes.json()
       const myAvail: Record<string,string> = {}
@@ -215,28 +225,24 @@ export default function PortalPage() {
               <p style={{fontSize:10,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase' as const,color:C.muted,marginBottom:4}}>Disponibilidad del mes</p>
               <p style={{fontSize:13,fontWeight:400,color:C.muted}}>Indica en qué domingos puedes servir este mes.</p>
             </div>
-            {services.length===0&&(
+            {allFutureServices.length===0&&(
               <div style={{background:'white',borderRadius:14,padding:32,textAlign:'center',border:`0.5px solid ${C.cremaDark}`}}>
                 <p style={{fontSize:14,color:C.muted}}>No hay servicios próximos registrados.</p>
               </div>
             )}
-            {services.map(({service})=>{
+            {allFutureServices.map((service)=>{
               const d = new Date(service.fecha+'T12:00:00')
               const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
               const meses=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
               const status = availData[service.id] || null
-              const isToggling = false
 
               async function toggleAvail(newStatus: 'disponible'|'no_disponible') {
                 if (!member) return
-                const res = await fetch('/api/availability',{
+                await fetch('/api/availability',{
                   method:'POST',headers:{'Content-Type':'application/json'},
                   body:JSON.stringify({action:'toggle',member_id:member.id,service_id:service.id,status:newStatus})
                 })
-                const data = await res.json()
-                if(data.availability) {
-                  setAvailData(prev=>({...prev,[service.id]:newStatus}))
-                }
+                setAvailData(prev=>({...prev,[service.id]:newStatus}))
               }
 
               return(
