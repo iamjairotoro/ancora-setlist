@@ -18,7 +18,7 @@ const LABEL_TECNICA: Record<string,string> = {
 }
 const INSTR_POR_POSICION: Record<string,string[]> = {
   AG1:['Guitarra Acustica'],AG2:['Guitarra Acustica'],EG:['Guitarra Electrica'],
-  KEYS:['Keys','Piano'],BASS:['Bajo'],DRUMS:['Bateria'],
+  KEYS:['Piano'],BASS:['Bajo'],DRUMS:['Bateria'],
   MD:['MD (Direccion Musical en vivo)'],
   SONIDO:['Sonido'],ASIST_SONIDO:['Sonido','Técnico'],
   ENC_MONTAJE:['Técnico','Montaje'],ASIST_MONTAJE1:['Técnico','Montaje'],

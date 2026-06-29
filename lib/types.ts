@@ -1,5 +1,5 @@
 export type Instrument =
-  | 'Guitarra Acustica' | 'Guitarra Electrica' | 'Keys' | 'Piano'
+  | 'Guitarra Acustica' | 'Guitarra Electrica' | 'Piano'
   | 'MD (Direccion Musical en vivo)' | 'Bajo' | 'Bateria'
   | 'Voz' | 'Sonido' | 'Perc menores'
 

@@ -5,14 +5,14 @@ import type { Member, Instrument } from '@/lib/types'
 import AvatarUpload from './AvatarUpload'
 
 const ALL_INSTRUMENTOS: Instrument[] = [
-  'Guitarra Acustica','Guitarra Electrica','Keys','Piano',
+  'Guitarra Acustica','Guitarra Electrica','Piano',
   'MD (Direccion Musical en vivo)','Bajo','Bateria','Voz','Sonido','Perc menores'
 ]
 const SHORT: Record<string, string> = {
-  'Guitarra Acustica': 'G. Acus.', 'Guitarra Electrica': 'G. Elec.',
+  'Guitarra Acustica': 'AG', 'Guitarra Electrica': 'EG',
   'MD (Direccion Musical en vivo)': 'MD', 'Perc menores': 'Perc',
-  'Keys': 'Keys', 'Piano': 'Piano', 'Bajo': 'Bajo',
-  'Bateria': 'Batería', 'Voz': 'Voz', 'Sonido': 'Sonido',
+  'Piano': 'Piano', 'Bajo': 'Bass',
+  'Bateria': 'Drums', 'Voz': 'Voz', 'Sonido': 'Sonido',
 }
 
 interface Props { members: Member[]; onRefresh: () => void }
