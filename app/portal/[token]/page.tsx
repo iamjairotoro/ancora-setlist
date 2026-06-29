@@ -9,7 +9,7 @@ interface Song { id:string;nombre:string;artista:string;tono_original?:string;bp
 interface SetlistItem { orden:number;tono?:string;titulo?:string;tipo?:string;duracion_min?:number;song?:Song;lead?:{nombre:string} }
 interface BandaItem { posicion:string;member?:{nombre:string} }
 interface ServiceData { service:{id:string;fecha:string;titulo:string};posiciones:string[];invitation:{status:string;comentario?:string;token:string}|null;setlist:SetlistItem[];banda:BandaItem[] }
-interface Member { id:string;nombre:string;apellido:string;email:string;telefono?:string;avatar_url?:string }
+interface Member { id:string;nombre:string;apellido:string;email:string;telefono?:string;avatar_url?:string;fecha_nacimiento?:string }
 
 const C = { crema:'#F5F0E6', cremaDark:'#E0D8C8', txt:'#1A1A1A', muted:'#999' }
 type Tab = 'home'|'misdomingos'|'recursos'|'perfil'
