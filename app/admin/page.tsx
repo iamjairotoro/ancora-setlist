@@ -74,12 +74,16 @@ export default function AdminPage() {
   useEffect(()=>{ if(authed){ loadServices(); loadMembers(); loadSongs() }},[authed])
   useEffect(()=>{ if(selectedService) loadService(selectedService) },[selectedService])
 
-  async function createService(fecha: string) {
+  async function createService(fecha: string, horaInicio?: string, horaFin?: string) {
     const d = new Date(fecha+'T12:00:00')
     const dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado']
     const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
     const titulo=`Servicio Ancora — ${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`
-    const{data}=await supabase.from('services').insert({fecha,titulo}).select().single()
+    const{data}=await supabase.from('services').insert({
+      fecha, titulo,
+      hora_inicio: horaInicio||'10:00',
+      hora_fin: horaFin||'14:00',
+    }).select().single()
     if(data){ await loadServices(); setSelectedService(data) }
   }
 

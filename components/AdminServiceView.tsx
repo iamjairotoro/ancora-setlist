@@ -36,7 +36,7 @@ interface Props {
   services: Service[]
   selectedService: Service|null
   setSelectedService: (s:Service)=>void
-  createService: (fecha:string)=>void
+  createService: (fecha:string, horaInicio?:string, horaFin?:string)=>void
   deleteService: (id:string)=>void
   duplicateService: (id:string,fecha:string)=>void
   members: Member[]
@@ -255,6 +255,8 @@ export default function AdminServiceView({
 }: Props) {
   const [showNew,setShowNew]         = useState(false)
   const [newFecha,setNewFecha]       = useState('')
+  const [newHoraInicio,setNewHoraInicio] = useState('10:00')
+  const [newHoraFin,setNewHoraFin]   = useState('14:00')
   const [showDup,setShowDup]         = useState(false)
   const [dupFecha,setDupFecha]       = useState('')
   const [showPresets,setShowPresets] = useState(false)
@@ -362,12 +364,20 @@ export default function AdminServiceView({
       </div>
 
       {showNew&&(
-        <div style={{background:'white',border:`1px solid ${C.txt}`,borderRadius:12,padding:'12px 14px',marginBottom:12,display:'flex',gap:10,alignItems:'flex-end'}}>
-          <div style={{flex:1}}>
+        <div style={{background:'white',border:`1px solid ${C.txt}`,borderRadius:12,padding:'12px 14px',marginBottom:12,display:'flex',gap:10,alignItems:'flex-end',flexWrap:'wrap'}}>
+          <div>
             <div style={{fontSize:10,fontWeight:700,color:C.muted,marginBottom:4,textTransform:'uppercase',letterSpacing:1}}>Fecha</div>
             <input type="date" style={input} value={newFecha} onChange={e=>setNewFecha(e.target.value)}/>
           </div>
-          <button style={btnDark} onClick={()=>{if(newFecha){createService(newFecha);setNewFecha('');setShowNew(false)}}}>Crear</button>
+          <div>
+            <div style={{fontSize:10,fontWeight:700,color:C.muted,marginBottom:4,textTransform:'uppercase',letterSpacing:1}}>Hora inicio</div>
+            <input type="time" style={{...input,width:110}} value={newHoraInicio} onChange={e=>setNewHoraInicio(e.target.value)}/>
+          </div>
+          <div>
+            <div style={{fontSize:10,fontWeight:700,color:C.muted,marginBottom:4,textTransform:'uppercase',letterSpacing:1}}>Hora fin</div>
+            <input type="time" style={{...input,width:110}} value={newHoraFin} onChange={e=>setNewHoraFin(e.target.value)}/>
+          </div>
+          <button style={btnDark} onClick={()=>{if(newFecha){createService(newFecha,newHoraInicio,newHoraFin);setNewFecha('');setShowNew(false)}}}>Crear</button>
           <button style={btn} onClick={()=>setShowNew(false)}>✕</button>
         </div>
       )}
@@ -387,7 +397,14 @@ export default function AdminServiceView({
           <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:14}}>
             <div>
               <h2 style={{fontSize:22,fontWeight:700,color:C.txt,letterSpacing:'-0.3px'}}>{fmtLong(selectedService.fecha)}</h2>
-              <p style={{fontSize:12,fontWeight:300,color:C.muted,marginTop:2}}>{selectedService.titulo}</p>
+              <p style={{fontSize:12,fontWeight:300,color:C.muted,marginTop:2}}>
+                {selectedService.titulo}
+                {selectedService.hora_inicio && (
+                  <span style={{marginLeft:8,background:C.crema,padding:'1px 7px',borderRadius:4,fontSize:11,fontWeight:500,color:C.muted}}>
+                    🕐 {selectedService.hora_inicio.slice(0,5)} – {(selectedService.hora_fin||'').slice(0,5)}
+                  </span>
+                )}
+              </p>
             </div>
             <div style={{display:'flex',alignItems:'center',gap:5,background:'#D8F3DC',padding:'3px 10px',borderRadius:20}}>
               <span style={{width:6,height:6,borderRadius:'50%',background:'#52B788',display:'inline-block'}}/>

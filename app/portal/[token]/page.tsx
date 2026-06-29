@@ -71,7 +71,10 @@ export default function PortalPage() {
     const svcsData = svcsRes.ok ? await svcsRes.json() : { services: [] }
     const now = new Date(); now.setHours(0,0,0,0)
     const futureSvcs = (svcsData.services||[])
-      .filter((s:any) => new Date(s.fecha+'T23:59:00') >= now)
+      .filter((s:any) => {
+        const endTime = s.hora_fin ? s.fecha + 'T' + s.hora_fin : s.fecha + 'T12:00:00'
+        return new Date(endTime) > now
+      })
       .sort((a:any,b:any) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
     setAllFutureServices(futureSvcs)
 

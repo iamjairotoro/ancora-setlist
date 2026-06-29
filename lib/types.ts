@@ -34,6 +34,8 @@ export interface Service {
   id: string
   fecha: string
   titulo: string
+  hora_inicio?: string
+  hora_fin?: string
   created_at: string
 }
 
