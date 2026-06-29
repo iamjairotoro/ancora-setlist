@@ -47,7 +47,7 @@ export default function PortalPage() {
   const [obsComment, setObsComment] = useState('')
   const [actionLoading, setActionLoading] = useState(false)
   const [editProfile, setEditProfile] = useState(false)
-  const [profileData, setProfileData] = useState({nombre:'',apellido:'',telefono:''})
+  const [profileData, setProfileData] = useState({nombre:'',apellido:'',telefono:'',fecha_nacimiento:''})
   const [savingProfile, setSavingProfile] = useState(false)
   const [profileMsg, setProfileMsg] = useState('')
   const [songSearch, setSongSearch] = useState('')
@@ -63,7 +63,7 @@ export default function PortalPage() {
     setMember(data.member)
     setServices(data.services)
     setAllSongs(songsData.songs||[])
-    setProfileData({nombre:data.member.nombre,apellido:data.member.apellido||'',telefono:data.member.telefono||''})
+    setProfileData({nombre:data.member.nombre,apellido:data.member.apellido||'',telefono:data.member.telefono||'',fecha_nacimiento:data.member.fecha_nacimiento||''})
     if (data.services.length>0) setExpandedSvc(prev=>prev||data.services[0].service.id)
 
     // Cargar todos los servicios futuros (para Mis domingos)
@@ -580,6 +580,7 @@ export default function PortalPage() {
           <div>
             <div style={{background:'white',borderRadius:14,overflow:'hidden',border:`0.5px solid ${C.cremaDark}`}}>
               <TexBg className="p-5 flex items-center gap-4">
+                {/* Avatar editable solo desde el portal */}
                 <AvatarUpload memberId={member?.id||''} currentUrl={member?.avatar_url} nombre={member?.nombre||''} apellido={member?.apellido} size="lg"
                   onUpdate={url=>setMember(prev=>prev?{...prev,avatar_url:url}:prev)}/>
                 <div>
@@ -598,6 +599,11 @@ export default function PortalPage() {
                           value={(profileData as any)[key]} onChange={e=>setProfileData({...profileData,[key]:e.target.value})}/>
                       </div>
                     ))}
+                    <div style={{marginBottom:10}}>
+                      <label style={{fontSize:11,fontWeight:600,color:C.muted,display:'block',marginBottom:4,textTransform:'uppercase' as const,letterSpacing:0.5}}>Fecha de nacimiento</label>
+                      <input type="date" style={{width:'100%',border:`0.5px solid ${C.cremaDark}`,borderRadius:8,padding:'9px 12px',fontSize:14,fontFamily:'inherit',outline:'none',color:C.txt}}
+                        value={profileData.fecha_nacimiento} onChange={e=>setProfileData({...profileData,fecha_nacimiento:e.target.value})}/>
+                    </div>
                     <div style={{display:'flex',gap:8,marginTop:4}}>
                       <button onClick={saveProfile} disabled={savingProfile}
                         style={{flex:1,background:C.txt,color:C.crema,border:'none',borderRadius:8,padding:'11px',fontSize:13,fontWeight:700,fontFamily:'inherit',cursor:'pointer'}}>
@@ -611,7 +617,12 @@ export default function PortalPage() {
                   </div>
                 ):(
                   <div>
-                    {[{label:'Nombre completo',value:`${member?.nombre} ${member?.apellido}`},{label:'Email',value:member?.email},{label:'Teléfono',value:member?.telefono||'—'}].map(({label,value})=>(
+                    {[
+                      {label:'Nombre completo',value:`${member?.nombre} ${member?.apellido}`},
+                      {label:'Email',value:member?.email},
+                      {label:'Teléfono',value:member?.telefono||'—'},
+                      {label:'Cumpleaños',value:member?.fecha_nacimiento ? new Date(member.fecha_nacimiento+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}) : '—'},
+                    ].map(({label,value})=>(
                       <div key={label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'11px 0',borderBottom:`0.5px solid ${C.crema}`}}>
                         <span style={{fontSize:13,fontWeight:400,color:C.muted}}>{label}</span>
                         <span style={{fontSize:14,fontWeight:600,color:C.txt}}>{value}</span>

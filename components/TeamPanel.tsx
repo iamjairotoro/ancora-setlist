@@ -39,7 +39,8 @@ export default function TeamPanel({ members, onRefresh }: Props) {
       apellido: editing.apellido || '',
       email: editing.email,
       telefono: editing.telefono || '',
-      instrumentos: editing.instrumentos || []
+      instrumentos: editing.instrumentos || [],
+      fecha_nacimiento: editing.fecha_nacimiento || null,
     }
     if (editing.id) {
       await supabase.from('members').update(payload).eq('id', editing.id)
@@ -88,6 +89,9 @@ export default function TeamPanel({ members, onRefresh }: Props) {
               <label className="text-sm text-gray-500 mb-1 block">Teléfono</label>
               <input className="input" value={editing.telefono || ''}
                 onChange={e => setEditing({...editing, telefono: e.target.value})} />
+              <label className="text-sm text-gray-500 mb-1 block mt-2">Fecha de nacimiento</label>
+              <input type="date" className="input" value={editing.fecha_nacimiento || ''}
+                onChange={e => setEditing({...editing, fecha_nacimiento: e.target.value})} />
             </div>
           </div>
           <div className="mb-4">
@@ -125,7 +129,13 @@ export default function TeamPanel({ members, onRefresh }: Props) {
         )}
         {members.map(m => (
           <div key={m.id} className="flex items-center gap-3 p-3">
-            <AvatarUpload memberId={m.id} currentUrl={m.avatar_url} nombre={m.nombre} apellido={m.apellido} size="sm" />
+            {/* Avatar solo lectura — editable desde el portal del músico */}
+            <div style={{width:36,height:36,borderRadius:'50%',background:'#1A1A1A',overflow:'hidden',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+              {m.avatar_url
+                ? <img src={m.avatar_url} style={{width:'100%',height:'100%',objectFit:'cover'}} alt={m.nombre}/>
+                : <span style={{fontFamily:'inherit',fontWeight:700,fontSize:13,color:'#F5F0E6'}}>{m.nombre?.[0]}{m.apellido?.[0]||''}</span>
+              }
+            </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="font-medium text-sm">{m.nombre} {m.apellido}</p>
@@ -136,6 +146,11 @@ export default function TeamPanel({ members, onRefresh }: Props) {
                 ))}
               </div>
               <p className="text-sm text-gray-500 truncate">{m.email}</p>
+              {m.fecha_nacimiento && (
+                <p className="text-xs text-gray-400 mt-0.5">
+                  🎂 {new Date(m.fecha_nacimiento+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long'})}
+                </p>
+              )}
             </div>
             <div className="flex gap-1">
               <button type="button" onClick={() => { setErr(''); setEditing({...m}) }}

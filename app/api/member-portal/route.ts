@@ -69,10 +69,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const { token, nombre, apellido, telefono } = await req.json()
+  const { token, nombre, apellido, telefono, fecha_nacimiento } = await req.json()
   const { data: inv } = await supabase
     .from('invitations').select('member_id').eq('token', token).single()
   if (!inv) return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
-  await supabase.from('members').update({ nombre, apellido, telefono }).eq('id', inv.member_id)
+  await supabase.from('members').update({ nombre, apellido, telefono, fecha_nacimiento: fecha_nacimiento || null }).eq('id', inv.member_id)
   return NextResponse.json({ ok: true })
 }

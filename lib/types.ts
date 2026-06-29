@@ -13,6 +13,7 @@ export interface Member {
   telefono?: string
   instrumentos: Instrument[]
   avatar_url?: string
+  fecha_nacimiento?: string
   created_at: string
 }
 

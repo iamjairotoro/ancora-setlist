@@ -17,3 +17,6 @@ CREATE POLICY "public write availability" ON availability FOR ALL USING (true);
 -- Agregar hora de inicio y fin a servicios
 ALTER TABLE services ADD COLUMN IF NOT EXISTS hora_inicio time DEFAULT '10:00:00';
 ALTER TABLE services ADD COLUMN IF NOT EXISTS hora_fin time DEFAULT '14:00:00';
+
+-- Agregar fecha de nacimiento a miembros
+ALTER TABLE members ADD COLUMN IF NOT EXISTS fecha_nacimiento date;
