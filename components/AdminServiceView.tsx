@@ -413,7 +413,7 @@ export default function AdminServiceView({
               <div style={{display:'flex',alignItems:'center',gap:8,marginTop:4,flexWrap:'wrap'}}>
                 <p style={{fontSize:12,fontWeight:300,color:C.muted}}>{selectedService.titulo}</p>
                 {/* Horas editables inline */}
-                <div style={{display:'flex',alignItems:'center',gap:5,background:C.crema,padding:'3px 8px',borderRadius:6}}>
+                <div style={{display:'flex',alignItems:'center',gap:5,background:C.crema,padding:'3px 10px',borderRadius:6}}>
                   <span style={{fontSize:11,color:C.muted}}>🕐</span>
                   <input
                     type="time"
@@ -423,7 +423,7 @@ export default function AdminServiceView({
                         body:JSON.stringify({id:selectedService.id,hora_inicio:e.target.value})})
                       onBlocksChange()
                     }}
-                    style={{border:'none',background:'transparent',fontSize:11,fontWeight:600,color:C.txt,outline:'none',fontFamily:'inherit',width:52,cursor:'pointer'}}
+                    style={{border:'none',background:'transparent',fontSize:12,fontWeight:600,color:C.txt,outline:'none',fontFamily:'inherit',width:70,cursor:'pointer'}}
                   />
                   <span style={{fontSize:11,color:C.muted}}>–</span>
                   <input
@@ -434,7 +434,7 @@ export default function AdminServiceView({
                         body:JSON.stringify({id:selectedService.id,hora_fin:e.target.value})})
                       onBlocksChange()
                     }}
-                    style={{border:'none',background:'transparent',fontSize:11,fontWeight:600,color:C.txt,outline:'none',fontFamily:'inherit',width:52,cursor:'pointer'}}
+                    style={{border:'none',background:'transparent',fontSize:12,fontWeight:600,color:C.txt,outline:'none',fontFamily:'inherit',width:70,cursor:'pointer'}}
                   />
                 </div>
               </div>
@@ -689,9 +689,9 @@ export default function AdminServiceView({
                           </>
                         ) : (
                           <div style={{display:'flex',alignItems:'center',gap:8,flex:1,minWidth:0}}>
-                            <span style={{fontSize:11,fontWeight:600,background:C.cremaDark,color:C.muted,padding:'2px 7px',borderRadius:4,letterSpacing:0.3,flexShrink:0}}>bloque</span>
+                            <span style={{fontSize:11,color:C.muted,flexShrink:0,letterSpacing:0.5,textTransform:'uppercase' as const,fontWeight:600}}>—</span>
                             <input defaultValue={block.titulo||''} onBlur={e=>updateBlock(block.id,{titulo:e.target.value})}
-                              style={{flex:1,fontSize:13,fontWeight:300,color:C.muted,fontStyle:'italic',border:'none',outline:'none',background:'transparent',fontFamily:'inherit',minWidth:0}}/>
+                              style={{flex:1,fontSize:14,fontWeight:500,color:'#555',fontStyle:'normal',border:'none',outline:'none',background:'transparent',fontFamily:'inherit',minWidth:0}}/>
                           </div>
                         )}
                       </div>
@@ -722,9 +722,12 @@ export default function AdminServiceView({
                         ) : !isSong && block.duracion_min ? (
                           <input type="text" placeholder="mm:ss" defaultValue={block.duracion_min?toMMSS(block.duracion_min):''}
                             onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
-                            style={{width:52,fontSize:11,padding:'3px 6px',border:`1px solid #C8C0B4`,borderRadius:5,fontFamily:'inherit',textAlign:'center',color:C.muted}}/>
-                        ) : null}
-                      </div>
+                            style={{width:52,fontSize:11,padding:'3px 6px',border:`0.5px solid #C8C0B4`,borderRadius:5,fontFamily:'inherit',textAlign:'center',color:C.muted,background:'white'}}/>
+                        ) : !isSong ? (
+                          <input type="text" placeholder="mm:ss" defaultValue=""
+                            onBlur={e=>updateBlock(block.id,{duracion_min:fromMMSS(e.target.value)||0})}
+                            style={{width:52,fontSize:11,padding:'3px 6px',border:`0.5px solid #C8C0B4`,borderRadius:5,fontFamily:'inherit',textAlign:'center',color:C.muted,background:'white'}}/>
+                        ) : null}                      </div>
 
                       {/* OBSERVACIONES — columna propia */}
                       <div style={{minWidth:0,paddingLeft:4}}>
