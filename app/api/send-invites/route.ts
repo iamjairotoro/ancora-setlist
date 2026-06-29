@@ -101,36 +101,69 @@ export async function POST(req: NextRequest) {
     const html = `
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"></head>
-<body style="font-family:system-ui,sans-serif;background:#f5f5f5;margin:0;padding:20px">
-  <div style="max-width:560px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-    <div style="background:#1F2A44;padding:24px 28px">
-      <h1 style="color:#C9A14A;margin:0;font-size:20px">Ancora</h1>
-      <p style="color:rgba(255,255,255,0.7);margin:4px 0 0;font-size:13px">Setlist semanal</p>
-    </div>
-    <div style="padding:28px">
-      <h2 style="color:#1F2A44;margin:0 0 4px;font-size:18px">Hola, ${member.nombre} 👋</h2>
-      <p style="color:#555;font-size:14px;margin:4px 0 0">Tienes una invitación para el servicio del:</p>
-      <p style="color:#1F2A44;font-weight:600;font-size:16px;margin:8px 0">${fechaFmt}</p>
-      <div style="background:#f8f8f8;border-radius:8px;padding:12px 16px;margin:16px 0">
-        <p style="margin:0;font-size:13px;color:#555">Tu(s) rol(es) este domingo:</p>
-        <p style="margin:4px 0 0;font-weight:600;color:#1F2A44;font-size:15px">${posiciones.join(' · ')}</p>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:#F5F0E6;margin:0;padding:20px">
+  <div style="max-width:520px;margin:0 auto">
+
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="display:inline-block;background:#1A1A1A;border-radius:12px;padding:10px 22px">
+        <div style="font-family:Georgia,serif;font-weight:700;font-size:28px;color:#F5F0E6;letter-spacing:-0.5px;line-height:1">Áncora</div>
+        <div style="width:28px;height:0.5px;background:rgba(245,240,230,0.3);margin:4px auto"></div>
+        <div style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(245,240,230,0.65)">Worship</div>
       </div>
-      <p style="color:#555;font-size:14px;font-weight:500;margin:20px 0 8px">Setlist del servicio:</p>
-      ${setlistHtml}
-      <p style="color:#555;font-size:14px;margin:24px 0 12px">¿Puedes asistir?</p>
-      <div style="display:flex;gap:12px;margin-bottom:28px">
-        <a href="${confirmUrl}" style="flex:1;background:#1F2A44;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">✓ Sí, confirmo</a>
-        <a href="${declineUrl}" style="flex:1;background:white;color:#666;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;border:1px solid #ddd">✗ No puedo ir</a>
-      </div>
-      <p style="color:#aaa;font-size:11px;text-align:center">Si haces clic en un botón podrás dejar un comentario.</p>
     </div>
+
+    <!-- Card -->
+    <div style="background:white;border-radius:16px;overflow:hidden;border:0.5px solid #E0D8C8">
+
+      <!-- Header oscuro -->
+      <div style="background:#1A1A1A;padding:20px 24px">
+        <p style="color:rgba(245,240,230,0.55);margin:0 0 4px;font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase">Invitación de servicio</p>
+        <h2 style="color:#F5F0E6;margin:0;font-size:20px;font-weight:700;letter-spacing:-0.3px">${fechaFmt}</h2>
+      </div>
+
+      <div style="padding:22px 24px">
+
+        <!-- Saludo -->
+        <p style="font-size:16px;font-weight:700;color:#1A1A1A;margin:0 0 4px">Hola, ${member.nombre} 👋</p>
+        <p style="font-size:13px;color:#999;margin:0 0 18px;font-weight:400">Te invitamos a servir este domingo en Áncora Worship.</p>
+
+        <!-- Rol -->
+        <div style="background:#F5F0E6;border-radius:10px;padding:12px 16px;margin-bottom:18px;border:0.5px solid #E0D8C8">
+          <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#999">Tu rol este domingo</p>
+          <p style="margin:0;font-weight:700;color:#1A1A1A;font-size:16px">${posiciones.join(' · ')}</p>
+        </div>
+
+        <!-- Setlist -->
+        <p style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin:0 0 10px">Setlist</p>
+        ${setlistHtml}
+
+        <!-- RSVP -->
+        <p style="font-size:13px;color:#555;margin:22px 0 12px;font-weight:500">¿Puedes asistir?</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px">
+          <tr>
+            <td width="48%" style="padding-right:6px">
+              <a href="${confirmUrl}" style="display:block;background:#1A1A1A;color:#F5F0E6;text-align:center;padding:13px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">✓ Confirmo</a>
+            </td>
+            <td width="4%"></td>
+            <td width="48%" style="padding-left:6px">
+              <a href="${declineUrl}" style="display:block;background:white;color:#B91C1C;text-align:center;padding:13px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;border:0.5px solid #FCA5A5">✗ No puedo</a>
+            </td>
+          </tr>
+        </table>
+
+        <p style="color:#BBB;font-size:11px;text-align:center;margin:0">También puedes responder desde tu portal en cualquier momento.</p>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:11px;color:#AAA;margin-top:16px">Áncora Worship · Portal del músico</p>
   </div>
 </body>
 </html>`
 
     try {
-      await sendEmail(member.email, `🎵 Setlist Ancora — ${fechaFmt}`, html)
+      await sendEmail(member.email, `📅 ${fechaFmt} — Invitación Áncora Worship`, html)
       sent++
     } catch (e: any) {
       errors.push(`${member.nombre}: ${e.message}`)
