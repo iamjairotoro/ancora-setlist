@@ -269,8 +269,14 @@ export default function AdminServiceView({
   const [editingBlockNum, setEditingBlockNum] = useState(0)
 
   const now = new Date(); now.setHours(0,0,0,0)
-  const futureServices  = services.filter(s => new Date(s.fecha+'T23:59:00') >= now)
-  const pastServices    = services.filter(s => new Date(s.fecha+'T23:59:00') < now)
+  const futureServices  = services.filter(s => {
+    const endTime = (s as any).hora_fin ? s.fecha + 'T' + (s as any).hora_fin : s.fecha + 'T14:00:00'
+    return new Date(endTime) > new Date()
+  })
+  const pastServices    = services.filter(s => {
+    const endTime = (s as any).hora_fin ? s.fecha + 'T' + (s as any).hora_fin : s.fecha + 'T14:00:00'
+    return new Date(endTime) <= new Date()
+  })
   const visibleServices = showHistorial ? services : futureServices
 
   function fmt(fecha:string) {
@@ -392,23 +398,54 @@ export default function AdminServiceView({
         </div>
       )}
 
-      {selectedService&&(
+      {selectedService&&(()=>{
+        // Determinar si el servicio ya pasó usando hora_fin
+        const endTime = selectedService.hora_fin
+          ? selectedService.fecha + 'T' + selectedService.hora_fin
+          : selectedService.fecha + 'T14:00:00'
+        const isPast = new Date(endTime) < new Date()
+
+        return(
         <div>
-          <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:14}}>
+          <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:14,flexWrap:'wrap',gap:8}}>
             <div>
               <h2 style={{fontSize:22,fontWeight:700,color:C.txt,letterSpacing:'-0.3px'}}>{fmtLong(selectedService.fecha)}</h2>
-              <p style={{fontSize:12,fontWeight:300,color:C.muted,marginTop:2}}>
-                {selectedService.titulo}
-                {selectedService.hora_inicio && (
-                  <span style={{marginLeft:8,background:C.crema,padding:'1px 7px',borderRadius:4,fontSize:11,fontWeight:500,color:C.muted}}>
-                    🕐 {selectedService.hora_inicio.slice(0,5)} – {(selectedService.hora_fin||'').slice(0,5)}
-                  </span>
-                )}
-              </p>
+              <div style={{display:'flex',alignItems:'center',gap:8,marginTop:4,flexWrap:'wrap'}}>
+                <p style={{fontSize:12,fontWeight:300,color:C.muted}}>{selectedService.titulo}</p>
+                {/* Horas editables inline */}
+                <div style={{display:'flex',alignItems:'center',gap:5,background:C.crema,padding:'3px 8px',borderRadius:6}}>
+                  <span style={{fontSize:11,color:C.muted}}>🕐</span>
+                  <input
+                    type="time"
+                    defaultValue={(selectedService.hora_inicio||'10:00').slice(0,5)}
+                    onBlur={async e=>{
+                      await fetch('/api/update-service',{method:'POST',headers:{'Content-Type':'application/json'},
+                        body:JSON.stringify({id:selectedService.id,hora_inicio:e.target.value})})
+                      onBlocksChange()
+                    }}
+                    style={{border:'none',background:'transparent',fontSize:11,fontWeight:600,color:C.txt,outline:'none',fontFamily:'inherit',width:52,cursor:'pointer'}}
+                  />
+                  <span style={{fontSize:11,color:C.muted}}>–</span>
+                  <input
+                    type="time"
+                    defaultValue={(selectedService.hora_fin||'14:00').slice(0,5)}
+                    onBlur={async e=>{
+                      await fetch('/api/update-service',{method:'POST',headers:{'Content-Type':'application/json'},
+                        body:JSON.stringify({id:selectedService.id,hora_fin:e.target.value})})
+                      onBlocksChange()
+                    }}
+                    style={{border:'none',background:'transparent',fontSize:11,fontWeight:600,color:C.txt,outline:'none',fontFamily:'inherit',width:52,cursor:'pointer'}}
+                  />
+                </div>
+              </div>
             </div>
-            <div style={{display:'flex',alignItems:'center',gap:5,background:'#D8F3DC',padding:'3px 10px',borderRadius:20}}>
-              <span style={{width:6,height:6,borderRadius:'50%',background:'#52B788',display:'inline-block'}}/>
-              <span style={{fontSize:10,fontWeight:600,color:'#1B4332'}}>En vivo</span>
+            <div style={{display:'flex',alignItems:'center',gap:5,
+              background:isPast?C.crema:'#D8F3DC',
+              padding:'3px 10px',borderRadius:20}}>
+              <span style={{width:6,height:6,borderRadius:'50%',background:isPast?C.muted:'#52B788',display:'inline-block'}}/>
+              <span style={{fontSize:10,fontWeight:600,color:isPast?C.muted:'#1B4332'}}>
+                {isPast?'Archivado':'En vivo'}
+              </span>
             </div>
           </div>
 
@@ -810,7 +847,8 @@ export default function AdminServiceView({
             </div>
           </div>
         </div>
-      )}
+        )
+      })()}
 
       {/* ── MOBILE EDIT PANEL ── */}
       {editingBlock && (
