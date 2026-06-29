@@ -39,6 +39,7 @@ export default function AvailabilityPanel({ services }: Props) {
   const now = new Date()
   const futureServices = services
     .filter(s => new Date(s.fecha + 'T23:59:00') >= now)
+    .sort((a,b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
     .slice(0, 6) // máximo 6 domingos
 
   const serviceIds = futureServices.map(s => s.id)

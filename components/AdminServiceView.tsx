@@ -260,10 +260,16 @@ export default function AdminServiceView({
   const [showPresets,setShowPresets] = useState(false)
   const [editingObs,setEditingObs]   = useState<string|null>(null)
   const [obsText,setObsText]         = useState<Record<string,string>>({})
+  const [showHistorial,setShowHistorial] = useState(false)
 
   // Mobile edit panel state
   const [editingBlock, setEditingBlock] = useState<ServiceBlock|null>(null)
   const [editingBlockNum, setEditingBlockNum] = useState(0)
+
+  const now = new Date(); now.setHours(0,0,0,0)
+  const futureServices  = services.filter(s => new Date(s.fecha+'T23:59:00') >= now)
+  const pastServices    = services.filter(s => new Date(s.fecha+'T23:59:00') < now)
+  const visibleServices = showHistorial ? services : futureServices
 
   function fmt(fecha:string) {
     const d=new Date(fecha+'T12:00:00')
@@ -330,11 +336,23 @@ export default function AdminServiceView({
       <div style={{background:'white',border:`1px solid #C8C0B4`,borderRadius:12,padding:'10px 14px',marginBottom:12,display:'flex',flexWrap:'wrap',gap:10,alignItems:'center'}}>
         <select style={{...input,flex:1,minWidth:200,fontWeight:500}}
           value={selectedService?.id||''}
-          onChange={e=>{const s=services.find(sv=>sv.id===e.target.value);if(s)setSelectedService(s)}}>
-          {services.map(s=><option key={s.id} value={s.id}>{fmt(s.fecha)} — {s.titulo}</option>)}
-          {!services.length&&<option>Sin servicios aún</option>}
+          onChange={e=>{const s=visibleServices.find(sv=>sv.id===e.target.value);if(s)setSelectedService(s)}}>
+          {futureServices.length===0&&!showHistorial&&<option value="">Sin servicios futuros</option>}
+          {showHistorial&&pastServices.length>0&&(
+            <optgroup label="── Historial ──">
+              {pastServices.map(s=><option key={s.id} value={s.id}>{fmt(s.fecha)} — {s.titulo}</option>)}
+            </optgroup>
+          )}
+          {futureServices.map(s=><option key={s.id} value={s.id}>{fmt(s.fecha)} — {s.titulo}</option>)}
         </select>
-        <div style={{display:'flex',gap:6}}>
+        <div style={{display:'flex',gap:6,alignItems:'center'}}>
+          {pastServices.length>0&&(
+            <button style={{...btn,fontSize:11,color:showHistorial?C.txt:C.muted,background:showHistorial?C.crema:'white'}}
+              onClick={()=>setShowHistorial(v=>!v)}
+              title="Ver historial de servicios pasados">
+              🕓 {showHistorial?'Ocultar historial':'Historial'}
+            </button>
+          )}
           <button style={btnDark} onClick={()=>setShowNew(v=>!v)}>+ Nuevo</button>
           {selectedService&&<>
             <button style={btn} onClick={()=>setShowDup(v=>!v)}>⧉ Duplicar</button>
