@@ -53,6 +53,8 @@ interface Props {
   onBlocksChange: ()=>void
   POSICIONES_BANDA: readonly string[]
   POSICIONES_VX: readonly string[]
+  POSICIONES_TECNICA: readonly string[]
+  LABEL_TECNICA: Record<string,string>
 }
 
 const sel: React.CSSProperties = {
@@ -251,7 +253,7 @@ export default function AdminServiceView({
   members,songs,blocks,bandaItems,invitations,
   membersFor,getBanda,assignBanda,
   sendInvites,sending,msg,onBlocksChange,
-  POSICIONES_BANDA,POSICIONES_VX
+  POSICIONES_BANDA,POSICIONES_VX,POSICIONES_TECNICA,LABEL_TECNICA
 }: Props) {
   const [showNew,setShowNew]         = useState(false)
   const [newFecha,setNewFecha]       = useState('')
@@ -487,6 +489,23 @@ export default function AdminServiceView({
                     </div>
                   )
                 })}
+                {/* TÉCNICA */}
+                <div style={{padding:'8px 14px',background:'#1A1A1A',borderTop:`1px solid #C8C0B4`,borderBottom:`1px solid #333`}}>
+                  <span style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:'uppercase',color:'rgba(245,240,230,0.7)'}}>Técnica</span>
+                </div>
+                {POSICIONES_TECNICA.map(pos=>{
+                  const asig=getBanda(pos), status=getMemberInvStatus(asig?.member_id)
+                  return(
+                    <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 14px',borderBottom:`0.5px solid #E8E0D0`,background:'#FAFAF8'}}>
+                      <span style={{fontSize:10,fontWeight:600,color:'#666',width:48,flexShrink:0,lineHeight:1.2}}>{LABEL_TECNICA[pos]?.split(' ')[0]}</span>
+                      <select style={sel} value={asig?.member_id||''} onChange={e=>assignBanda(pos,e.target.value)}>
+                        <option value=""></option>
+                        {members.map(m=><option key={m.id} value={m.id}>{m.nombre} {m.apellido}</option>)}
+                      </select>
+                      {status&&statusDot(status)}
+                    </div>
+                  )
+                })}
                 <div style={{padding:'12px 14px',borderTop:`1px solid #C8C0B4`}}>
                   <div style={{display:'flex',gap:5,marginBottom:10}}>
                     <span style={{fontSize:9,fontWeight:700,background:'rgba(82,183,136,0.2)',color:'#1B4332',padding:'2px 7px',borderRadius:10}}>✓ {confirmed}</span>
@@ -503,7 +522,7 @@ export default function AdminServiceView({
 
               {/* Equipo del domingo */}
               {(()=>{
-                const allPos=[...POSICIONES_BANDA,...POSICIONES_VX]
+                const allPos=[...POSICIONES_BANDA,...POSICIONES_VX,...POSICIONES_TECNICA]
                 const byMember:Record<string,{member:any,roles:string[],status:string|null}>= {}
                 allPos.forEach(pos=>{
                   const asig=getBanda(pos)

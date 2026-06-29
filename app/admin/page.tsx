@@ -8,12 +8,21 @@ import AdminServiceView from '@/components/AdminServiceView'
 import AvailabilityPanel from '@/components/AvailabilityPanel'
 import TexBg from '@/components/TexBg'
 
-const POSICIONES_BANDA = ['AG1','AG2','EG','KEYS','BASS','DRUMS','MD','SONIDO'] as const
+const POSICIONES_BANDA = ['AG1','AG2','EG','KEYS','BASS','DRUMS','MD'] as const
 const POSICIONES_VX    = ['VX1','VX2','VX3','VX4'] as const
+const POSICIONES_TECNICA = ['SONIDO','ASIST_SONIDO','ENC_MONTAJE','ASIST_MONTAJE1','ASIST_MONTAJE2','ASIST_MONTAJE3'] as const
+const LABEL_TECNICA: Record<string,string> = {
+  SONIDO:'Sonido', ASIST_SONIDO:'Asistente Sonido',
+  ENC_MONTAJE:'Encargado Montaje', ASIST_MONTAJE1:'Asistente Montaje 1',
+  ASIST_MONTAJE2:'Asistente Montaje 2', ASIST_MONTAJE3:'Asistente Montaje 3',
+}
 const INSTR_POR_POSICION: Record<string,string[]> = {
   AG1:['Guitarra Acustica'],AG2:['Guitarra Acustica'],EG:['Guitarra Electrica'],
   KEYS:['Keys','Piano'],BASS:['Bajo'],DRUMS:['Bateria'],
-  MD:['MD (Direccion Musical en vivo)'],SONIDO:['Sonido'],
+  MD:['MD (Direccion Musical en vivo)'],
+  SONIDO:['Sonido'],ASIST_SONIDO:['Sonido','Técnico'],
+  ENC_MONTAJE:['Técnico','Montaje'],ASIST_MONTAJE1:['Técnico','Montaje'],
+  ASIST_MONTAJE2:['Técnico','Montaje'],ASIST_MONTAJE3:['Técnico','Montaje'],
   VX1:['Voz'],VX2:['Voz'],VX3:['Voz'],VX4:['Voz'],
 }
 
@@ -236,6 +245,7 @@ export default function AdminPage() {
             sendInvites={sendInvites} sending={sending} msg={msg}
             onBlocksChange={()=>selectedService&&loadService(selectedService)}
             POSICIONES_BANDA={POSICIONES_BANDA} POSICIONES_VX={POSICIONES_VX}
+            POSICIONES_TECNICA={POSICIONES_TECNICA} LABEL_TECNICA={LABEL_TECNICA}
           />
         )}
         {tab==='equipo'       && <TeamPanel members={members} onRefresh={loadMembers} />}

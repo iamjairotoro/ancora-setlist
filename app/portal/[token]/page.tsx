@@ -382,23 +382,71 @@ export default function PortalPage() {
                         </div>
                       )}
 
-                      {/* Banda del día */}
-                      <div style={{padding:'14px 16px',borderBottom:`0.5px solid ${C.crema}`}}>
-                        <p style={{fontSize:10,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase' as const,color:C.muted,marginBottom:10}}>Banda del día</p>
-                        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6}}>
-                          {['AG1','AG2','EG','KEYS','BASS','DRUMS','MD','SONIDO','VX1','VX2','VX3','VX4'].map(pos=>{
-                            const b=banda.find(x=>x.posicion===pos)
-                            if(!b?.member) return null
-                            const isMe=b.member.nombre===member?.nombre
-                            return(
-                              <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',borderRadius:8,background:isMe?C.txt:C.crema}}>
-                                <span style={{fontSize:9,fontWeight:700,color:isMe?'#C9A14A':C.muted,width:32,flexShrink:0}}>{pos}</span>
-                                <span style={{fontSize:13,fontWeight:500,color:isMe?'white':C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const}}>{b.member.nombre}</span>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
+                      {/* Banda + Técnica colapsables */}
+                      {(()=>{
+                        const POS_MUSICA=['AG1','AG2','EG','KEYS','BASS','DRUMS','MD','VX1','VX2','VX3','VX4']
+                        const POS_TEC=['SONIDO','ASIST_SONIDO','ENC_MONTAJE','ASIST_MONTAJE1','ASIST_MONTAJE2','ASIST_MONTAJE3']
+                        const LABEL_TEC:Record<string,string>={SONIDO:'Sonido',ASIST_SONIDO:'Asist. Sonido',ENC_MONTAJE:'Enc. Montaje',ASIST_MONTAJE1:'Asist. Montaje 1',ASIST_MONTAJE2:'Asist. Montaje 2',ASIST_MONTAJE3:'Asist. Montaje 3'}
+                        const isTecnico=banda.some(b=>POS_TEC.includes(b.posicion)&&b.member?.nombre===member?.nombre)
+                        const isMusico=banda.some(b=>POS_MUSICA.includes(b.posicion)&&b.member?.nombre===member?.nombre)
+                        const bandaKey=`banda-${service.id}`
+                        const tecKey=`tec-${service.id}`
+                        const hasBanda=POS_MUSICA.some(p=>banda.find(b=>b.posicion===p&&b.member))
+                        const hasTec=POS_TEC.some(p=>banda.find(b=>b.posicion===p&&b.member))
+                        // Músico ve banda abierta, técnico ve técnica abierta
+                        const bandaOpen=expandedSetlistItem===bandaKey||(isMusico&&expandedSetlistItem!==`close-banda-${service.id}`)
+                        const tecOpen=expandedSetlistItem===tecKey||(isTecnico&&expandedSetlistItem!==`close-tec-${service.id}`)
+                        return(<>
+                          {hasBanda&&(
+                            <div style={{borderBottom:`0.5px solid ${C.crema}`}}>
+                              <button onClick={()=>setExpandedSetlistItem(bandaOpen&&!isMusico?null:bandaKey)}
+                                style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+                                <p style={{fontSize:10,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase' as const,color:C.muted}}>Banda del día</p>
+                                <span style={{fontSize:12,color:C.muted,transform:bandaOpen?'rotate(180deg)':'none',transition:'transform 0.2s'}}>▼</span>
+                              </button>
+                              {bandaOpen&&(
+                                <div style={{padding:'0 16px 14px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:6}}>
+                                  {POS_MUSICA.map(pos=>{
+                                    const b=banda.find(x=>x.posicion===pos)
+                                    if(!b?.member) return null
+                                    const isMe=b.member.nombre===member?.nombre
+                                    return(
+                                      <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',borderRadius:8,background:isMe?C.txt:C.crema}}>
+                                        <span style={{fontSize:9,fontWeight:700,color:isMe?'#C9A14A':C.muted,width:32,flexShrink:0}}>{pos}</span>
+                                        <span style={{fontSize:13,fontWeight:500,color:isMe?'white':C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const}}>{b.member.nombre}</span>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {hasTec&&(
+                            <div style={{borderBottom:`0.5px solid ${C.crema}`}}>
+                              <button onClick={()=>setExpandedSetlistItem(tecOpen&&!isTecnico?null:tecKey)}
+                                style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+                                <p style={{fontSize:10,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase' as const,color:C.muted}}>Equipo técnico</p>
+                                <span style={{fontSize:12,color:C.muted,transform:tecOpen?'rotate(180deg)':'none',transition:'transform 0.2s'}}>▼</span>
+                              </button>
+                              {tecOpen&&(
+                                <div style={{padding:'0 16px 14px',display:'flex',flexDirection:'column',gap:5}}>
+                                  {POS_TEC.map(pos=>{
+                                    const b=banda.find(x=>x.posicion===pos)
+                                    if(!b?.member) return null
+                                    const isMe=b.member.nombre===member?.nombre
+                                    return(
+                                      <div key={pos} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 12px',borderRadius:8,background:isMe?'#1A1A1A':'#F0EDE7'}}>
+                                        <span style={{fontSize:10,fontWeight:600,color:isMe?'#C9A14A':'#888',minWidth:110}}>{LABEL_TEC[pos]}</span>
+                                        <span style={{fontSize:13,fontWeight:500,color:isMe?'white':C.txt}}>{b.member.nombre}</span>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>)
+                      })()}
 
                       {/* ── SETLIST — expandible por canción ── */}
                       {setlist.length>0&&(
