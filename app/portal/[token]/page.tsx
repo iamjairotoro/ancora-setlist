@@ -22,10 +22,10 @@ function toMMSS(secs:number):string {
 // Logo Áncora SVG inline — versión blanca para fondo oscuro
 function LogoAncora() {
   return (
-    <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:20}}>
-      <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:34,color:'#F5F0E6',lineHeight:1}}>Áncora</div>
-      <div style={{width:32,height:0.5,background:'rgba(245,240,230,0.4)',margin:'4px 0'}}/>
-      <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:400,fontSize:9,letterSpacing:5,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.85)'}}>Worship</div>
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:12}}>
+      <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:24,color:'#F5F0E6',lineHeight:1}}>Áncora</div>
+      <div style={{width:22,height:0.5,background:'rgba(245,240,230,0.4)',margin:'3px 0'}}/>
+      <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:400,fontSize:7,letterSpacing:4,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.85)'}}>Worship</div>
     </div>
   )
 }
@@ -162,7 +162,7 @@ export default function PortalPage() {
         backgroundSize:'cover',
         backgroundPosition:'center',
         position:'relative',
-        paddingTop:32, paddingBottom:80, paddingLeft:20, paddingRight:20,
+        paddingTop:18, paddingBottom:50, paddingLeft:16, paddingRight:16,
       }}>
         <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,0.5)'}}/>
         <div style={{maxWidth:500,margin:'0 auto',position:'relative'}}>
@@ -171,16 +171,16 @@ export default function PortalPage() {
           <LogoAncora />
 
           {/* Avatar + nombre */}
-          <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:20}}>
-            <div style={{width:52,height:52,borderRadius:12,background:C.crema,overflow:'hidden',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',border:'2px solid rgba(245,240,230,0.3)'}}>
+          <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
+            <div style={{width:38,height:38,borderRadius:10,background:C.crema,overflow:'hidden',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',border:'2px solid rgba(245,240,230,0.3)'}}>
               {member?.avatar_url
                 ? <img src={member.avatar_url} style={{width:'100%',height:'100%',objectFit:'cover'}} alt={member.nombre}/>
-                : <span style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:28,color:C.txt,lineHeight:1}}>{member?.nombre[0]}</span>
+                : <span style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:20,color:C.txt,lineHeight:1}}>{member?.nombre[0]}</span>
               }
             </div>
             <div>
-              <h1 style={{fontSize:22,fontWeight:700,color:'#F5F0E6',lineHeight:1.2}}>Hola, {member?.nombre}</h1>
-              <p style={{fontSize:12,fontWeight:400,color:'rgba(245,240,230,0.55)',marginTop:3}}>Mi espacio Áncora</p>
+              <h1 style={{fontSize:16,fontWeight:700,color:'#F5F0E6',lineHeight:1.2}}>Hola, {member?.nombre}</h1>
+              <p style={{fontSize:10,fontWeight:400,color:'rgba(245,240,230,0.55)',marginTop:2}}>Mi espacio Áncora</p>
             </div>
           </div>
 
@@ -189,19 +189,19 @@ export default function PortalPage() {
             const {dia,fecha}=fmtFecha(nextService.service.fecha)
             const days=daysUntil(nextService.service.fecha)
             return(
-              <div style={{background:'rgba(255,255,255,0.78)',border:'0.5px solid rgba(255,255,255,0.6)',borderRadius:14,padding:'14px 16px'}}>
-                <p style={{fontSize:9,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase' as const,color:'#888',marginBottom:6}}>Próximo servicio</p>
-                <p style={{fontSize:18,fontWeight:700,color:C.txt,marginBottom:8,letterSpacing:'-0.3px'}}>{dia} {fecha}</p>
-                <div style={{display:'flex',gap:6,alignItems:'center',flexWrap:'wrap' as const}}>
+              <div style={{background:'rgba(255,255,255,0.78)',border:'0.5px solid rgba(255,255,255,0.6)',borderRadius:12,padding:'10px 12px'}}>
+                <p style={{fontSize:8,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase' as const,color:'#888',marginBottom:4}}>Próximo servicio</p>
+                <p style={{fontSize:14,fontWeight:700,color:C.txt,marginBottom:6,letterSpacing:'-0.3px'}}>{dia} {fecha}</p>
+                <div style={{display:'flex',gap:5,alignItems:'center',flexWrap:'wrap' as const}}>
                   {nextService.posiciones.map(p=>(
-                    <span key={p} style={{fontSize:10,fontWeight:700,background:'rgba(26,26,26,0.1)',color:C.txt,padding:'3px 8px',borderRadius:5,border:'0.5px solid rgba(26,26,26,0.15)'}}>{p}</span>
+                    <span key={p} style={{fontSize:9,fontWeight:700,background:'rgba(26,26,26,0.1)',color:C.txt,padding:'2px 7px',borderRadius:5,border:'0.5px solid rgba(26,26,26,0.15)'}}>{p}</span>
                   ))}
                   {nextService.invitation&&(
-                    <span style={{fontSize:10,fontWeight:600,background:nextService.invitation.status==='confirmado'?'#D8F3DC':'#FFF3CD',color:nextService.invitation.status==='confirmado'?'#1B4332':'#664D03',padding:'3px 8px',borderRadius:5}}>
+                    <span style={{fontSize:9,fontWeight:600,background:nextService.invitation.status==='confirmado'?'#D8F3DC':'#FFF3CD',color:nextService.invitation.status==='confirmado'?'#1B4332':'#664D03',padding:'2px 7px',borderRadius:5}}>
                       {nextService.invitation.status==='confirmado'?'✓ Confirmado':'⏳ Pendiente'}
                     </span>
                   )}
-                  <span style={{fontSize:10,fontWeight:600,background:'#FFF3CD',color:'#664D03',padding:'3px 10px',borderRadius:20,marginLeft:'auto'}}>
+                  <span style={{fontSize:9,fontWeight:600,background:'#FFF3CD',color:'#664D03',padding:'2px 8px',borderRadius:20,marginLeft:'auto'}}>
                     {days===0?'¡Hoy!':days===1?'Mañana':`En ${days} días`}
                   </span>
                 </div>
@@ -468,7 +468,7 @@ export default function PortalPage() {
                               const isItemOpen = expandedSetlistItem===itemKey
                               const hasLinks = item.song?.link_spotify||item.song?.link_letras||item.song?.link_recursos
                               return(
-                                <div key={idx} style={{background:isSong?C.crema:'rgba(0,0,0,0.04)',borderRadius:10,overflow:'hidden'}}>
+                                <div key={idx} style={{background:isSong?'white':'rgba(0,0,0,0.03)',border:isSong?`0.5px solid ${C.cremaDark}`:'none',borderRadius:10,overflow:'hidden'}}>
                                   {/* Fila principal — siempre visible */}
                                   <div style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px'}}>
                                     <span style={{width:22,height:22,borderRadius:'50%',background:isSong?C.txt:'#CCC',color:C.crema,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,flexShrink:0}}>
