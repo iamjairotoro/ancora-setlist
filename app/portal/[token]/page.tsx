@@ -197,8 +197,8 @@ export default function PortalPage() {
                     <span key={p} style={{fontSize:9,fontWeight:700,background:'rgba(26,26,26,0.1)',color:C.txt,padding:'2px 7px',borderRadius:5,border:'0.5px solid rgba(26,26,26,0.15)'}}>{p}</span>
                   ))}
                   {nextService.invitation&&(
-                    <span style={{fontSize:9,fontWeight:600,background:nextService.invitation.status==='confirmado'?'#D8F3DC':'#FFF3CD',color:nextService.invitation.status==='confirmado'?'#1B4332':'#664D03',padding:'2px 7px',borderRadius:5}}>
-                      {nextService.invitation.status==='confirmado'?'✓ Confirmado':'⏳ Pendiente'}
+                    <span style={{fontSize:9,fontWeight:600,background:nextService.invitation.status==='confirmado'?'#D8F3DC':nextService.invitation.status==='declinado'?'#FEE2E2':'#FFF3CD',color:nextService.invitation.status==='confirmado'?'#1B4332':nextService.invitation.status==='declinado'?'#991B1B':'#664D03',padding:'2px 7px',borderRadius:5}}>
+                      {nextService.invitation.status==='confirmado'?'✓ Confirmado':nextService.invitation.status==='declinado'?'✗ Declinado':'⏳ Pendiente'}
                     </span>
                   )}
                   <span style={{fontSize:9,fontWeight:600,background:'#FFF3CD',color:'#664D03',padding:'2px 8px',borderRadius:20,marginLeft:'auto'}}>
@@ -420,7 +420,7 @@ export default function PortalPage() {
                                     if(!b?.member) return null
                                     const isMe=b.member.nombre===member?.nombre
                                     return(
-                                      <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',borderRadius:8,background:isMe?C.txt:C.crema}}>
+                                      <div key={pos} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',borderRadius:8,background:isMe?C.txt:'white',border:isMe?'none':`0.5px solid ${C.cremaDark}`}}>
                                         <span style={{fontSize:9,fontWeight:700,color:isMe?'#C9A14A':C.muted,width:32,flexShrink:0}}>{pos}</span>
                                         <span style={{fontSize:13,fontWeight:500,color:isMe?'white':C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const}}>{b.member.nombre}</span>
                                       </div>
@@ -444,7 +444,7 @@ export default function PortalPage() {
                                     if(!b?.member) return null
                                     const isMe=b.member.nombre===member?.nombre
                                     return(
-                                      <div key={pos} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 12px',borderRadius:8,background:isMe?'#1A1A1A':'#F0EDE7'}}>
+                                      <div key={pos} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 12px',borderRadius:8,background:isMe?'#1A1A1A':'white',border:isMe?'none':`0.5px solid ${C.cremaDark}`}}>
                                         <span style={{fontSize:10,fontWeight:600,color:isMe?'#C9A14A':'#888',minWidth:110}}>{LABEL_TEC[pos]}</span>
                                         <span style={{fontSize:13,fontWeight:500,color:isMe?'white':C.txt}}>{b.member.nombre}</span>
                                       </div>

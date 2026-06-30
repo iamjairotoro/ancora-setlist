@@ -111,5 +111,3 @@ Sí, está diseñada para funcionar bien en móvil tanto para el admin como para
 
 **¿Los músicos necesitan crear cuenta?**
 No. Reciben un link único en su correo y con un clic responden. Sin registro, sin contraseña.
-
-Rama de desarrollo
