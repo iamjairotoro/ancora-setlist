@@ -590,7 +590,7 @@ export default function AdminServiceView({
                   <div style={{position:'relative'}}>
                     <button style={btn} onClick={()=>setShowPresets(v=>!v)}>+ Bloque ▾</button>
                     {showPresets&&(
-                      <div style={{position:'absolute',right:0,top:'calc(100% + 4px)',background:'white',border:`1px solid #C8C0B4`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.12)',zIndex:20,width:190,padding:'4px 0'}}>
+                      <div style={{position:'absolute',right:0,top:'calc(100% + 4px)',background:'white',border:`1px solid #C8C0B4`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.12)',zIndex:20,width:190,maxHeight:'60vh',overflowY:'auto',padding:'4px 0'}}>
                         {BLOQUES_PRESET.map(b=>(
                           <button key={b.titulo} onClick={()=>addBlock('bloque',b)}
                             onMouseEnter={e=>(e.currentTarget.style.background='#F5F0E6')}
@@ -623,7 +623,7 @@ export default function AdminServiceView({
                   <div style={{position:'relative'}}>
                     <button style={{...btn,fontSize:11,padding:'5px 10px'}} onClick={()=>setShowPresets(v=>!v)}>+ Bloque ▾</button>
                     {showPresets&&(
-                      <div style={{position:'absolute',left:'50%',transform:'translateX(-50%)',top:'calc(100% + 4px)',background:'white',border:`1px solid #C8C0B4`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.12)',zIndex:20,width:'min(200px,85vw)',padding:'4px 0'}}>
+                      <div style={{position:'absolute',left:'50%',transform:'translateX(-50%)',top:'calc(100% + 4px)',background:'white',border:`1px solid #C8C0B4`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.12)',zIndex:20,width:'min(200px,85vw)',maxHeight:'60vh',overflowY:'auto',padding:'4px 0'}}>
                         {BLOQUES_PRESET.map(b=>(
                           <button key={b.titulo} onClick={()=>addBlock('bloque',b)}
                             onMouseEnter={e=>(e.currentTarget.style.background='#F5F0E6')}
