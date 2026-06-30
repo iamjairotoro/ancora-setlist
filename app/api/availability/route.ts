@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:11px;color:#AAA;margin-top:16px">Ancora Worship · Portal del músico</p>
+    <p style="text-align:center;font-size:11px;color:#AAA;margin-top:16px">Ancora Worship · Mi espacio Áncora</p>
   </div>
 </body>
 </html>`

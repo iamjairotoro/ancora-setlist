@@ -22,10 +22,10 @@ function toMMSS(secs:number):string {
 // Logo Áncora SVG inline — versión blanca para fondo oscuro
 function LogoAncora() {
   return (
-    <div style={{display:'inline-flex',flexDirection:'column',alignItems:'center',background:'#1A1A1A',borderRadius:12,padding:'10px 20px',marginBottom:20}}>
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:20}}>
       <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:34,color:'#F5F0E6',lineHeight:1}}>Áncora</div>
-      <div style={{width:32,height:0.5,background:'rgba(245,240,230,0.35)',margin:'4px 0'}}/>
-      <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:400,fontSize:9,letterSpacing:5,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.75)'}}>Worship</div>
+      <div style={{width:32,height:0.5,background:'rgba(245,240,230,0.4)',margin:'4px 0'}}/>
+      <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:400,fontSize:9,letterSpacing:5,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.85)'}}>Worship</div>
     </div>
   )
 }
@@ -157,8 +157,15 @@ export default function PortalPage() {
     <div style={{minHeight:'100vh',background:C.crema,fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif'}}>
 
       {/* ── HERO ── */}
-      <TexBg className="pt-8 pb-20 px-5">
-        <div style={{maxWidth:500,margin:'0 auto'}}>
+      <div style={{
+        backgroundImage:'url(/bg-ancora.jpg)',
+        backgroundSize:'cover',
+        backgroundPosition:'center',
+        position:'relative',
+        paddingTop:32, paddingBottom:80, paddingLeft:20, paddingRight:20,
+      }}>
+        <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,0.5)'}}/>
+        <div style={{maxWidth:500,margin:'0 auto',position:'relative'}}>
 
           {/* Logo Áncora Worship */}
           <LogoAncora />
@@ -173,7 +180,7 @@ export default function PortalPage() {
             </div>
             <div>
               <h1 style={{fontSize:22,fontWeight:700,color:'#F5F0E6',lineHeight:1.2}}>Hola, {member?.nombre}</h1>
-              <p style={{fontSize:12,fontWeight:400,color:'rgba(245,240,230,0.55)',marginTop:3}}>Portal del músico</p>
+              <p style={{fontSize:12,fontWeight:400,color:'rgba(245,240,230,0.55)',marginTop:3}}>Mi espacio Áncora</p>
             </div>
           </div>
 
@@ -202,7 +209,7 @@ export default function PortalPage() {
             )
           })()}
         </div>
-      </TexBg>
+      </div>
 
       {/* ── TAB BAR ── */}
       <div style={{maxWidth:500,margin:'-1px auto 0',padding:'0 16px'}}>
@@ -212,7 +219,7 @@ export default function PortalPage() {
               style={{flex:1,padding:'9px 4px',borderRadius:10,fontSize:12,fontWeight:tab===t?700:500,color:tab===t?'white':C.muted,background:tab===t?C.txt:'transparent',border:'none',cursor:'pointer',fontFamily:'inherit',transition:'all 0.15s'}}>
               {t==='home'?'🏠':t==='misdomingos'?'📅':t==='recursos'?'🎵':'👤'}
               <br/>
-              <span style={{fontSize:10}}>{t==='home'?'Inicio':t==='misdomingos'?'Mis dom.':t==='recursos'?'Canciones':'Perfil'}</span>
+              <span style={{fontSize:10}}>{t==='home'?'Servicios':t==='misdomingos'?'Disponib.':t==='recursos'?'Canciones':'Perfil'}</span>
             </button>
           ))}
         </div>
@@ -259,7 +266,11 @@ export default function PortalPage() {
                     {/* Info */}
                     <div style={{flex:1}}>
                       <p style={{fontSize:15,fontWeight:700,color:C.txt}}>{dias[d.getDay()]} {d.getDate()} de {meses[d.getMonth()]}</p>
-                      <p style={{fontSize:11,color:C.muted,marginTop:1}}>Servicio Ancora</p>
+                      {!status ? (
+                        <span style={{fontSize:10,fontWeight:600,background:'#FFF3CD',color:'#92400E',padding:'1px 7px',borderRadius:10,marginTop:2,display:'inline-block'}}>⏳ Pendiente</span>
+                      ) : (
+                        <p style={{fontSize:11,color:C.muted,marginTop:1}}>Servicio Ancora</p>
+                      )}
                     </div>
                     {/* Buttons */}
                     <div style={{display:'flex',gap:8}}>
@@ -323,59 +334,57 @@ export default function PortalPage() {
 
                       {/* RSVP */}
                       {invitation&&(
-                        <div style={{padding:'12px 16px',borderBottom:`0.5px solid ${C.crema}`,background:invitation.status==='pendiente'?'#FFFBEB':invitation.status==='confirmado'?'#F0FFF4':'#FFF5F5'}}>
+                        <div style={{padding:'10px 16px',borderBottom:`0.5px solid ${C.crema}`,background:invitation.status==='pendiente'?'#FFFBEB':invitation.status==='confirmado'?'#F0FFF4':'#FFF5F5'}}>
                           {confirmingDecline===service.id ? (
                             <div>
-                              <p style={{fontSize:13,fontWeight:600,color:'#B91C1C',marginBottom:8}}>¿Seguro que no puedes asistir?</p>
+                              <p style={{fontSize:12,fontWeight:600,color:'#B91C1C',marginBottom:6}}>¿Seguro que no puedes asistir?</p>
                               <input placeholder="Motivo (obligatorio) *" value={obsComment} onChange={e=>setObsComment(e.target.value)}
-                                style={{width:'100%',fontSize:13,padding:'8px 10px',border:'0.5px solid #FCA5A5',borderRadius:8,marginBottom:8,fontFamily:'inherit',outline:'none'}}/>
-                              <div style={{display:'flex',gap:8}}>
+                                style={{width:'100%',fontSize:12,padding:'6px 9px',border:'0.5px solid #FCA5A5',borderRadius:7,marginBottom:6,fontFamily:'inherit',outline:'none'}}/>
+                              <div style={{display:'flex',gap:6}}>
                                 <button onClick={()=>handleRSVP(invitation.token,'no',obsComment)} disabled={actionLoading||!obsComment.trim()}
-                                  style={{flex:1,background:obsComment.trim()?'#B91C1C':'#CCC',color:'white',border:'none',borderRadius:8,padding:'10px',fontSize:13,fontWeight:700,fontFamily:'inherit',cursor:obsComment.trim()?'pointer':'default'}}>
+                                  style={{flex:1,background:obsComment.trim()?'#B91C1C':'#CCC',color:'white',border:'none',borderRadius:7,padding:'8px',fontSize:12,fontWeight:700,fontFamily:'inherit',cursor:obsComment.trim()?'pointer':'default'}}>
                                   {actionLoading?'...':'Sí, no puedo'}
                                 </button>
                                 <button onClick={()=>setConfirmingDecline(null)}
-                                  style={{flex:1,background:'white',color:C.txt,border:`0.5px solid ${C.cremaDark}`,borderRadius:8,padding:'10px',fontSize:13,fontWeight:500,fontFamily:'inherit',cursor:'pointer'}}>
+                                  style={{flex:1,background:'white',color:C.txt,border:`0.5px solid ${C.cremaDark}`,borderRadius:7,padding:'8px',fontSize:12,fontWeight:500,fontFamily:'inherit',cursor:'pointer'}}>
                                   Cancelar
                                 </button>
                               </div>
                             </div>
                           ) : (
                             <div>
-                              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:invitation.status==='pendiente'?10:0}}>
-                                <span style={{fontSize:14,fontWeight:700,color:invitation.status==='confirmado'?'#1B4332':invitation.status==='declinado'?'#991B1B':'#92400E'}}>
-                                  {invitation.status==='confirmado'?'✓ Confirmado':invitation.status==='declinado'?'✗ Declinado':'¿Puedes asistir?'}
-                                </span>
-                                {invitation.status!=='pendiente'&&(
-                                  <button onClick={()=>setConfirmingDecline(null)}
-                                    style={{fontSize:12,color:C.muted,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',textDecoration:'underline'}}>
-                                    Cambiar
-                                  </button>
-                                )}
-                              </div>
                               {invitation.status==='pendiente'&&(
-                                <div style={{display:'flex',gap:8}}>
-                                  <button onClick={()=>handleRSVP(invitation.token,'si')} disabled={actionLoading}
-                                    style={{flex:1,background:C.txt,color:C.crema,border:'none',borderRadius:10,padding:'12px',fontSize:14,fontWeight:700,fontFamily:'inherit',cursor:'pointer'}}>
-                                    {actionLoading?'...':'✓ Confirmo'}
-                                  </button>
+                                <>
+                                  <p style={{fontSize:13,fontWeight:700,color:'#92400E',marginBottom:8}}>¿Puedes asistir?</p>
+                                  <div style={{display:'flex',gap:6}}>
+                                    <button onClick={()=>handleRSVP(invitation.token,'si')} disabled={actionLoading}
+                                      style={{flex:1,background:C.txt,color:C.crema,border:'none',borderRadius:8,padding:'9px',fontSize:13,fontWeight:700,fontFamily:'inherit',cursor:'pointer'}}>
+                                      {actionLoading?'...':'✓ Confirmo'}
+                                    </button>
+                                    <button onClick={()=>setConfirmingDecline(service.id)}
+                                      style={{flex:1,background:'white',color:'#B91C1C',border:'0.5px solid #FCA5A5',borderRadius:8,padding:'9px',fontSize:13,fontWeight:500,fontFamily:'inherit',cursor:'pointer'}}>
+                                      ✗ No puedo
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                              {invitation.status==='confirmado'&&(
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                                  <span style={{fontSize:13,fontWeight:700,color:'#1B4332'}}>✓ Confirmado</span>
                                   <button onClick={()=>setConfirmingDecline(service.id)}
-                                    style={{flex:1,background:'white',color:'#B91C1C',border:'0.5px solid #FCA5A5',borderRadius:10,padding:'12px',fontSize:14,fontWeight:500,fontFamily:'inherit',cursor:'pointer'}}>
-                                    ✗ No puedo
+                                    style={{fontSize:11,color:'#B91C1C',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+                                    Declinar
                                   </button>
                                 </div>
                               )}
-                              {invitation.status==='confirmado'&&(
-                                <button onClick={()=>setConfirmingDecline(service.id)}
-                                  style={{fontSize:12,color:C.muted,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',textDecoration:'underline',display:'block',marginTop:4}}>
-                                  ¿Ya no puedes? Declinar
-                                </button>
-                              )}
                               {invitation.status==='declinado'&&(
-                                <button onClick={()=>handleRSVP(invitation.token,'si')} disabled={actionLoading}
-                                  style={{marginTop:8,width:'100%',background:C.txt,color:C.crema,border:'none',borderRadius:10,padding:'10px',fontSize:13,fontWeight:700,fontFamily:'inherit',cursor:'pointer'}}>
-                                  {actionLoading?'...':'✓ Confirmar asistencia'}
-                                </button>
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                                  <span style={{fontSize:13,fontWeight:700,color:'#991B1B'}}>✗ Declinado</span>
+                                  <button onClick={()=>handleRSVP(invitation.token,'si')} disabled={actionLoading}
+                                    style={{fontSize:11,color:C.txt,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',fontWeight:600}}>
+                                    {actionLoading?'...':'Confirmar'}
+                                  </button>
+                                </div>
                               )}
                             </div>
                           )}
@@ -491,26 +500,26 @@ export default function PortalPage() {
                                   </div>
                                   {/* Links expandibles */}
                                   {isSong&&hasLinks&&isItemOpen&&(
-                                    <div style={{padding:'0 12px 12px',display:'flex',gap:8}}>
+                                    <div style={{padding:'0 12px 10px',display:'flex',gap:6}}>
                                       {item.song?.link_spotify&&(
                                         <a href={item.song.link_spotify} target="_blank"
-                                          style={{flex:1,background:'#D8F3DC',borderRadius:10,padding:'10px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}>
-                                          <div style={{fontSize:22,marginBottom:3}}>🎧</div>
-                                          <span style={{fontSize:10,fontWeight:700,color:'#1B4332'}}>Spotify</span>
+                                          style={{flex:1,background:'#D8F3DC',borderRadius:8,padding:'6px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}>
+                                          <div style={{fontSize:14,marginBottom:1}}>🎧</div>
+                                          <span style={{fontSize:9,fontWeight:700,color:'#1B4332'}}>Spotify</span>
                                         </a>
                                       )}
                                       {item.song?.link_letras&&(
                                         <a href={item.song.link_letras} target="_blank"
-                                          style={{flex:1,background:'#DBE4FF',borderRadius:10,padding:'10px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}>
-                                          <div style={{fontSize:22,marginBottom:3}}>📄</div>
-                                          <span style={{fontSize:10,fontWeight:700,color:'#1971C2'}}>Letras</span>
+                                          style={{flex:1,background:'#DBE4FF',borderRadius:8,padding:'6px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}>
+                                          <div style={{fontSize:14,marginBottom:1}}>📄</div>
+                                          <span style={{fontSize:9,fontWeight:700,color:'#1971C2'}}>Letras</span>
                                         </a>
                                       )}
                                       {item.song?.link_recursos&&(
                                         <a href={item.song.link_recursos} target="_blank"
-                                          style={{flex:1,background:'#FFF3CD',borderRadius:10,padding:'10px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}>
-                                          <div style={{fontSize:22,marginBottom:3}}>📁</div>
-                                          <span style={{fontSize:10,fontWeight:700,color:'#92400E'}}>Recursos</span>
+                                          style={{flex:1,background:'#FFF3CD',borderRadius:8,padding:'6px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}>
+                                          <div style={{fontSize:14,marginBottom:1}}>📁</div>
+                                          <span style={{fontSize:9,fontWeight:700,color:'#92400E'}}>Recursos</span>
                                         </a>
                                       )}
                                     </div>
@@ -560,10 +569,10 @@ export default function PortalPage() {
                     {isOpen&&(
                       <div style={{borderTop:`0.5px solid ${C.crema}`,padding:'12px 14px'}}>
                         {song.notas&&<div style={{background:'#FFFBEB',borderRadius:8,padding:'8px 10px',marginBottom:10}}><p style={{fontSize:10,color:'#92400E',fontWeight:600,marginBottom:3}}>📝 Notas</p><p style={{fontSize:12,color:'#92400E',fontWeight:400}}>{song.notas}</p></div>}
-                        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
-                          {song.link_spotify&&<a href={song.link_spotify} target="_blank" style={{background:'#D8F3DC',borderRadius:10,padding:'12px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:24,marginBottom:4}}>🎧</div><span style={{fontSize:11,fontWeight:700,color:'#1B4332'}}>Spotify</span></a>}
-                          {song.link_letras&&<a href={song.link_letras} target="_blank" style={{background:'#DBE4FF',borderRadius:10,padding:'12px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:24,marginBottom:4}}>📄</div><span style={{fontSize:11,fontWeight:700,color:'#1971C2'}}>Letras</span></a>}
-                          {song.link_recursos&&<a href={song.link_recursos} target="_blank" style={{background:'#FFF3CD',borderRadius:10,padding:'12px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:24,marginBottom:4}}>📁</div><span style={{fontSize:11,fontWeight:700,color:'#92400E'}}>Recursos</span></a>}
+                        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6}}>
+                          {song.link_spotify&&<a href={song.link_spotify} target="_blank" style={{background:'#D8F3DC',borderRadius:8,padding:'7px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:15,marginBottom:1}}>🎧</div><span style={{fontSize:9,fontWeight:700,color:'#1B4332'}}>Spotify</span></a>}
+                          {song.link_letras&&<a href={song.link_letras} target="_blank" style={{background:'#DBE4FF',borderRadius:8,padding:'7px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:15,marginBottom:1}}>📄</div><span style={{fontSize:9,fontWeight:700,color:'#1971C2'}}>Letras</span></a>}
+                          {song.link_recursos&&<a href={song.link_recursos} target="_blank" style={{background:'#FFF3CD',borderRadius:8,padding:'7px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:15,marginBottom:1}}>📁</div><span style={{fontSize:9,fontWeight:700,color:'#92400E'}}>Recursos</span></a>}
                         </div>
                         {!song.link_spotify&&!song.link_letras&&!song.link_recursos&&<p style={{fontSize:12,fontWeight:400,color:C.muted,textAlign:'center' as const,padding:'8px 0'}}>Sin links disponibles</p>}
                       </div>
@@ -621,7 +630,7 @@ export default function PortalPage() {
                       {label:'Nombre completo',value:`${member?.nombre} ${member?.apellido}`},
                       {label:'Email',value:member?.email},
                       {label:'Teléfono',value:member?.telefono||'—'},
-                      {label:'Cumpleaños',value:member?.fecha_nacimiento ? new Date(member.fecha_nacimiento+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}) : '—'},
+                      {label:'Fecha de nacimiento',value:member?.fecha_nacimiento ? new Date(member.fecha_nacimiento+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'}) : '—'},
                     ].map(({label,value})=>(
                       <div key={label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'11px 0',borderBottom:`0.5px solid ${C.crema}`}}>
                         <span style={{fontSize:13,fontWeight:400,color:C.muted}}>{label}</span>
@@ -635,6 +644,10 @@ export default function PortalPage() {
                   </div>
                 )}
                 <p style={{fontSize:11,fontWeight:400,color:C.muted,textAlign:'center' as const,marginTop:14}}>Para cambiar email o instrumentos, contacta al administrador.</p>
+                <button onClick={async()=>{ await supabase.auth.signOut(); window.location.href='/login' }}
+                  style={{width:'100%',marginTop:14,background:'none',color:'#B91C1C',border:'none',padding:'8px',fontSize:13,fontWeight:500,fontFamily:'inherit',cursor:'pointer'}}>
+                  Cerrar sesión
+                </button>
               </div>
             </div>
           </div>

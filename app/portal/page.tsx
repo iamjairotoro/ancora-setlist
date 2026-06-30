@@ -68,7 +68,7 @@ export default function PortalLoginPage() {
           <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:500,fontSize:10,letterSpacing:5,textTransform:'uppercase' as const,color:'#666'}}>Worship</div>
         </div>
 
-        <p style={{fontSize:13,fontWeight:400,color:'#888',marginBottom:20}}>Portal del músico</p>
+        <p style={{fontSize:13,fontWeight:400,color:'#888',marginBottom:20}}>Mi espacio Áncora</p>
 
         {error && (
           <div style={{background:'#FEF2F2',color:'#B91C1C',fontSize:12,padding:'8px 12px',borderRadius:8,marginBottom:14,textAlign:'left'}}>

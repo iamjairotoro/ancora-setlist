@@ -177,3 +177,13 @@ body {
   .desktop-cols-header { display: grid !important; }
   .mobile-cols-header  { display: none !important; }
 }
+
+/* ── ORDEN DEL SERVICIO HEADER RESPONSIVE ── */
+@media (max-width: 768px) {
+  .oos-header-desktop { display: none !important; }
+  .oos-header-mobile  { display: flex !important; }
+}
+@media (min-width: 769px) {
+  .oos-header-mobile  { display: none !important; }
+  .oos-header-desktop { display: flex !important; }
+}

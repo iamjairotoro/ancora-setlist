@@ -148,7 +148,7 @@ export default function TeamPanel({ members, onRefresh }: Props) {
               <p className="text-sm text-gray-500 truncate">{m.email}</p>
               {m.fecha_nacimiento && (
                 <p className="text-xs text-gray-400 mt-0.5">
-                  🎂 {new Date(m.fecha_nacimiento+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long'})}
+                  Nac. {new Date(m.fecha_nacimiento+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})}
                 </p>
               )}
             </div>

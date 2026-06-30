@@ -131,33 +131,27 @@ export default function SongsPanel({ songs, onRefresh }: Props) {
       <div className="card divide-y divide-gray-50">
         {filtered.length===0 && <p className="p-4 text-sm text-gray-400">{search?'Sin resultados.':'Sin canciones. Agrega la primera.'}</p>}
         {filtered.map(s => (
-          <div key={s.id} className="flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-navy/10 flex items-center justify-center flex-shrink-0 text-lg">🎵</div>
+          <div key={s.id} className="flex items-start gap-2 p-3 hover:bg-gray-50 transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-navy/10 flex items-center justify-center flex-shrink-0 text-sm">🎵</div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-semibold text-sm text-navy">{s.nombre}</p>
-                  <p className="text-sm text-gray-500 mt-0.5">{s.artista}</p>
-                </div>
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <div className="flex gap-1 text-sm">
-                    {s.tono_original && <span className="bg-navy/10 text-navy px-1.5 py-0.5 rounded font-medium">{s.tono_original}</span>}
-                    {s.bpm && <span className="bg-gold/20 text-yellow-700 px-1.5 py-0.5 rounded">{s.bpm} BPM</span>}
-                  {s.duracion_min && <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{toMMSS(s.duracion_min)}</span>}
-                    {s.compas && <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{s.compas}</span>}
-                  </div>
-                </div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="font-semibold text-sm text-navy truncate">{s.nombre}</p>
+                {s.link_spotify   && <a href={s.link_spotify}   target="_blank" title="Spotify" className="w-5 h-5 flex items-center justify-center bg-green-100 text-green-700 rounded text-xs flex-shrink-0">🎧</a>}
+                {s.link_letras    && <a href={s.link_letras}    target="_blank" title="Letras" className="w-5 h-5 flex items-center justify-center bg-blue-100 text-blue-700 rounded text-xs flex-shrink-0">📄</a>}
+                {s.link_recursos  && <a href={s.link_recursos}  target="_blank" title="Recursos" className="w-5 h-5 flex items-center justify-center bg-purple-100 text-purple-700 rounded text-xs flex-shrink-0">📁</a>}
               </div>
-              <div className="flex gap-2 mt-2 flex-wrap">
-                {s.link_spotify   && <a href={s.link_spotify}   target="_blank" className="text-sm bg-green-100 text-green-700 px-2 py-1 rounded-lg hover:bg-green-200">🎧 Spotify</a>}
-                {s.link_letras    && <a href={s.link_letras}    target="_blank" className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-200">📄 Letras</a>}
-                {s.link_recursos  && <a href={s.link_recursos}  target="_blank" className="text-sm bg-purple-100 text-purple-700 px-2 py-1 rounded-lg hover:bg-purple-200">📁 Recursos</a>}
+              <p className="text-xs text-gray-500 mt-0.5 truncate">{s.artista}</p>
+              <div className="flex gap-1 flex-wrap mt-1.5">
+                {s.tono_original && <span className="bg-navy/10 text-navy px-1.5 py-0.5 rounded text-xs font-medium">{s.tono_original}</span>}
+                {s.bpm && <span className="bg-gold/20 text-yellow-700 px-1.5 py-0.5 rounded text-xs">{s.bpm} BPM</span>}
+                {s.duracion_min && <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-xs">{toMMSS(s.duracion_min)}</span>}
+                {s.compas && <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-xs">{s.compas}</span>}
               </div>
-              {s.notas && <p className="text-sm text-gray-400 mt-1 italic">{s.notas}</p>}
+              {s.notas && <p className="text-xs text-gray-400 mt-1 italic truncate">{s.notas}</p>}
             </div>
-            <div className="flex gap-1 flex-shrink-0">
-              <button onClick={() => setEditing({...s})} className="text-sm text-gray-400 hover:text-navy px-2 py-1">Editar</button>
-              <button onClick={() => del(s.id)} className="text-sm text-gray-400 hover:text-red-500 px-2 py-1">×</button>
+            <div className="flex flex-col gap-0.5 flex-shrink-0">
+              <button onClick={() => setEditing({...s})} className="text-xs text-gray-400 hover:text-navy px-1.5 py-0.5">Editar</button>
+              <button onClick={() => del(s.id)} className="text-xs text-gray-400 hover:text-red-500 px-1.5 py-0.5">Eliminar</button>
             </div>
           </div>
         ))}

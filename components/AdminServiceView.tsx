@@ -581,7 +581,7 @@ export default function AdminServiceView({
 
             {/* RIGHT — Order of service (desktop: grid, mobile: clean rows) */}
             <div style={{background:'white',border:`1px solid #C8C0B4`,borderRadius:12,overflow:'hidden'}}>
-              <div style={{padding:'10px 16px',borderBottom:`1px solid #C8C0B4`,display:'flex',alignItems:'baseline',justifyContent:'space-between'}}>
+              <div className="oos-header-desktop" style={{padding:'10px 16px',borderBottom:`1px solid #C8C0B4`,display:'flex',alignItems:'baseline',justifyContent:'space-between'}}>
                 <div>
                   <span style={{fontSize:12,fontWeight:700,letterSpacing:1,textTransform:'uppercase',color:C.txt}}>Orden del servicio</span>
                   <span style={{fontSize:11,fontWeight:300,color:C.muted,marginLeft:8}}>{blocks.length} items · {totalToDisplay(totalSecs)}</span>
@@ -605,6 +605,34 @@ export default function AdminServiceView({
                     )}
                   </div>
                   <button style={btnDark} onClick={()=>addBlock('cancion')}>🎵 + Canción</button>
+                </div>
+              </div>
+
+              {/* Header móvil — centrado, compacto */}
+              <div className="oos-header-mobile" style={{display:'none',flexDirection:'column',gap:8,padding:'10px 12px',borderBottom:`1px solid #C8C0B4`}}>
+                <div style={{textAlign:'center'}}>
+                  <div style={{fontSize:13,fontWeight:700,letterSpacing:0.5,textTransform:'uppercase' as const,color:C.txt}}>Orden del servicio</div>
+                  <div style={{fontSize:10,fontWeight:300,color:C.muted,marginTop:1}}>{blocks.length} items · {totalToDisplay(totalSecs)}</div>
+                </div>
+                <div style={{display:'flex',gap:6,justifyContent:'center',position:'relative'}}>
+                  <div style={{position:'relative'}}>
+                    <button style={{...btn,fontSize:11,padding:'5px 10px'}} onClick={()=>setShowPresets(v=>!v)}>+ Bloque ▾</button>
+                    {showPresets&&(
+                      <div style={{position:'absolute',left:0,top:'calc(100% + 4px)',background:'white',border:`1px solid #C8C0B4`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.08)',zIndex:20,width:180,padding:'4px 0'}}>
+                        {BLOQUES_PRESET.map(b=>(
+                          <button key={b.titulo} onClick={()=>addBlock('bloque',b)}
+                            style={{width:'100%',textAlign:'left',padding:'8px 14px',fontSize:11,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.txt,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            {b.titulo}<span style={{fontSize:9,color:C.muted}}>{toMMSS(b.duracion_min)}</span>
+                          </button>
+                        ))}
+                        <div style={{borderTop:`1px solid #C8C0B4`,margin:'2px 0'}}/>
+                        <button onClick={()=>addBlock('bloque')} style={{width:'100%',textAlign:'left',padding:'8px 14px',fontSize:11,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.muted}}>
+                          + Personalizado
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <button style={{...btnDark,fontSize:11,padding:'5px 10px'}} onClick={()=>addBlock('cancion')}>🎵 + Canción</button>
                 </div>
               </div>
 
