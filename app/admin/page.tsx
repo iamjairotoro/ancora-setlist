@@ -151,13 +151,16 @@ export default function AdminPage() {
     <div style={{minHeight:'100vh',background:'#F5F0E6',fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif'}}>
 
       {/* ── NAVBAR ── */}
-      <TexBg className="sticky top-0 z-30 shadow-lg">
+      <div className="z-30 shadow-lg" style={{
+        position:'sticky', top:0,
+        background:'#1A1A1A',
+      }}>
         <header style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',justifyContent:'space-between'}}>
-          {/* Logo — fondo oscuro vertical */}
-          <div style={{background:'#1A1A1A',borderRadius:10,padding:'7px 16px',display:'flex',flexDirection:'column',alignItems:'center'}}>
+          {/* Logo — sin caja */}
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
             <div style={{fontFamily:'"Dancing Script",cursive',fontWeight:700,fontSize:22,color:'#F5F0E6',lineHeight:1}}>Áncora</div>
-            <div style={{width:28,height:0.5,background:'rgba(245,240,230,0.35)',margin:'3px 0'}}/>
-            <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:400,fontSize:8,letterSpacing:5,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.75)'}}>Worship</div>
+            <div style={{width:24,height:0.5,background:'rgba(245,240,230,0.4)',margin:'2px 0'}}/>
+            <div style={{fontFamily:'"Helvetica Neue",Helvetica,sans-serif',fontWeight:400,fontSize:7,letterSpacing:4,textTransform:'uppercase' as const,color:'rgba(245,240,230,0.85)'}}>Worship</div>
           </div>
 
           {/* Desktop nav */}
@@ -203,9 +206,9 @@ export default function AdminPage() {
           </div>
         </header>
 
-      </TexBg>
+      </div>
 
-      {/* Dropdown — fixed para evitar overflow:hidden del TexBg */}
+      {/* Dropdown — fixed para evitar overflow:hidden del navbar */}
       {mobileMenuOpen&&(
         <div style={{position:'fixed',top:56,right:0,zIndex:100,width:240}}>
           <div onClick={()=>setMobileMenuOpen(false)}
