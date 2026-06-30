@@ -154,7 +154,7 @@ export default function PortalPage() {
   )
 
   return (
-    <div style={{minHeight:'100vh',background:C.crema,fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif'}}>
+    <div style={{minHeight:'100vh',background:'#FFFFFF',fontFamily:'"Helvetica Neue",Helvetica,Arial,sans-serif'}}>
 
       {/* ── HERO ── */}
       <div style={{
@@ -231,12 +231,12 @@ export default function PortalPage() {
         {/* MIS DOMINGOS */}
         {tab==='misdomingos'&&(
           <div style={{display:'flex',flexDirection:'column',gap:10}}>
-            <div style={{background:'white',borderRadius:14,padding:'12px 16px',border:`0.5px solid ${C.cremaDark}`}}>
+            <div style={{background:C.crema,borderRadius:14,padding:'12px 16px',border:`0.5px solid ${C.cremaDark}`}}>
               <p style={{fontSize:10,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase' as const,color:C.muted,marginBottom:4}}>Disponibilidad del mes</p>
               <p style={{fontSize:13,fontWeight:400,color:C.muted}}>Indica en qué domingos puedes servir este mes.</p>
             </div>
             {allFutureServices.length===0&&(
-              <div style={{background:'white',borderRadius:14,padding:32,textAlign:'center',border:`0.5px solid ${C.cremaDark}`}}>
+              <div style={{background:C.crema,borderRadius:14,padding:32,textAlign:'center',border:`0.5px solid ${C.cremaDark}`}}>
                 <p style={{fontSize:14,color:C.muted}}>No hay servicios próximos registrados.</p>
               </div>
             )}
@@ -256,10 +256,10 @@ export default function PortalPage() {
               }
 
               return(
-                <div key={service.id} style={{background:'white',borderRadius:12,border:`0.5px solid ${status==='disponible'?'#BBE5C5':status==='no_disponible'?'#FCA5A5':C.cremaDark}`,overflow:'hidden'}}>
+                <div key={service.id} style={{background:C.crema,borderRadius:12,border:`0.5px solid ${status==='disponible'?'#BBE5C5':status==='no_disponible'?'#FCA5A5':C.cremaDark}`,overflow:'hidden'}}>
                   <div style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px'}}>
                     {/* Date box */}
-                    <div style={{width:40,height:40,background:C.crema,borderRadius:9,border:`0.5px solid ${C.cremaDark}`,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                    <div style={{width:40,height:40,background:'white',borderRadius:9,border:`0.5px solid ${C.cremaDark}`,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                       <span style={{fontSize:17,fontWeight:700,color:C.txt,lineHeight:1}}>{d.getDate()}</span>
                       <span style={{fontSize:8,fontWeight:500,color:C.muted,textTransform:'uppercase' as const}}>{meses[d.getMonth()]}</span>
                     </div>
@@ -296,7 +296,7 @@ export default function PortalPage() {
         {tab==='home'&&(
           <div style={{display:'flex',flexDirection:'column',gap:12}}>
             {services.length===0&&(
-              <div style={{background:'white',borderRadius:14,padding:32,textAlign:'center',border:`0.5px solid ${C.cremaDark}`}}>
+              <div style={{background:C.crema,borderRadius:14,padding:32,textAlign:'center',border:`0.5px solid ${C.cremaDark}`}}>
                 <p style={{fontSize:32,marginBottom:8}}>🎶</p>
                 <p style={{fontSize:14,fontWeight:400,color:C.muted}}>No tienes servicios próximos asignados.</p>
               </div>
@@ -306,11 +306,11 @@ export default function PortalPage() {
               const {dia,fecha}=fmtFecha(service.fecha)
               const days=daysUntil(service.fecha)
               return(
-                <div key={service.id} style={{background:'white',borderRadius:14,overflow:'hidden',border:`0.5px solid ${C.cremaDark}`}}>
+                <div key={service.id} style={{background:C.crema,borderRadius:14,overflow:'hidden',border:`0.5px solid ${C.cremaDark}`}}>
                   {/* Header row */}
                   <button onClick={()=>setExpandedSvc(isOpen?null:service.id)}
                     style={{width:'100%',textAlign:'left',padding:'14px 16px',display:'flex',alignItems:'center',gap:12,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
-                    <div style={{width:40,height:40,background:C.crema,borderRadius:10,border:`0.5px solid ${C.cremaDark}`,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                    <div style={{width:40,height:40,background:'white',borderRadius:10,border:`0.5px solid ${C.cremaDark}`,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                       <span style={{fontSize:16,fontWeight:700,color:C.txt,lineHeight:1}}>{new Date(service.fecha+'T12:00:00').getDate()}</span>
                       <span style={{fontSize:8,fontWeight:500,color:C.muted,textTransform:'uppercase' as const}}>{fecha.split(' ')[1]}</span>
                     </div>
@@ -541,7 +541,7 @@ export default function PortalPage() {
         {/* RECURSOS / CANCIONES */}
         {tab==='recursos'&&(
           <div>
-            <div style={{background:'white',borderRadius:10,padding:'10px 12px',marginBottom:10,border:`0.5px solid ${C.cremaDark}`,display:'flex',alignItems:'center',gap:8}}>
+            <div style={{background:C.crema,borderRadius:10,padding:'10px 12px',marginBottom:10,border:`0.5px solid ${C.cremaDark}`,display:'flex',alignItems:'center',gap:8}}>
               <span style={{fontSize:16}}>🔍</span>
               <input style={{flex:1,border:'none',outline:'none',fontSize:14,fontFamily:'inherit',fontWeight:400,color:C.txt,background:'transparent'}} placeholder="Buscar canción o artista..." value={songSearch} onChange={e=>setSongSearch(e.target.value)}/>
             </div>
@@ -550,7 +550,7 @@ export default function PortalPage() {
               {filteredSongs.map(song=>{
                 const isOpen=expandedSong===song.id
                 return(
-                  <div key={song.id} style={{background:'white',borderRadius:12,overflow:'hidden',border:`0.5px solid ${C.cremaDark}`}}>
+                  <div key={song.id} style={{background:C.crema,borderRadius:12,overflow:'hidden',border:`0.5px solid ${C.cremaDark}`}}>
                     <button onClick={()=>setExpandedSong(isOpen?null:song.id)}
                       style={{width:'100%',textAlign:'left' as const,padding:'12px 14px',display:'flex',alignItems:'center',gap:12,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
                       <div style={{width:38,height:38,borderRadius:9,background:C.txt,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:18}}>🎵</div>
@@ -587,7 +587,7 @@ export default function PortalPage() {
         {/* PERFIL */}
         {tab==='perfil'&&(
           <div>
-            <div style={{background:'white',borderRadius:14,overflow:'hidden',border:`0.5px solid ${C.cremaDark}`}}>
+            <div style={{background:C.crema,borderRadius:14,overflow:'hidden',border:`0.5px solid ${C.cremaDark}`}}>
               <TexBg className="p-5 flex items-center gap-4">
                 {/* Avatar editable solo desde el portal */}
                 <AvatarUpload memberId={member?.id||''} currentUrl={member?.avatar_url} nombre={member?.nombre||''} apellido={member?.apellido} size="lg"
