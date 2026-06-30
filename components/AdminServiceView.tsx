@@ -590,15 +590,20 @@ export default function AdminServiceView({
                   <div style={{position:'relative'}}>
                     <button style={btn} onClick={()=>setShowPresets(v=>!v)}>+ Bloque ▾</button>
                     {showPresets&&(
-                      <div style={{position:'absolute',right:0,top:'calc(100% + 4px)',background:'white',border:`1px solid #C8C0B4`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.08)',zIndex:20,width:190,padding:'4px 0'}}>
+                      <div style={{position:'absolute',right:0,top:'calc(100% + 4px)',background:'white',border:`1px solid #C8C0B4`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.12)',zIndex:20,width:190,padding:'4px 0'}}>
                         {BLOQUES_PRESET.map(b=>(
                           <button key={b.titulo} onClick={()=>addBlock('bloque',b)}
-                            style={{width:'100%',textAlign:'left',padding:'8px 16px',fontSize:12,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.txt,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            onMouseEnter={e=>(e.currentTarget.style.background='#F5F0E6')}
+                            onMouseLeave={e=>(e.currentTarget.style.background='none')}
+                            style={{width:'100%',textAlign:'left',padding:'8px 16px',fontSize:12,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.txt,display:'flex',justifyContent:'space-between',alignItems:'center',transition:'background 0.15s'}}>
                             {b.titulo}<span style={{fontSize:10,color:C.muted}}>{toMMSS(b.duracion_min)}</span>
                           </button>
                         ))}
                         <div style={{borderTop:`1px solid #C8C0B4`,margin:'2px 0'}}/>
-                        <button onClick={()=>addBlock('bloque')} style={{width:'100%',textAlign:'left',padding:'8px 16px',fontSize:12,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.muted}}>
+                        <button onClick={()=>addBlock('bloque')}
+                          onMouseEnter={e=>(e.currentTarget.style.background='#F5F0E6')}
+                          onMouseLeave={e=>(e.currentTarget.style.background='none')}
+                          style={{width:'100%',textAlign:'left',padding:'8px 16px',fontSize:12,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.muted,transition:'background 0.15s'}}>
                           + Personalizado
                         </button>
                       </div>
@@ -614,19 +619,24 @@ export default function AdminServiceView({
                   <div style={{fontSize:13,fontWeight:700,letterSpacing:0.5,textTransform:'uppercase' as const,color:C.txt}}>Orden del servicio</div>
                   <div style={{fontSize:10,fontWeight:300,color:C.muted,marginTop:1}}>{blocks.length} items · {totalToDisplay(totalSecs)}</div>
                 </div>
-                <div style={{display:'flex',gap:6,justifyContent:'center',position:'relative'}}>
+                <div style={{display:'flex',gap:6,justifyContent:'center'}}>
                   <div style={{position:'relative'}}>
                     <button style={{...btn,fontSize:11,padding:'5px 10px'}} onClick={()=>setShowPresets(v=>!v)}>+ Bloque ▾</button>
                     {showPresets&&(
-                      <div style={{position:'absolute',left:0,top:'calc(100% + 4px)',background:'white',border:`1px solid #C8C0B4`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.08)',zIndex:20,width:180,padding:'4px 0'}}>
+                      <div style={{position:'absolute',left:'50%',transform:'translateX(-50%)',top:'calc(100% + 4px)',background:'white',border:`1px solid #C8C0B4`,borderRadius:10,boxShadow:'0 4px 16px rgba(0,0,0,0.12)',zIndex:20,width:'min(200px,85vw)',padding:'4px 0'}}>
                         {BLOQUES_PRESET.map(b=>(
                           <button key={b.titulo} onClick={()=>addBlock('bloque',b)}
-                            style={{width:'100%',textAlign:'left',padding:'8px 14px',fontSize:11,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.txt,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            onMouseEnter={e=>(e.currentTarget.style.background='#F5F0E6')}
+                            onMouseLeave={e=>(e.currentTarget.style.background='none')}
+                            style={{width:'100%',textAlign:'left',padding:'8px 14px',fontSize:11,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.txt,display:'flex',justifyContent:'space-between',alignItems:'center',transition:'background 0.15s'}}>
                             {b.titulo}<span style={{fontSize:9,color:C.muted}}>{toMMSS(b.duracion_min)}</span>
                           </button>
                         ))}
                         <div style={{borderTop:`1px solid #C8C0B4`,margin:'2px 0'}}/>
-                        <button onClick={()=>addBlock('bloque')} style={{width:'100%',textAlign:'left',padding:'8px 14px',fontSize:11,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.muted}}>
+                        <button onClick={()=>addBlock('bloque')}
+                          onMouseEnter={e=>(e.currentTarget.style.background='#F5F0E6')}
+                          onMouseLeave={e=>(e.currentTarget.style.background='none')}
+                          style={{width:'100%',textAlign:'left',padding:'8px 14px',fontSize:11,fontFamily:'inherit',background:'none',border:'none',cursor:'pointer',color:C.muted,transition:'background 0.15s'}}>
                           + Personalizado
                         </button>
                       </div>
