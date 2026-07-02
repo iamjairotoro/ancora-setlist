@@ -554,32 +554,38 @@ export default function PortalPage() {
             <div style={{display:'flex',flexDirection:'column',gap:6}}>
               {filteredSongs.map(song=>{
                 const isOpen=expandedSong===song.id
+                const hasDetails=song.tono_original||song.bpm||song.compas||song.duracion_min||song.link_spotify||song.link_letras||song.link_recursos||song.notas
                 return(
-                  <div key={song.id} style={{background:C.crema,borderRadius:12,overflow:'hidden',border:`0.5px solid ${C.cremaDark}`}}>
+                  <div key={song.id} style={{background:C.crema,borderRadius:10,overflow:'hidden',border:`0.5px solid ${C.cremaDark}`}}>
                     <button onClick={()=>setExpandedSong(isOpen?null:song.id)}
-                      style={{width:'100%',textAlign:'left' as const,padding:'12px 14px',display:'flex',alignItems:'center',gap:12,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
-                      <div style={{width:38,height:38,borderRadius:9,background:C.txt,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:18}}>🎵</div>
+                      style={{width:'100%',textAlign:'left' as const,padding:'10px 14px',display:'flex',alignItems:'center',gap:10,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
                       <div style={{flex:1,minWidth:0}}>
-                        <p style={{fontSize:15,fontWeight:700,color:C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const}}>{song.nombre}</p>
-                        <p style={{fontSize:12,fontWeight:400,color:C.muted,marginTop:2}}>{song.artista}</p>
-                        <div style={{display:'flex',gap:4,marginTop:5,flexWrap:'wrap' as const}}>
-                          {song.tono_original&&<span style={{fontSize:10,fontWeight:700,background:'rgba(0,0,0,0.07)',color:C.txt,padding:'2px 6px',borderRadius:10}}>{song.tono_original}</span>}
-                          {song.bpm&&<span style={{fontSize:10,background:'rgba(201,161,74,0.15)',color:'#92400E',padding:'2px 6px',borderRadius:10}}>♩{song.bpm}</span>}
-                          {song.compas&&<span style={{fontSize:10,background:C.crema,color:C.muted,padding:'2px 6px',borderRadius:10}}>{song.compas}</span>}
-                          {song.duracion_min&&<span style={{fontSize:10,background:C.crema,color:C.muted,padding:'2px 6px',borderRadius:10}}>{toMMSS(song.duracion_min)}</span>}
-                        </div>
+                        <p style={{fontSize:14,fontWeight:600,color:C.txt,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const}}>{song.nombre}</p>
+                        <p style={{fontSize:11,fontWeight:400,color:C.muted,marginTop:1}}>{song.artista}</p>
                       </div>
-                      <span style={{color:C.muted,fontSize:12,transform:isOpen?'rotate(180deg)':'none',transition:'transform 0.2s'}}>▼</span>
+                      {hasDetails&&<span style={{color:C.muted,fontSize:11,transform:isOpen?'rotate(180deg)':'none',transition:'transform 0.2s',flexShrink:0}}>▼</span>}
                     </button>
                     {isOpen&&(
-                      <div style={{borderTop:`0.5px solid ${C.crema}`,padding:'12px 14px'}}>
-                        {song.notas&&<div style={{background:'#FFFBEB',borderRadius:8,padding:'8px 10px',marginBottom:10}}><p style={{fontSize:10,color:'#92400E',fontWeight:600,marginBottom:3}}>📝 Notas</p><p style={{fontSize:12,color:'#92400E',fontWeight:400}}>{song.notas}</p></div>}
-                        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6}}>
-                          {song.link_spotify&&<a href={song.link_spotify} target="_blank" style={{background:'#D8F3DC',borderRadius:8,padding:'7px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:15,marginBottom:1}}>🎧</div><span style={{fontSize:9,fontWeight:700,color:'#1B4332'}}>Spotify</span></a>}
-                          {song.link_letras&&<a href={song.link_letras} target="_blank" style={{background:'#DBE4FF',borderRadius:8,padding:'7px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:15,marginBottom:1}}>📄</div><span style={{fontSize:9,fontWeight:700,color:'#1971C2'}}>Letras</span></a>}
-                          {song.link_recursos&&<a href={song.link_recursos} target="_blank" style={{background:'#FFF3CD',borderRadius:8,padding:'7px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:15,marginBottom:1}}>📁</div><span style={{fontSize:9,fontWeight:700,color:'#92400E'}}>Recursos</span></a>}
-                        </div>
-                        {!song.link_spotify&&!song.link_letras&&!song.link_recursos&&<p style={{fontSize:12,fontWeight:400,color:C.muted,textAlign:'center' as const,padding:'8px 0'}}>Sin links disponibles</p>}
+                      <div style={{borderTop:`0.5px solid ${C.cremaDark}`,padding:'10px 14px',background:'white'}}>
+                        {/* Metadata */}
+                        {(song.tono_original||song.bpm||song.compas||song.duracion_min)&&(
+                          <div style={{display:'flex',gap:5,flexWrap:'wrap' as const,marginBottom:10}}>
+                            {song.tono_original&&<span style={{fontSize:11,fontWeight:700,background:'rgba(0,0,0,0.07)',color:C.txt,padding:'3px 8px',borderRadius:10}}>{song.tono_original}</span>}
+                            {song.bpm&&<span style={{fontSize:11,background:'rgba(201,161,74,0.15)',color:'#92400E',padding:'3px 8px',borderRadius:10}}>♩ {song.bpm} BPM</span>}
+                            {song.compas&&<span style={{fontSize:11,background:'rgba(0,0,0,0.05)',color:C.muted,padding:'3px 8px',borderRadius:10}}>{song.compas}</span>}
+                            {song.duracion_min&&<span style={{fontSize:11,background:'rgba(0,0,0,0.05)',color:C.muted,padding:'3px 8px',borderRadius:10}}>{toMMSS(song.duracion_min)}</span>}
+                          </div>
+                        )}
+                        {/* Notas */}
+                        {song.notas&&<div style={{background:'#FFFBEB',borderRadius:8,padding:'7px 10px',marginBottom:10}}><p style={{fontSize:11,color:'#92400E'}}>{song.notas}</p></div>}
+                        {/* Links */}
+                        {(song.link_spotify||song.link_letras||song.link_recursos)&&(
+                          <div style={{display:'flex',gap:6}}>
+                            {song.link_spotify&&<a href={song.link_spotify} target="_blank" style={{flex:1,background:'#D8F3DC',borderRadius:8,padding:'7px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:14,marginBottom:1}}>🎧</div><span style={{fontSize:9,fontWeight:700,color:'#1B4332'}}>Spotify</span></a>}
+                            {song.link_letras&&<a href={song.link_letras} target="_blank" style={{flex:1,background:'#DBE4FF',borderRadius:8,padding:'7px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:14,marginBottom:1}}>📄</div><span style={{fontSize:9,fontWeight:700,color:'#1971C2'}}>Letras</span></a>}
+                            {song.link_recursos&&<a href={song.link_recursos} target="_blank" style={{flex:1,background:'#FFF3CD',borderRadius:8,padding:'7px 4px',textAlign:'center' as const,textDecoration:'none',display:'block'}}><div style={{fontSize:14,marginBottom:1}}>📁</div><span style={{fontSize:9,fontWeight:700,color:'#92400E'}}>Recursos</span></a>}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
