@@ -66,6 +66,11 @@ export default function PortalPage() {
     setProfileData({nombre:data.member.nombre,apellido:data.member.apellido||'',telefono:data.member.telefono||'',fecha_nacimiento:data.member.fecha_nacimiento||''})
     if (data.services.length>0) setExpandedSvc(prev=>prev||data.services[0].service.id)
 
+    // Registrar última conexión
+    if (data.member?.id) {
+      supabase.from('members').update({ last_seen: new Date().toISOString() }).eq('id', data.member.id)
+    }
+
     // Cargar todos los servicios futuros (para Mis domingos)
     const svcsRes = await fetch('/api/all-services')
     const svcsData = svcsRes.ok ? await svcsRes.json() : { services: [] }

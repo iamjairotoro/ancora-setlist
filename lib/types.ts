@@ -12,6 +12,7 @@ export interface Member {
   instrumentos: Instrument[]
   avatar_url?: string
   fecha_nacimiento?: string
+  last_seen?: string
   created_at: string
 }
 

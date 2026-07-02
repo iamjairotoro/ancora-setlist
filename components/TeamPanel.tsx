@@ -146,6 +146,14 @@ export default function TeamPanel({ members, onRefresh }: Props) {
                 ))}
               </div>
               <p className="text-sm text-gray-500 truncate">{m.email}</p>
+              {m.last_seen && (
+                <p className="text-xs text-gray-400 mt-0.5">
+                  🟢 {new Date(m.last_seen).toLocaleDateString('es-CL',{day:'numeric',month:'short'})} · {new Date(m.last_seen).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})}
+                </p>
+              )}
+              {!m.last_seen && (
+                <p className="text-xs text-gray-300 mt-0.5">Sin conexión aún</p>
+              )}
               {m.fecha_nacimiento && (
                 <p className="text-xs text-gray-400 mt-0.5">
                   Nac. {new Date(m.fecha_nacimiento+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})}
